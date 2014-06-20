@@ -1,0 +1,178 @@
+import nIOp
+
+#origParameter = Parameter
+from pyqtgraph.parametertree.Parameter import Parameter as origParameter
+from pyqtgraph.parametertree.Parameter import registerParameterType
+
+from pyqtgraph.parametertree.Parameter import PARAM_TYPES, PARAM_NAMES
+
+#origParameter.create = 
+
+from nIOp import log
+
+
+
+
+class Parameter(origParameter):
+
+	@staticmethod
+	def create(**opts):
+		#NEW#
+		if opts['type'] not in ('group', 'action'):
+			#if 'select' not in opts:
+			#	opts['select'] = False
+			if 'setValue' not in opts:
+				#if arg not in opts:
+				pass
+				#raise KeyError("needed key 'type' not in opts '%s'" %(opts) )
+			if 'value' not in opts:
+				if 'getValue' not in opts:
+					pass
+					#raise KeyError("if a parameter doesn't have a 'get'-key it has to have a 'values' key in dict '%s'" %(opts) )
+				else:
+					opts['value'] = opts['getValue'] ()
+			#if 'getLimits' in opts and 'limits' not in opts:
+			try:
+
+				opts['limits'] = opts['getLimits'] ()
+			except KeyError:
+				pass
+
+		#ORIG#
+		typ = opts.get('type', None)
+		if typ is None:
+			cls = Parameter
+		else:
+			cls = PARAM_TYPES[opts['type']]
+		return cls(**opts)
+
+
+	def __init__(self,**opts):
+		origParameter.__init__(self, **opts)
+		self._gui = nIOp.getGui()
+
+
+		if self.opts['type'] != 'group':
+			#self._checkSelect()
+			x = self.sigValueChanged
+			if self.opts['type'] == 'action':
+				x = self.sigActivated
+			x.connect(self._setValue)
+			x.connect(self._gui.updateParams)
+			self._gui.addParam(self)
+
+
+	def _checkSelect(self):
+		try:
+			if self.opts['select']:
+
+				for c in self.children():
+
+					if c.name() == self.value():
+						c.show()
+					else:
+						c.hide()
+		except KeyError:
+			pass
+
+
+
+	def _setValue(self):
+		self._checkSelect()
+		try:
+			method = self.opts['setValue']
+			arg = self.value()
+			out = method(arg)
+			log.logSetMethod(out, method,arg)
+
+
+		except KeyError:
+			pass
+
+
+	def parentChanged(self,parent):
+		if parent:
+			try:
+				if parent.opts['select']:
+					if self.value() != parent.name():
+						self.hide()
+					if parent.isType('list') and self.name() not in parent.opts['limits']:
+						parent.opts['limits'].append(self.name())
+			except KeyError:
+				pass #no select
+
+		else:
+			self.parent()._removeListEntry(self.name())
+
+
+		super(Parameter,self).parentChanged(parent)
+
+	def _removeListEntry(self, entry):
+		try:
+			l = self.opts['limits']
+			i = l.index(entry)
+			l.pop(i)
+			self.sigLimitsChanged.emit(self, l)
+		except KeyError, ValueError:
+			pass
+
+
+	def setValues(self, opts):
+		if opts:
+			for key in opts:
+
+				k = key
+				if "," in k:
+					k = tuple(key.split(","))
+				self.param(k).setValue(opts[key])
+
+
+	def update(self):
+
+		try:
+			v = self.opts['getValue']()
+			if v != self.value():
+				self.setValue(v)
+		except:
+			pass
+		try:
+			v = self.opts['getLimits']()
+			if v != self.opts['limits']:
+				self.setLimits(v)
+		except:
+			pass
+
+
+	def insertChild(self,pos, child):
+		"""
+		Insert a new child at pos.
+		If pos is a Parameter, then insert at the position of that Parameter.
+		If child is a dict, then a parameter is constructed using
+		:func:`Parameter.create <pyqtgraph.parametertree.Parameter.create>`.
+		"""
+		if isinstance(child, dict):
+			child = Parameter.create(**child)
+		
+		name = child.name()
+		if name in self.names and child is not self.names[name]:
+			if child.opts.get('autoIncrementName', False):
+				name = self.incrementName(name)
+				child.setName(name)
+			else:
+				raise Exception("Already have child named %s" % str(name))
+		if isinstance(pos, Parameter):
+			pos = self.childs.index(pos)
+			
+		with self.treeChangeBlocker():
+			if child.parent() is not None:
+				child.remove()
+				
+			self.names[name] = child
+			self.childs.insert(pos, child)
+			#print 666666666666666,self
+			child.parentChanged(self)
+			#print child.parent(),989898
+			self.sigChildAdded.emit(self, child, pos)
+			child.sigTreeStateChanged.connect(self.treeStateChanged)
+		return child
+		#return origParameter.insertChild(self, pos, child)
