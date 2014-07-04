@@ -19,6 +19,8 @@ import tempfile
 
 class Launcher(QtGui.QMainWindow):
 	'''main class for the Launcher'''
+	CONFIG_FILE = PathStr.home().join(__name__)
+
 	def __init__(self,
 			title='PYZ-Launcher',
 			icon=None,
@@ -65,7 +67,6 @@ class Launcher(QtGui.QMainWindow):
 
 
 		self._start_script = start_script
-		self._config_file = PathStr.home().join(__name__)
 		self.setWindowTitle(title)
 		self.setWindowIcon(QtGui.QIcon(icon))
 		self.resize(900,500)
@@ -132,9 +133,9 @@ class Launcher(QtGui.QMainWindow):
 
 		#get last root-path
 		self._path = PathStr('')
-		if self._config_file:
+		if Launcher.CONFIG_FILE:
 			try:
-				self._path = PathStr(open(self._config_file, 'r').read().decode('unicode-escape'))
+				self._path = PathStr(open(Launcher.CONFIG_FILE, 'r').read().decode('unicode-escape'))
 			except IOError:
 				pass #file not existant
 		if not self._path or not self._path.exists():
@@ -167,7 +168,7 @@ class Launcher(QtGui.QMainWindow):
 	@staticmethod
 	def rootDir():
 		try:
-			return PathStr(open(config_file, 'r').read().decode('unicode-escape'))
+			return PathStr(open(Launcher.CONFIG_FILE, 'r').read().decode('unicode-escape'))
 		except IOError:#create starter
 			return PathStr.home()
 		
@@ -195,8 +196,8 @@ class Launcher(QtGui.QMainWindow):
 		root = self.fileSystemModel.setRootPath(self._path)
 		self.treeView.setRootIndex(root)
 		#save last path to file
-		if self._config_file:
-			open(self._config_file, 'w').write(self._path.encode('unicode-escape'))
+		if Launcher.CONFIG_FILE:
+			open(Launcher.CONFIG_FILE, 'w').write(self._path.encode('unicode-escape'))
 
 
 	def _openNew(self):

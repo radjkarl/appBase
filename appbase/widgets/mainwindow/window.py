@@ -10,7 +10,16 @@
 from QtRec import QtGui
 
 from menubar import MenuBar
-import appbase
+#import appbase
+try:
+	from __main__ import Application
+except:
+	from appbase.application import Application
+
+
+#from fancywidgets.messageDock import MessageDock
+#from fancywidgets.dockArea import DockArea
+
 
 
 class MainWindow(QtGui.QMainWindow):
@@ -21,7 +30,8 @@ class MainWindow(QtGui.QMainWindow):
 	def __init__(self, title=''):
 		super(MainWindow, self).__init__()
 		self.app = QtGui.QApplication.instance()
-		if not isinstance(self.app, appbase.application.Application):
+
+		if not isinstance(self.app, Application):
 			print 'Error: QApp is no instance from appbase.Application'
 			return
 
@@ -29,7 +39,15 @@ class MainWindow(QtGui.QMainWindow):
 
 		self._window_title = title
 		self.setMenuBar(MenuBar())
+
+		#TODO: loggen und in messagebar schreiben
+		#TODO: normale größe von messagebar eine zeile - bei doppelklick glöcker/kleiner
+
 		self.setTitle()
+		#area = DockArea()
+		#self.setCentralWidget(area)
+		#md = MessageDock(size=(1,1))
+		#area.addDock(md)
 
 
 	def setTitle(self, path=''):

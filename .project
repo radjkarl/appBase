@@ -3,6 +3,9 @@
 	<name>appBase</name>
 	<comment></comment>
 	<projects>
+		<project>fancyTools</project>
+		<project>fancyWidgets</project>
+		<project>QtRec</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

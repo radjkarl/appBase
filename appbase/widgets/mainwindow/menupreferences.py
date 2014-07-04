@@ -4,7 +4,7 @@ import QtRec
 from QtRec import QtGui, QtCore
 from appbase.widgets import dialogs
 #import os
-from appbase.widgets.textEditor import MinimalTextEditor
+from fancywidgets import FwMinimalTextEditor
 
 
 from fancytools.os import userName
@@ -31,17 +31,21 @@ class MenuPreferences(QtGui.QWidget):
 		qtrecPrefs.setLayout(qtrecLayout)
 		vlayout.addWidget(qtrecPrefs)
 
-		b = QtGui.QRadioButton('Save time stamp')
-		b.setChecked(QtRec.save_time_stamp)
-		b.toggled.connect(QtRec.setSaveTimeStep)
-		b.setToolTip(QtRec.setSaveTimeStep.__doc__)
+		b = QtGui.QCheckBox('Save time stamp')
+		b.setChecked(QtRec.core.save_time_stamp)
+		#b.toggled.connect(QtRec.core.setSaveTimeStep)
+		b.toggled.connect(lambda x: setattr(QtRec.core, 'save_time_stamp', x))
+
+		#b.setToolTip(QtRec.core.setSaveTimeStep.__doc__)
 
 		qtrecLayout.addWidget(b)
 
-		b = QtGui.QRadioButton('Save History')
-		b.setChecked(QtRec.save_history)
-		b.toggled.connect(QtRec.setSaveHistory)
-		b.setToolTip(QtRec.setSaveHistory.__doc__)
+		b = QtGui.QCheckBox('Save History')
+		b.setChecked(QtRec.core.save_history)
+		#b.toggled.connect(QtRec.core.setSaveHistory)
+		b.toggled.connect(lambda x: setattr(QtRec.core, 'save_history', x))
+
+		#b.setToolTip(QtRec.core.setSaveHistory.__doc__)
 		qtrecLayout.addWidget(b)
 
 		self.interval = QtGui.QLabel()
@@ -56,39 +60,39 @@ class MenuPreferences(QtGui.QWidget):
 		else:
 			self._updateInterval(5)
 
-		file_desc = QtGui.nolog.QGroupBox('File Information')
-		layout = QtGui.nolog.QVBoxLayout()
+		file_desc = QtGui.origQtGui.QGroupBox('File Information')
+		layout = QtGui.origQtGui.QVBoxLayout()
 
-		iconChoose = QtGui.nolog.QComboBox()
+		iconChoose = QtGui.origQtGui.QComboBox()
 		if self.app:
 			self._iconPath = self.app.session.tmp_dir_session.join('icon')
 			if self._iconPath.exists():
-				iconChoose.addItem (QtGui.nolog.QIcon(self._iconPath), 'Recent')
+				iconChoose.addItem (QtGui.origQtGui.QIcon(self._iconPath), 'Recent')
 			else:
 				self._iconPath = appbase.logo_path
-			iconChoose.addItem (QtGui.nolog.QIcon(appbase.logo_path), 'Default')
+			iconChoose.addItem (QtGui.origQtGui.QIcon(appbase.logo_path), 'Default')
 		else:
 			iconChoose.addItem('None')
 		iconChoose.addItem('Individual')
 		iconChoose.activated[unicode].connect(self._cooseIndividualIcon)
 
-		iconLayout = QtGui.nolog.QHBoxLayout()
-		iconLayout.addWidget(QtGui.nolog.QLabel('Icon:'))
+		iconLayout = QtGui.origQtGui.QHBoxLayout()
+		iconLayout.addWidget(QtGui.origQtGui.QLabel('Icon:'))
 		iconLayout.addWidget(iconChoose)
 		layout.addLayout(iconLayout)
 
 		#CHOOSE A SCREENSHOT A SHOW IN THE LAUNCHER DETAILS AREA
 		self._lastSchreenshotWindow = None
 		self._screenshot_from_window = None
-		screenshotLayout = QtGui.nolog.QHBoxLayout()
-		screenshotLayout.addWidget(QtGui.nolog.QLabel('Screenshot:'))
-		self._screenshotChoose = QtGui.nolog.QComboBox()
+		screenshotLayout = QtGui.origQtGui.QHBoxLayout()
+		screenshotLayout.addWidget(QtGui.origQtGui.QLabel('Screenshot:'))
+		self._screenshotChoose = QtGui.origQtGui.QComboBox()
 		self._screenshotChoose.currentIndexChanged.connect(self._chosenScreenshotWindowChanged)
 		screenshotLayout.addWidget(self._screenshotChoose)
 		layout.addLayout(screenshotLayout)
 
 		#CREATE A DESCRIPTION TEXT
-		self.descritionEditior = MinimalTextEditor(self)
+		self.descritionEditior = FwMinimalTextEditor(self)
 		descriptionText = ''
 		if self.app:
 			descriptionText = self.app.session.getSavedContent('description')

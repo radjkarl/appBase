@@ -14,42 +14,42 @@ class MenuBar(QtGui.QMenuBar):
 		super(MenuBar, self).__init__()
 		self.app = QtGui.QApplication.instance()
 		#MENU - FILE
-		self.menu_file = self.addMenu('&File')
+		self.menu_session = self.addMenu('&Session')
 
-		new_add = self.menu_file.addAction('New - add')
+		new_add = self.menu_session.addAction('New - add')
 		new_add.setStatusTip('...in new window')
 		new_add.setShortcuts(QtGui.QKeySequence.New)
 
-		new_rep = self.menu_file.addAction('New - replace')
+		new_rep = self.menu_session.addAction('New - replace')
 		new_rep.setStatusTip('...replace this window')
 		key_new_replace = QtGui.QKeySequence(QtCore.Qt.CTRL + QtCore.Qt.SHIFT + QtCore.Qt.Key_N)
 		new_rep.setShortcuts(key_new_replace)
 
-		self.menu_file.addSeparator()
+		self.menu_session.addSeparator()
 
-		save = self.menu_file.addAction('Save')
+		save = self.menu_session.addAction('Save')
 		save.setStatusTip('Override last saved session')
 		save.setShortcuts(QtGui.QKeySequence.Save)
 
-		save_as = self.menu_file.addAction('Save As')
+		save_as = self.menu_session.addAction('Save As')
 		save.setStatusTip('Choose a name')
 		save_as.setShortcuts(QtGui.QKeySequence.SaveAs)
 
-		self.menu_file.addSeparator()
+		self.menu_session.addSeparator()
 
-		open_add = self.menu_file.addAction('Open - add')
+		open_add = self.menu_session.addAction('Open - add')
 		open_add.setStatusTip('...in new window')
 		open_add.setShortcuts(QtGui.QKeySequence.Open)
 
-		open_rep = self.menu_file.addAction('Open - replace')
+		open_rep = self.menu_session.addAction('Open - replace')
 		open_rep.setStatusTip('...replace this window')
 		key_open_replace = QtGui.QKeySequence(QtCore.Qt.CTRL + QtCore.Qt.SHIFT + QtCore.Qt.Key_O)
 		open_rep.setShortcuts(key_open_replace)
 
-		self.menu_file.addSeparator()
+		self.menu_session.addSeparator()
 		self.file_preferences = MenuPreferences(self)
 		#print preferences, preferences.show()
-		prefBtn = self.menu_file.addAction('Preferences')
+		prefBtn = self.menu_session.addAction('Preferences')
 		prefBtn.triggered.connect(self.file_preferences.show)
 
 
@@ -58,12 +58,12 @@ class MenuBar(QtGui.QMenuBar):
 
 		undo = self.menu_edit.addAction('Undo')
 		#undo.setStatusTip('...')
-		undo.triggered.connect(QtRec.undo)
+		undo.triggered.connect(QtRec.core.undo)
 		undo.setShortcuts(QtGui.QKeySequence.Undo)
 
 		redo = self.menu_edit.addAction('Redo')
 		#redo.setStatusTip('...')
-		redo.triggered.connect(QtRec.redo)
+		redo.triggered.connect(QtRec.core.redo)
 		redo.setShortcuts(QtGui.QKeySequence.Redo)
 
 		#self.menu_edit.addSeparator()
@@ -127,9 +127,9 @@ class MenuBar(QtGui.QMenuBar):
 
 	def toggleFullScreen(self):
 		'''toggle between fullscreen and normal window'''
-		if self.isFullScreen():
+		if self.parent().isFullScreen():
 			self.ckBox_fullscreen.setChecked(False)
-			self.showNormal()
+			self.parent().showNormal()
 		else:
 			self.ckBox_fullscreen.setChecked(True)
-			self.showFullScreen()
+			self.parent().showFullScreen()

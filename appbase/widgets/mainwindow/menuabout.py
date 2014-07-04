@@ -3,7 +3,7 @@ import appbase
 from QtRec import QtGui, QtCore
 import appbase.widgets.dialogs
 import os
-from appbase.widgets.textEditor import MinimalTextEditor
+from fancywidgets import FwMinimalTextEditor
 
 
 from fancytools.os import userName
@@ -36,30 +36,30 @@ class MenuAbout(QtGui.QWidget):
 		#else:
 		self._updateInterval(5)
 
-		file_desc = QtGui.nolog.QGroupBox('File Information')
-		layout = QtGui.nolog.QVBoxLayout()
+		file_desc = QtGui.origQtGui.QGroupBox('File Information')
+		layout = QtGui.origQtGui.QVBoxLayout()
 
 
-		iconText =  QtGui.nolog.QLabel('Icon:')
-		iconChoose = QtGui.nolog.QComboBox()
+		iconText =  QtGui.origQtGui.QLabel('Icon:')
+		iconChoose = QtGui.origQtGui.QComboBox()
 
 		#if self.app:
 		iconPath = self.app.session.tmp_dir_session.join('icon')
 		if iconPath.exists():
-			iconChoose.addItem (QtGui.nolog.QIcon(iconPath), 'Recent')
-		iconChoose.addItem (QtGui.nolog.QIcon(appbase.logo_path), 'Default')
+			iconChoose.addItem (QtGui.origQtGui.QIcon(iconPath), 'Recent')
+		iconChoose.addItem (QtGui.origQtGui.QIcon(appbase.logo_path), 'Default')
 		#else:
 		#	iconChoose.addItem('None')
 		iconChoose.addItem('Individual')
 		iconChoose.activated[unicode].connect(self._cooseIndividualIcon)
 
-		iconLayout = QtGui.nolog.QHBoxLayout()
+		iconLayout = QtGui.origQtGui.QHBoxLayout()
 		iconLayout.addWidget(iconText)
 		iconLayout.addWidget(iconChoose)
 
 
 		layout.addLayout(iconLayout)
-		self.descritionEditior = MinimalTextEditor(self)
+		self.descritionEditior = FwMinimalTextEditor(self)
 
 		descriptionText = ''
 		if self.app:

@@ -25,8 +25,8 @@ from zipfile import ZipFile
 import __main__
 
 import QtRec
-from QtRec import QtCore, QtGui
 
+from QtRec import QtCore, QtGui
 
 
 
@@ -102,7 +102,7 @@ class _Session(QtCore.QObject):
 			#...as last save-number +1
 			self._save_file_name = savefolder.join( '%s.py' %str(int(d[-1][:-3]) + 1 ))
 			#create one singe file form all saved ones
-			with open(QtRec.log_file_name, "wb") as outfile:
+			with open(QtRec.core.log_file_name, "wb") as outfile:
 				for f in d:
 					with open(savefolder.join(f), "rb") as infile:
 						outfile.write(infile.read())
@@ -139,7 +139,7 @@ class _Session(QtCore.QObject):
 		self.timerAutosave = QtCore.QTimer()
 		self.autosave_interval = 5
 		self.timerAutosave.setInterval(self.autosave_interval*60*1000)
-		self.timerAutosave.timeout.connect(lambda path=path: self.saveAs(path))
+		self.timerAutosave.timeout.connect(lambda path=path: self._save(path))
 
 
 	#TODO: copy evtl. in PathStr rein
@@ -292,9 +292,8 @@ class _Session(QtCore.QObject):
 
 
 	def _save(self, name):
-		print 44
 		self.sigSave.emit(self.tmp_dir_save_session)
-		QtRec.saveAs(self._save_file_name)
+		QtRec.core.saveAs(self._save_file_name)
 		if not self.tmp_dir_save_session.join('__main__.py').exists():
 			#because opened from regular .py
 			self.addFileToSave(__main__.__file__, '__main__.py')
@@ -339,29 +338,35 @@ class Application(QtGui.QApplication):#Structure):
 
 
 if __name__ == '__main__':
+	#from QtRec import QtGui
+	QtRec.core.print_class_not_found = False
+
+
 	from appbase.widgets.mainwindow.window import MainWindow
 	from appbase.widgets.textEditor import TextEditor
-	from appbase.widgets.dockArea import DockArea
-	from appbase.widgets.dock import Dock
+	from fancywidgets.dockArea import DockArea
+	from fancywidgets.dock import Dock
 	from appbase. widgets.table import Table
-	from QtRec import QtGui
 
 
 	app = Application([])
+
+	win2 = TextEditor()
+	win2.show()
+
 	win = MainWindow(title='Hello World')
 
 
-	area = DockArea()
-	win.setCentralWidget(area)
-	d1 = Dock('one')#TODO: fold/unfold
-	d1.addWidget(Table())
-	area.addDock(d1)
+	#area = DockArea()
+	#win.setCentralWidget(area)
+	#d1 = Dock('one')#TODO: fold/unfold
+	#d1.addWidget(Table())
+	#area.addDock(d1)
 
 	win.show()
 
 
-	win2 = TextEditor()
-	win2.show()
+
 
 	sys.exit(app.exec_())
 
