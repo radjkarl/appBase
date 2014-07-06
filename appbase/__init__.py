@@ -1,5 +1,10 @@
 # -*- coding: utf-8 -*-
-import os
+import os as _os
+
+from Application import Application
+from Launcher import Launcher
+from MainWindow import MainWindow
+
 
 __version__ = '0.1.0'
 __author__ = 'Karl Bedrich'
@@ -23,9 +28,9 @@ __classifiers__ = [
 		'Topic :: Software Development :: Libraries :: Python Modules',
 		]
 
-_path = os.path.abspath(os.path.dirname(__file__))
-logo_path = os.path.join(_path,'media','logo.svg')
-icon_path = os.path.join(_path,'media','icons')
+_path = _os.path.abspath(_os.path.dirname(__file__))
+logo_path = _os.path.join(_path,'media','logo.svg')
+icon_path = _os.path.join(_path,'media','icons')
 
 
 
