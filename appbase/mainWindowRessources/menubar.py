@@ -72,6 +72,9 @@ class _MenuBarAppend(QtGui.QMenuBar):
 		new_action = self.insertMenu(before_action, new_menu)
 		return new_action
 
+
+
+
 class MenuBar(_MenuBarAppend):
 	
 	def __init__(self):
@@ -115,6 +118,8 @@ class MenuBar(_MenuBarAppend):
 		#print preferences, preferences.show()
 		self.menu_file.action_preferences = self.menu_file.addAction('Preferences')
 		self.menu_file.action_preferences.triggered.connect(self.file_preferences.show)
+
+		self.menu_file.addAction('Exit').triggered.connect(self.app.exit)
 
 
 		#MENU - EDIT
