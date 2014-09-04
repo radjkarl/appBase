@@ -3,29 +3,33 @@ import appbase
 import QtRec
 from QtRec import QtGui, QtCore
 #import os
-from fancywidgets import FwMinimalTextEditor
-from fancywidgets import Dialogs
+from fancywidgets.pyQtBased.FwMinimalTextEditor import FwMinimalTextEditor
+from fancywidgets.pyQtBased.Dialogs import Dialogs
+from fancywidgets.pyQtBased.FingerTabWidget import FingerTabWidget
 
-
-from fancytools.os import userName
+from fancytools.os.userName import userName
 
 
 _dialogs = Dialogs()
 
-class MenuPreferences(QtGui.QWidget):
 
-	def __init__(self, win, parent=None):
+class _TabSession(QtGui.QWidget):
+	'''
+	The tab 'session' in the preferences widget
+	'''
+	def __init__(self, prefWindow):
+		super(_TabSession, self).__init__()
+		self._pref_window = prefWindow
+		prefWindow.sigClosed.connect(self._restoreLastScreenshotWindow)
 
-		super(MenuPreferences, self).__init__(parent, logparent=win)
-		self.setWindowTitle('Preferences')
 		self.app = QtGui.QApplication.instance()
 		self.app.session.sigSave.connect(self._saveToFile)
-
+		
 		self._iconPath = None
-
+	
 		vlayout = QtGui.QVBoxLayout()
 		self.setLayout(vlayout)
-
+		
 		qtrecPrefs = QtGui.QGroupBox("Record Activity")
 		qtrecLayout = QtGui.QVBoxLayout()
 		qtrecPrefs.setLayout(qtrecLayout)
@@ -37,21 +41,23 @@ class MenuPreferences(QtGui.QWidget):
 		b.toggled.connect(lambda x: setattr(QtRec.core, 'save_time_stamp', x))
 
 		#b.setToolTip(QtRec.core.setSaveTimeStep.__doc__)
-
+		
 		qtrecLayout.addWidget(b)
 
 		b = QtGui.QCheckBox('Save History')
 		b.setChecked(QtRec.core.save_history)
 		#b.toggled.connect(QtRec.core.setSaveHistory)
 		b.toggled.connect(lambda x: setattr(QtRec.core, 'save_history', x))
-
+		
 		#b.setToolTip(QtRec.core.setSaveHistory.__doc__)
 		qtrecLayout.addWidget(b)
-
+		
 		self.interval = QtGui.QLabel()
+		
 		self.slider = QtGui.QSlider(QtCore.Qt.Orientation(1), self, logname='AutosaveInterval')#1...horizontal
+		
 		self.slider.sliderMoved.connect(self._updateInterval)
-
+		
 		qtrecLayout.addWidget(self.interval)
 		qtrecLayout.addWidget(self.slider)
 		if self.app:
@@ -59,7 +65,7 @@ class MenuPreferences(QtGui.QWidget):
 			self._updateInterval(self.app.session.autosave_interval)
 		else:
 			self._updateInterval(5)
-
+		
 		file_desc = QtGui.origQtGui.QGroupBox('File Information')
 		layout = QtGui.origQtGui.QVBoxLayout()
 
@@ -75,12 +81,12 @@ class MenuPreferences(QtGui.QWidget):
 			iconChoose.addItem('None')
 		iconChoose.addItem('Individual')
 		iconChoose.activated[unicode].connect(self._cooseIndividualIcon)
-
+		
 		iconLayout = QtGui.origQtGui.QHBoxLayout()
 		iconLayout.addWidget(QtGui.origQtGui.QLabel('Icon:'))
 		iconLayout.addWidget(iconChoose)
 		layout.addLayout(iconLayout)
-
+		
 		#CHOOSE A SCREENSHOT A SHOW IN THE LAUNCHER DETAILS AREA
 		self._lastSchreenshotWindow = None
 		self._screenshot_from_window = None
@@ -90,9 +96,10 @@ class MenuPreferences(QtGui.QWidget):
 		self._screenshotChoose.currentIndexChanged.connect(self._chosenScreenshotWindowChanged)
 		screenshotLayout.addWidget(self._screenshotChoose)
 		layout.addLayout(screenshotLayout)
-
+		
 		#CREATE A DESCRIPTION TEXT
 		self.descritionEditior = FwMinimalTextEditor(self)
+		
 		descriptionText = ''
 		if self.app:
 			descriptionText = self.app.session.getSavedContent('description')
@@ -120,21 +127,30 @@ class MenuPreferences(QtGui.QWidget):
 
 
 	def _availWindows(self):
-		#must be a visible window but not this one
+		'''
+		returns a list of all widgets, that are:
+		* windows
+		* visible
+		* not the preferences window
+		'''
 		return [win for win in self.app.topLevelWidgets()
-			if not win.parent() and win.isVisible() and win != self]
+			if not win.parent() and win.isVisible() and win != self._pref_window]
 
 
 	def _chosenScreenshotWindowChanged(self, index):
 		self._restoreLastScreenshotWindow()
 		title = self._screenshotChoose.itemText(index)
-		win = self._name_2_win[unicode(title)]
-		p = win.palette()
-		self._lastSchreenshotWindow = (win, win.autoFillBackground(), p.color(win.backgroundRole()) )
-		win.setAutoFillBackground(True)
-		p.setColor(win.backgroundRole(), QtCore.Qt.red)
-		win.setPalette(p)
-		self._screenshot_from_window = win
+		#only indicate the window (e.g. by changing color) if:
+		# the window has a title
+		# there are more than one window to choose from
+		if title and len(self._name_2_win) > 1:
+			win = self._name_2_win[unicode(title)]
+			p = win.palette()
+			self._lastSchreenshotWindow = (win, win.autoFillBackground(), p.color(win.backgroundRole()) )
+			win.setAutoFillBackground(True)
+			p.setColor(win.backgroundRole(), QtCore.Qt.red)
+			win.setPalette(p)
+			self._screenshot_from_window = win
 
 
 	def _restoreLastScreenshotWindow(self):
@@ -159,7 +175,7 @@ class MenuPreferences(QtGui.QWidget):
 
 	def showEvent(self, event):
 		self._fillScreenshotChoose()
-		super(MenuPreferences, self).showEvent(event)
+		super(_TabSession, self).showEvent(event)
 
 
 	def _defaultDescription(self):
@@ -198,6 +214,26 @@ p, li { white-space: pre-wrap; }
 			self.app.session.timerAutosave.start()
 
 
+
+	
+
+class MenuPreferences(QtGui.QWidget):
+	sigClosed = QtCore.pyqtSignal()
+
+	def __init__(self, win, parent=None):
+		
+		super(MenuPreferences, self).__init__(parent, logparent=win)
+		self.setWindowTitle('Preferences')
+		self.resize(530,480)
+		#print FingerTabWidget,998
+		self.tabs = FingerTabWidget(self)
+		#print 777
+		self.tab_session = _TabSession(self)
+		#print 1
+		self.tabs.addTab(self.tab_session, 'Session')
+
+		
 	def closeEvent(self, evt):
-		self._restoreLastScreenshotWindow()
+		self.sigClosed.emit()
 		super(MenuPreferences, self).closeEvent(evt)
+

@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 #own
 import appbase
-from fancywidgets import Dialogs
-from fancytools.os import PathStr
+from fancytools.os.PathStr import PathStr
+from fancywidgets.pyQtBased.Dialogs import Dialogs
 
 #foreign
 from PyQt4 import QtGui, QtCore, QtSvg
@@ -31,7 +31,7 @@ class Launcher(QtGui.QMainWindow):
 			):
 		self.dialogs = Dialogs()
 
-		_path = os.path.abspath(os.path.dirname(__file__))
+		_path = PathStr.getcwd()
 		_default_text_color = '#3c3c3c'
 
 		if icon == None:
@@ -214,7 +214,7 @@ class _FileEditMenu(QtGui.QWidget):
 		QtGui.QWidget.__init__(self)
 		self._treeView = treeView
 		self._menu=QtGui.QMenu(self)
-		d = os.path.dirname(__file__)
+		d = PathStr.getcwd()
 		iconpath = os.path.join(d, 'media','icons','approve.svg')
 		self._actionStart = QtGui.QAction(QtGui.QIcon(iconpath),
 			'Start', self._treeView,

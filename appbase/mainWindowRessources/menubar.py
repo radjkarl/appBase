@@ -74,6 +74,7 @@ class _MenuBarAppend(QtGui.QMenuBar):
 
 
 
+			
 
 class MenuBar(_MenuBarAppend):
 	
@@ -81,8 +82,8 @@ class MenuBar(_MenuBarAppend):
 		super(MenuBar, self).__init__()
 		self.app = QtGui.QApplication.instance()
 		#MENU - FILE
-		self.menu_file = self.addMenu('&File')
 
+		self.menu_file = self.addMenu('&File')
 		new_add = self.menu_file.addAction('New - add')
 		new_add.setStatusTip('...in new window')
 		new_add.setShortcuts(QtGui.QKeySequence.New)
@@ -91,19 +92,16 @@ class MenuBar(_MenuBarAppend):
 		new_rep.setStatusTip('...replace this window')
 		key_new_replace = QtGui.QKeySequence(QtCore.Qt.CTRL + QtCore.Qt.SHIFT + QtCore.Qt.Key_N)
 		new_rep.setShortcuts(key_new_replace)
-
 		self.menu_file.addSeparator()
 
 		save = self.menu_file.addAction('Save')
 		save.setStatusTip('Override last saved session')
 		save.setShortcuts(QtGui.QKeySequence.Save)
-
 		save_as = self.menu_file.addAction('Save As')
 		save.setStatusTip('Choose a name')
 		save_as.setShortcuts(QtGui.QKeySequence.SaveAs)
 
 		self.menu_file.addSeparator()
-
 		open_add = self.menu_file.addAction('Open - add')
 		open_add.setStatusTip('...in new window')
 		open_add.setShortcuts(QtGui.QKeySequence.Open)
@@ -112,7 +110,6 @@ class MenuBar(_MenuBarAppend):
 		open_rep.setStatusTip('...replace this window')
 		key_open_replace = QtGui.QKeySequence(QtCore.Qt.CTRL + QtCore.Qt.SHIFT + QtCore.Qt.Key_O)
 		open_rep.setShortcuts(key_open_replace)
-
 		self.menu_file.addSeparator()
 		self.file_preferences = MenuPreferences(self)
 		#print preferences, preferences.show()
@@ -120,7 +117,6 @@ class MenuBar(_MenuBarAppend):
 		self.menu_file.action_preferences.triggered.connect(self.file_preferences.show)
 
 		self.menu_file.addAction('Exit').triggered.connect(self.app.exit)
-
 
 		#MENU - EDIT
 		self.menu_edit = self.addMenu('&Edit')
@@ -183,15 +179,21 @@ class MenuBar(_MenuBarAppend):
 		#connecting to app
 		#try:
 		s = self.app.session
-		#i = self.app.identity
-		#self.setWindowIcon(QtGui.QIcon(appbase.logo_path))
 		new_add.triggered.connect(s.newAdd)
-		new_rep.triggered.connect(s.newReplace)
+		new_rep.triggered.connect(self._newReplace)
 		save.triggered.connect(s.save)
 		save_as.triggered.connect(s.saveAs)
 		open_add.triggered.connect(s.openAdd)
 		open_rep.triggered.connect(s.openReplace)
 
+
+	def _newReplace(self):
+		#ask: are you sure
+		reply = QtGui.QMessageBox.question(self, 
+			'Replace this Program', 'Are you sure?', 
+			QtGui.QMessageBox.Yes, QtGui.QMessageBox.No)
+		if reply == QtGui.QMessageBox.Yes:
+			self.app.session.newReplace()
 
 
 	def toggleFullScreen(self):
