@@ -33,25 +33,46 @@ class MainWindow(QtGui.QMainWindow):
 		if not isinstance(self.app, Application):
 			print 'Error: QApp is no instance from appbase.Application'
 			return
-		self.app.session.sigPathChanged.connect(self.setTitle)
+		self.app.session.sigPathChanged.connect(self.setTitlePath)
 
 		self._window_title = title
+		self._window_title_additive = ''
+		self._window_title_path = ''
+		
 		self.setMenuBar(MenuBar())
-		self.setTitle()
+		self._setTitle()
 
 
-	def setTitle(self, path=''):
-		#if self.app:
-		if self._window_title:
-			if path:
-				title = "(%s) || %s" %(self._window_title,path)
-			else:
-				title = self._window_title
+	def setTitleAdditive(self, value=''):
+		if value:
+			self._window_title_additive = '- %s' %value
 		else:
-			title = path
+			self._window_title_additive = value		
+		self._setTitle()
+
+
+	def setTitlePath(self, value=''):
+		if value:
+			self._window_title_path = '- %s' %value
+		else:
+			self._window_title_path = value
+# 		#if self.app:
+# 		if self._window_title:
+# 			if path:
+# 				title = "%s || %s" %(self._window_title,path)
+# 			else:
+# 				title = self._window_title
+# 		else:
+# 			title = path
+		self._setTitle()
+		
+		
+	def _setTitle(self):
 		##if path.endswith('.pyz'):
 		#title += ' || %s'%path
-		self.setWindowTitle(title)
+		self.setWindowTitle('%s %s %s' %(self._window_title, 
+										self._window_title_additive, 
+										self._window_title_path) )
 
 
 
