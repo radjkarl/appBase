@@ -19,7 +19,7 @@ import os as _os
 # except ImportError, err:
 # 	print err # package not jet installed
 
-__version__ = '0.2.1'
+__version__ = '0.2.2'
 __author__ = 'Karl Bedrich'
 __email__ = 'karl@bedrich.de'
 __url__ = 'http://pypi.python.org/pypi/AppBase/'
