@@ -147,12 +147,26 @@
 <dt id="appbase.Launcher.Launcher">
 <em class="property">class </em><code class="descclassname">appbase.Launcher.</code><code class="descname">Launcher</code><span class="sig-paren">(</span><em>title='PYZ-Launcher'</em>, <em>icon=None</em>, <em>start_script=None</em>, <em>left_header=None</em>, <em>right_header=None</em>, <em>file_type='pyz'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appbase/Launcher.html#Launcher"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appbase.Launcher.Launcher" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">PyQt4.QtGui.QMainWindow</span></code></p>
-<p>main class for the Launcher</p>
-<dl class="attribute">
-<dt id="appbase.Launcher.Launcher.CONFIG_FILE">
-<code class="descname">CONFIG_FILE</code><em class="property"> = 'c:\\Users\\elkb4\\appbase.Launcher'</em><a class="headerlink" href="#appbase.Launcher.Launcher.CONFIG_FILE" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
+<p>A graphical starter for <a href="#id1"><span class="problematic" id="id2">*</span></a>.pyz files created by the save-method from
+appbase.MainWindow</p>
+<p>NEEDS AN OVERHAUL ... after that&#8217;s done it will be able to:</p>
+<ul>
+<li><p class="first">show all <a href="#id3"><span class="problematic" id="id4">*</span></a>.pyz-files in a filetree</p>
+</li>
+<li><p class="first">show the session specific ...</p>
+<blockquote>
+<div><ul class="simple">
+<li>icon</li>
+<li>description</li>
+<li>author etc.</li>
+</ul>
+</div></blockquote>
+</li>
+<li><p class="first">start, remove, rename, modify a session</p>
+</li>
+<li><p class="first">modify, start a certain state of a session</p>
+</li>
+</ul>
 <dl class="method">
 <dt id="appbase.Launcher.Launcher.__init__">
 <code class="descname">__init__</code><span class="sig-paren">(</span><em>title='PYZ-Launcher'</em>, <em>icon=None</em>, <em>start_script=None</em>, <em>left_header=None</em>, <em>right_header=None</em>, <em>file_type='pyz'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appbase/Launcher.html#Launcher.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appbase.Launcher.Launcher.__init__" title="Permalink to this definition">¶</a></dt>
@@ -169,13 +183,15 @@
 <dt id="appbase.MainWindow.MainWindow">
 <em class="property">class </em><code class="descclassname">appbase.MainWindow.</code><code class="descname">MainWindow</code><span class="sig-paren">(</span><em>title=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appbase/MainWindow.html#MainWindow"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appbase.MainWindow.MainWindow" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">PyQt4.QtGui.QMainWindow</span></code></p>
-<p>template for QMainWindow including:
-* a menu bar with all common features
-* fullscreen with F11
-* changed window title when saved under a new name
-* Preferences in Menubar-&gt;File
-* autosave
-* close dialog</p>
+<p>template for QMainWindow including:</p>
+<ul class="simple">
+<li>a menu bar with all common features</li>
+<li>fullscreen with F11</li>
+<li>changed window title when saved under a new name</li>
+<li>Preferences in Menubar-&gt;File</li>
+<li>autosave</li>
+<li>close dialog</li>
+</ul>
 <dl class="method">
 <dt id="appbase.MainWindow.MainWindow.__init__">
 <code class="descname">__init__</code><span class="sig-paren">(</span><em>title=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appbase/MainWindow.html#MainWindow.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appbase.MainWindow.MainWindow.__init__" title="Permalink to this definition">¶</a></dt>
@@ -262,9 +278,7 @@
 
 </dd></dl>
 
-<span class="target" id="module-appbase.Server"></span><p>Created on 11 Nov 2014</p>
-<p>&#64;author: elkb4</p>
-<dl class="class">
+<span class="target" id="module-appbase.Server"></span><dl class="class">
 <dt id="appbase.Server.Server">
 <em class="property">class </em><code class="descclassname">appbase.Server.</code><code class="descname">Server</code><span class="sig-paren">(</span><em>win</em>, <em>parent=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appbase/Server.html#Server"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appbase.Server.Server" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">PyQt4.QtGui.QSystemTrayIcon</span></code></p>
