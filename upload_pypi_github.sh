@@ -23,7 +23,7 @@ sphinx-apidoc -A "Karl Bedrich" -f -E -M -o doc appbase
 
 cd doc/_build
 
-git clone https://github.com/radjkarl/fancyTools.git gh-pages
+git clone https://github.com/radjkarl/appbase.git gh-pages
 
 rm -r -f html
 mv gh-pages html
