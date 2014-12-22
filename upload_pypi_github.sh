@@ -3,6 +3,7 @@
 #build
 python setup.py sdist #standard egg
 python setup.py bdist_wheel #new_standard wheel
+python setup.py install #s phinx takes only the installed pkg 
 
 #upload
 python setup.py sdist upload -r pypi
