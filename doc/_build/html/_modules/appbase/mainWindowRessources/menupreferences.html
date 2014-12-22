@@ -1,0 +1,409 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>appbase.mainWindowRessources.menupreferences &mdash; appbase  documentation</title>
+  
+
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="top" title="appbase  documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        <a href="../../../index.html" class="fa fa-home"> appbase</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+        
+            <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../appbase.html">appbase package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../appbase.html#subpackages">Subpackages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../appbase.html#module-appbase.Application">Submodules</a></li>
+</ul>
+</li>
+</ul>
+
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../../index.html">appbase</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      
+    <li>appbase.mainWindowRessources.menupreferences</li>
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            
+  <h1>Source code for appbase.mainWindowRessources.menupreferences</h1><div class="highlight"><pre>
+<span class="c"># -*- coding: utf-8 -*-</span>
+<span class="kn">import</span> <span class="nn">appbase</span>
+
+<span class="kn">from</span> <span class="nn">PyQt4</span> <span class="kn">import</span> <span class="n">QtGui</span><span class="p">,</span> <span class="n">QtCore</span>
+
+<span class="kn">from</span> <span class="nn">fancywidgets.pyQtBased.FwMinimalTextEditor</span> <span class="kn">import</span> <span class="n">FwMinimalTextEditor</span>
+<span class="kn">from</span> <span class="nn">fancywidgets.pyQtBased.Dialogs</span> <span class="kn">import</span> <span class="n">Dialogs</span>
+<span class="kn">from</span> <span class="nn">fancywidgets.pyQtBased.FingerTabWidget</span> <span class="kn">import</span> <span class="n">FingerTabWidget</span>
+
+<span class="kn">from</span> <span class="nn">fancytools.os.userName</span> <span class="kn">import</span> <span class="n">userName</span>
+
+
+<span class="n">_dialogs</span> <span class="o">=</span> <span class="n">Dialogs</span><span class="p">()</span>
+
+
+<span class="k">class</span> <span class="nc">_TabSession</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QWidget</span><span class="p">):</span>
+	<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">	The fingerTab &#39;session&#39; in the preferences widget</span>
+<span class="sd">	&#39;&#39;&#39;</span>
+	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefWindow</span><span class="p">):</span>
+		<span class="nb">super</span><span class="p">(</span><span class="n">_TabSession</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">()</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">_pref_window</span> <span class="o">=</span> <span class="n">prefWindow</span>
+		<span class="n">prefWindow</span><span class="o">.</span><span class="n">sigClosed</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_restoreLastScreenshotWindow</span><span class="p">)</span>
+
+		<span class="bp">self</span><span class="o">.</span><span class="n">app</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QApplication</span><span class="o">.</span><span class="n">instance</span><span class="p">()</span>
+		
+		<span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">sigSave</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_save</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">sigRestore</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_restore</span><span class="p">)</span>
+		
+		<span class="bp">self</span><span class="o">.</span><span class="n">opts</span><span class="o">=</span> <span class="p">{</span><span class="s">&#39;iconPath&#39;</span><span class="p">:</span><span class="bp">None</span><span class="p">}</span>
+		
+		<span class="n">vlayout</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QVBoxLayout</span><span class="p">()</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">setLayout</span><span class="p">(</span><span class="n">vlayout</span><span class="p">)</span>
+		
+		<span class="n">qtrecPrefs</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QGroupBox</span><span class="p">(</span><span class="s">&quot;Record Activity&quot;</span><span class="p">)</span>
+		<span class="n">qtrecLayout</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QVBoxLayout</span><span class="p">()</span>
+		<span class="n">qtrecPrefs</span><span class="o">.</span><span class="n">setLayout</span><span class="p">(</span><span class="n">qtrecLayout</span><span class="p">)</span>
+		<span class="n">vlayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">qtrecPrefs</span><span class="p">)</span>
+
+		<span class="n">l</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QHBoxLayout</span><span class="p">()</span>
+		<span class="n">l</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QLabel</span><span class="p">(</span><span class="s">&#39;max. saved states&#39;</span><span class="p">))</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">maxSessions</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QSpinBox</span><span class="p">()</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">maxSessions</span><span class="o">.</span><span class="n">setRange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1000</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">maxSessions</span><span class="o">.</span><span class="n">valueChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
+			<span class="k">lambda</span> <span class="n">val</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">opts</span><span class="o">.</span><span class="n">__setitem__</span><span class="p">(</span><span class="s">&#39;maxSessions&#39;</span><span class="p">,</span> <span class="n">val</span><span class="p">))</span>
+		<span class="n">l</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">maxSessions</span><span class="p">)</span>
+		<span class="n">qtrecLayout</span><span class="o">.</span><span class="n">addLayout</span><span class="p">(</span><span class="n">l</span><span class="p">)</span>
+		
+		<span class="bp">self</span><span class="o">.</span><span class="n">interval</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QLabel</span><span class="p">()</span>
+		
+		<span class="bp">self</span><span class="o">.</span><span class="n">slider</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QSlider</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">Orientation</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="bp">self</span><span class="p">)</span><span class="c">#1...horizontal</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">slider</span><span class="o">.</span><span class="n">sliderMoved</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_updateInterval</span><span class="p">)</span>
+		
+		<span class="n">qtrecLayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">interval</span><span class="p">)</span>
+		<span class="n">qtrecLayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">slider</span><span class="p">)</span>
+
+		<span class="n">file_desc</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QGroupBox</span><span class="p">(</span><span class="s">&#39;File Information&#39;</span><span class="p">)</span>
+		<span class="n">layout</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QVBoxLayout</span><span class="p">()</span>
+
+		<span class="bp">self</span><span class="o">.</span><span class="n">iconChoose</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QComboBox</span><span class="p">()</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">_iconPath</span> <span class="o">=</span> <span class="bp">None</span>
+		
+		<span class="bp">self</span><span class="o">.</span><span class="n">iconChoose</span><span class="o">.</span><span class="n">addItem</span> <span class="p">(</span><span class="s">&#39;Default&#39;</span><span class="p">)</span>
+
+		<span class="bp">self</span><span class="o">.</span><span class="n">iconChoose</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="s">&#39;Individual&#39;</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">iconChoose</span><span class="o">.</span><span class="n">activated</span><span class="p">[</span><span class="nb">unicode</span><span class="p">]</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cooseIndividualIcon</span><span class="p">)</span>
+		
+		<span class="n">iconLayout</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QHBoxLayout</span><span class="p">()</span>
+		<span class="n">iconLayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QLabel</span><span class="p">(</span><span class="s">&#39;Icon:&#39;</span><span class="p">))</span>
+		<span class="n">iconLayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">iconChoose</span><span class="p">)</span>
+		<span class="n">layout</span><span class="o">.</span><span class="n">addLayout</span><span class="p">(</span><span class="n">iconLayout</span><span class="p">)</span>
+		
+		<span class="c">#CHOOSE A SCREENSHOT A SHOW IN THE LAUNCHER DETAILS AREA</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">_lastSchreenshotWindow</span> <span class="o">=</span> <span class="bp">None</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">_screenshot_from_window</span> <span class="o">=</span> <span class="bp">None</span>
+		<span class="n">screenshotLayout</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QHBoxLayout</span><span class="p">()</span>
+		<span class="n">screenshotLayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QLabel</span><span class="p">(</span><span class="s">&#39;Screenshot:&#39;</span><span class="p">))</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">_screenshotChoose</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QComboBox</span><span class="p">()</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">_screenshotChoose</span><span class="o">.</span><span class="n">currentIndexChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_chosenScreenshotWindowChanged</span><span class="p">)</span>
+		<span class="n">screenshotLayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_screenshotChoose</span><span class="p">)</span>
+		<span class="n">layout</span><span class="o">.</span><span class="n">addLayout</span><span class="p">(</span><span class="n">screenshotLayout</span><span class="p">)</span>
+		
+		<span class="c">#CREATE A DESCRIPTION TEXT</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">descritionEditior</span> <span class="o">=</span> <span class="n">FwMinimalTextEditor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+		
+		<span class="n">descriptionText</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+		<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="p">:</span>
+			<span class="n">descriptionText</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">getSavedContent</span><span class="p">(</span><span class="s">&#39;description&#39;</span><span class="p">)</span>
+		<span class="k">if</span> <span class="n">descriptionText</span><span class="p">:</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">descritionEditior</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="n">descriptionText</span><span class="p">)</span>
+		<span class="k">else</span><span class="p">:</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">descritionEditior</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_defaultDescription</span><span class="p">())</span>
+		<span class="n">layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">descritionEditior</span><span class="p">)</span>
+		<span class="n">file_desc</span><span class="o">.</span><span class="n">setLayout</span><span class="p">(</span><span class="n">layout</span><span class="p">)</span>
+		<span class="n">vlayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">file_desc</span><span class="p">)</span>
+
+
+	<span class="k">def</span> <span class="nf">_fillScreenshotChoose</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">_screenshotChoose</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">_name_2_win</span> <span class="o">=</span> <span class="p">{}</span>
+		<span class="n">n</span> <span class="o">=</span> <span class="mi">0</span>
+		<span class="k">for</span> <span class="n">win</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_availWindows</span><span class="p">():</span>
+				<span class="n">n</span> <span class="o">+=</span> <span class="mi">1</span>
+				<span class="n">title</span> <span class="o">=</span> <span class="nb">unicode</span><span class="p">(</span><span class="n">win</span><span class="o">.</span><span class="n">windowTitle</span><span class="p">())</span>
+				<span class="k">if</span> <span class="ow">not</span> <span class="n">title</span><span class="p">:</span>
+					<span class="n">title</span> <span class="o">=</span> <span class="s">&#39;Window &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+				<span class="bp">self</span><span class="o">.</span><span class="n">_name_2_win</span><span class="p">[</span><span class="n">title</span><span class="p">]</span> <span class="o">=</span> <span class="n">win</span>
+				<span class="bp">self</span><span class="o">.</span><span class="n">_screenshotChoose</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">_screenshot_from_window</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name_2_win</span><span class="o">.</span><span class="n">values</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+
+
+	<span class="k">def</span> <span class="nf">_availWindows</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">		returns a list of all widgets, that are:</span>
+<span class="sd">		* windows</span>
+<span class="sd">		* visible</span>
+<span class="sd">		* not the preferences window</span>
+<span class="sd">		&#39;&#39;&#39;</span>
+		<span class="k">return</span> <span class="p">[</span><span class="n">win</span> <span class="k">for</span> <span class="n">win</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">topLevelWidgets</span><span class="p">()</span>
+			<span class="k">if</span> <span class="ow">not</span> <span class="n">win</span><span class="o">.</span><span class="n">parent</span><span class="p">()</span> <span class="ow">and</span> <span class="n">win</span><span class="o">.</span><span class="n">isVisible</span><span class="p">()</span> <span class="ow">and</span> <span class="n">win</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pref_window</span><span class="p">]</span>
+
+
+	<span class="k">def</span> <span class="nf">_chosenScreenshotWindowChanged</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">_restoreLastScreenshotWindow</span><span class="p">()</span>
+		<span class="n">title</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_screenshotChoose</span><span class="o">.</span><span class="n">itemText</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+		<span class="c">#only indicate the window (e.g. by changing color) if:</span>
+		<span class="c"># the window has a title</span>
+		<span class="c"># there are more than one window to choose from</span>
+		<span class="k">if</span> <span class="n">title</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_name_2_win</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+			<span class="n">win</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name_2_win</span><span class="p">[</span><span class="nb">unicode</span><span class="p">(</span><span class="n">title</span><span class="p">)]</span>
+			<span class="n">p</span> <span class="o">=</span> <span class="n">win</span><span class="o">.</span><span class="n">palette</span><span class="p">()</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">_lastSchreenshotWindow</span> <span class="o">=</span> <span class="p">(</span><span class="n">win</span><span class="p">,</span> <span class="n">win</span><span class="o">.</span><span class="n">autoFillBackground</span><span class="p">(),</span> <span class="n">p</span><span class="o">.</span><span class="n">color</span><span class="p">(</span><span class="n">win</span><span class="o">.</span><span class="n">backgroundRole</span><span class="p">())</span> <span class="p">)</span>
+			<span class="n">win</span><span class="o">.</span><span class="n">setAutoFillBackground</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+			<span class="n">p</span><span class="o">.</span><span class="n">setColor</span><span class="p">(</span><span class="n">win</span><span class="o">.</span><span class="n">backgroundRole</span><span class="p">(),</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">red</span><span class="p">)</span>
+			<span class="n">win</span><span class="o">.</span><span class="n">setPalette</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">_screenshot_from_window</span> <span class="o">=</span> <span class="n">win</span>
+
+
+	<span class="k">def</span> <span class="nf">_restoreLastScreenshotWindow</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lastSchreenshotWindow</span><span class="p">:</span>
+			<span class="c">#restore last</span>
+			<span class="p">(</span><span class="n">win</span><span class="p">,</span> <span class="n">autoFill</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lastSchreenshotWindow</span>
+			<span class="n">win</span><span class="o">.</span><span class="n">setAutoFillBackground</span><span class="p">(</span><span class="n">autoFill</span><span class="p">)</span>
+			<span class="n">p</span> <span class="o">=</span> <span class="n">win</span><span class="o">.</span><span class="n">palette</span><span class="p">()</span>
+			<span class="n">p</span><span class="o">.</span><span class="n">setColor</span><span class="p">(</span><span class="n">win</span><span class="o">.</span><span class="n">backgroundRole</span><span class="p">(),</span> <span class="n">color</span><span class="p">)</span>
+			<span class="n">win</span><span class="o">.</span><span class="n">setPalette</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+
+
+	<span class="k">def</span> <span class="nf">_save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">session</span><span class="p">):</span>
+		<span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_screenshot_from_window</span><span class="p">:</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">_screenshot_from_window</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_availWindows</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+		<span class="n">pixmap</span> <span class="o">=</span>  <span class="n">QtGui</span><span class="o">.</span><span class="n">QPixmap</span><span class="o">.</span><span class="n">grabWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_screenshot_from_window</span><span class="p">)</span>
+		<span class="n">pixmap</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">session</span><span class="o">.</span><span class="n">tmp_dir_save_session</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s">&#39;screenshot.png&#39;</span><span class="p">),</span> <span class="s">&#39;png&#39;</span><span class="p">)</span>
+		<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iconPath</span><span class="p">:</span>
+			<span class="n">session</span><span class="o">.</span><span class="n">addFileToSave</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">opts</span><span class="p">[</span><span class="s">&#39;iconPath&#39;</span><span class="p">],</span> <span class="s">&#39;icon&#39;</span><span class="p">)</span>
+		<span class="n">session</span><span class="o">.</span><span class="n">addContentToSave</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">descritionEditior</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">toHtml</span><span class="p">(),</span> <span class="s">&#39;description.html&#39;</span><span class="p">)</span>
+
+
+	<span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">opts</span><span class="p">[</span><span class="s">&#39;autosave&#39;</span><span class="p">]:</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">slider</span><span class="o">.</span><span class="n">setSliderPosition</span><span class="p">(</span><span class="mi">99</span><span class="p">)</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">_updateInterval</span><span class="p">(</span><span class="mi">99</span><span class="p">,</span> <span class="bp">False</span><span class="p">)</span>
+		<span class="k">else</span><span class="p">:</span>
+			<span class="n">a</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">opts</span><span class="p">[</span><span class="s">&#39;autosaveIntervalMin&#39;</span><span class="p">]</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">slider</span><span class="o">.</span><span class="n">setSliderPosition</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">_updateInterval</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="bp">False</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">maxSessions</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">opts</span><span class="p">[</span><span class="s">&#39;maxSessions&#39;</span><span class="p">])</span>
+	
+	
+	<span class="k">def</span> <span class="nf">_restore</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">descritionEditior</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">getSavedContent</span><span class="p">(</span><span class="s">&#39;description.html&#39;</span><span class="p">)</span> <span class="p">)</span>
+		<span class="n">iconPath</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">getSavedFile</span><span class="p">(</span><span class="s">&#39;icon&#39;</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">opts</span><span class="p">[</span><span class="s">&#39;iconPath&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">iconPath</span>
+
+
+	<span class="k">def</span> <span class="nf">showEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">_fillScreenshotChoose</span><span class="p">()</span>
+		<span class="nb">super</span><span class="p">(</span><span class="n">_TabSession</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">showEvent</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+
+
+	<span class="k">def</span> <span class="nf">_defaultDescription</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="k">return</span> <span class="s">&#39;&#39;&#39;</span>
+<span class="s">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;</span>
+<span class="s">&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;</span>
+<span class="s">p, li { white-space: pre-wrap; }</span>
+<span class="s">&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&#39;Ubuntu&#39;; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;</span>
+<span class="s">&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-style:italic; text-decoration: underline;&quot;&gt;- no descrition found -&lt;/span&gt;&lt;/p&gt;</span>
+<span class="s">&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; text-decoration: underline;&quot;&gt;&lt;br /&gt;&lt;/p&gt;</span>
+<span class="s">&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;create one in &lt;span style=&quot; font-weight:600;&quot;&gt;File-&amp;gt;Preferences&lt;/span&gt;&lt;/p&gt;</span>
+<span class="s">&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;</span>
+<span class="s">&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:14pt;&quot;&gt;Example&lt;/span&gt;&lt;/p&gt;</span>
+<span class="s">&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Editor:     </span><span class="si">%s</span><span class="s">&lt;/span&gt;&lt;/p&gt;</span>
+<span class="s">&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Project:&lt;/span&gt;&lt;/p&gt;</span>
+<span class="s">&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;State:&lt;/span&gt;&lt;/p&gt;</span>
+<span class="s">&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-weight:600;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</span>
+<span class="s">&#39;&#39;&#39;</span> <span class="o">%</span><span class="n">userName</span><span class="p">()</span>
+
+
+	<span class="k">def</span> <span class="nf">_cooseIndividualIcon</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">txt</span><span class="p">):</span>
+		<span class="k">if</span> <span class="n">txt</span> <span class="o">==</span> <span class="s">&#39;Individual&#39;</span><span class="p">:</span>
+			<span class="n">i</span> <span class="o">=</span> <span class="n">_dialogs</span><span class="o">.</span><span class="n">getOpenFileName</span><span class="p">(</span><span class="n">directory</span><span class="o">=</span><span class="n">appbase</span><span class="o">.</span><span class="n">icon_path</span><span class="p">)</span>
+			<span class="k">if</span> <span class="n">i</span><span class="p">:</span>
+				<span class="bp">self</span><span class="o">.</span><span class="n">opts</span><span class="p">[</span><span class="s">&#39;iconPath&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">i</span>
+
+
+	<span class="k">def</span> <span class="nf">_updateInterval</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">time_min</span><span class="p">,</span> <span class="n">updateOpts</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+		<span class="k">if</span> <span class="n">time_min</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+			<span class="n">time_min</span> <span class="o">=</span> <span class="mf">0.1</span>
+		<span class="k">if</span> <span class="n">time_min</span> <span class="o">==</span> <span class="mi">99</span><span class="p">:</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">interval</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="s">&quot;Autosave: never&quot;</span><span class="p">)</span>
+			<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">app</span> <span class="ow">and</span> <span class="n">updateOpts</span><span class="p">:</span>
+				<span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">opts</span><span class="p">[</span><span class="s">&#39;autosave&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">False</span>
+		<span class="k">else</span><span class="p">:</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">interval</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="s">&quot;Autosave: </span><span class="si">%s</span><span class="s"> min&quot;</span> <span class="o">%</span><span class="n">time_min</span><span class="p">)</span>
+			<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">app</span> <span class="ow">and</span> <span class="n">updateOpts</span><span class="p">:</span>
+				<span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">opts</span><span class="p">[</span><span class="s">&#39;autosaveIntervalMin&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">time_min</span>
+				<span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">opts</span><span class="p">[</span><span class="s">&#39;autosave&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">True</span>
+
+
+
+	
+
+<div class="viewcode-block" id="MenuPreferences"><a class="viewcode-back" href="../../../appbase.mainWindowRessources.html#appbase.mainWindowRessources.menupreferences.MenuPreferences">[docs]</a><span class="k">class</span> <span class="nc">MenuPreferences</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QWidget</span><span class="p">):</span>
+	<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">	The mainWindow preferences shown using fingerTabs</span>
+<span class="sd">	&#39;&#39;&#39;</span>
+	<span class="n">sigClosed</span> <span class="o">=</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">pyqtSignal</span><span class="p">()</span>
+
+<div class="viewcode-block" id="MenuPreferences.__init__"><a class="viewcode-back" href="../../../appbase.mainWindowRessources.html#appbase.mainWindowRessources.menupreferences.MenuPreferences.__init__">[docs]</a>	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">win</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+		
+		<span class="nb">super</span><span class="p">(</span><span class="n">MenuPreferences</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">window</span> <span class="o">=</span> <span class="n">win</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">setWindowTitle</span><span class="p">(</span><span class="s">&#39;Preferences&#39;</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="mi">530</span><span class="p">,</span><span class="mi">480</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">tabs</span> <span class="o">=</span> <span class="n">FingerTabWidget</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">tab_session</span> <span class="o">=</span> <span class="n">_TabSession</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">tabs</span><span class="o">.</span><span class="n">addTab</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tab_session</span><span class="p">,</span> <span class="s">&#39;Session&#39;</span><span class="p">)</span>
+	
+</div>
+<div class="viewcode-block" id="MenuPreferences.show"><a class="viewcode-back" href="../../../appbase.mainWindowRessources.html#appbase.mainWindowRessources.menupreferences.MenuPreferences.show">[docs]</a>	<span class="k">def</span> <span class="nf">show</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tabs</span><span class="o">.</span><span class="n">count</span><span class="p">()):</span>
+			<span class="k">try</span><span class="p">:</span>
+				<span class="bp">self</span><span class="o">.</span><span class="n">tabs</span><span class="o">.</span><span class="n">widget</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+			<span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+				<span class="k">pass</span>
+		<span class="n">QtGui</span><span class="o">.</span><span class="n">QWidget</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="MenuPreferences.closeEvent"><a class="viewcode-back" href="../../../appbase.mainWindowRessources.html#appbase.mainWindowRessources.menupreferences.MenuPreferences.closeEvent">[docs]</a>	<span class="k">def</span> <span class="nf">closeEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">evt</span><span class="p">):</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">sigClosed</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span>
+		<span class="nb">super</span><span class="p">(</span><span class="n">MenuPreferences</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">closeEvent</span><span class="p">(</span><span class="n">evt</span><span class="p">)</span>
+</pre></div></div></div>
+
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2014, Karl Bedrich.
+    </p>
+  </div>
+
+  <a href="https://github.com/snide/sphinx_rtd_theme">Sphinx theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

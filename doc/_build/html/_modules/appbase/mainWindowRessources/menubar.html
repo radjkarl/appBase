@@ -1,0 +1,314 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>appbase.mainWindowRessources.menubar &mdash; appbase  documentation</title>
+  
+
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="top" title="appbase  documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        <a href="../../../index.html" class="fa fa-home"> appbase</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+        
+            <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../appbase.html">appbase package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../appbase.html#subpackages">Subpackages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../appbase.html#module-appbase.Application">Submodules</a></li>
+</ul>
+</li>
+</ul>
+
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../../index.html">appbase</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      
+    <li>appbase.mainWindowRessources.menubar</li>
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            
+  <h1>Source code for appbase.mainWindowRessources.menubar</h1><div class="highlight"><pre>
+<span class="c"># -*- coding: utf-8 -*-</span>
+
+<span class="c">#foreign</span>
+<span class="kn">from</span> <span class="nn">PyQt4</span> <span class="kn">import</span> <span class="n">QtGui</span><span class="p">,</span> <span class="n">QtCore</span>
+
+<span class="c">#this pgk</span>
+<span class="kn">from</span> <span class="nn">menupreferences</span> <span class="kn">import</span> <span class="n">MenuPreferences</span>
+<span class="kn">from</span> <span class="nn">menuabout</span> <span class="kn">import</span> <span class="n">MenuAbout</span>
+
+<span class="c">#own</span>
+<span class="kn">from</span> <span class="nn">fancywidgets.pyQtBased.MenuBar</span> <span class="kn">import</span> <span class="n">MenuBar</span> <span class="k">as</span> <span class="n">FWMenuBar</span>
+
+
+
+<span class="k">class</span> <span class="nc">_RenameStateDialog</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QDialog</span><span class="p">):</span>
+	<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">	A simple QDialog asking for a new name for a given save state</span>
+<span class="sd">	&#39;&#39;&#39;</span>
+	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">oldStateName</span><span class="p">):</span>
+		<span class="n">QtGui</span><span class="o">.</span><span class="n">QDialog</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">setWindowTitle</span><span class="p">(</span><span class="s">&#39;Rename State&#39;</span><span class="p">)</span>
+		<span class="n">l</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QVBoxLayout</span><span class="p">()</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">setLayout</span><span class="p">(</span><span class="n">l</span><span class="p">)</span>
+		<span class="n">hl</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QHBoxLayout</span><span class="p">()</span>
+		<span class="n">hl</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QLabel</span><span class="p">(</span><span class="n">oldStateName</span><span class="p">))</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">editor</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QLineEdit</span><span class="p">(</span><span class="n">oldStateName</span><span class="p">)</span>
+		<span class="n">hl</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="p">)</span>
+		
+		<span class="n">l</span><span class="o">.</span><span class="n">addLayout</span><span class="p">(</span><span class="n">hl</span><span class="p">)</span>
+		
+		<span class="bp">self</span><span class="o">.</span><span class="n">btn_done</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QPushButton</span><span class="p">(</span><span class="s">&#39;Done&#39;</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">btn_done</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">accept</span><span class="p">)</span>
+		<span class="n">l</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">btn_done</span><span class="p">)</span> 
+
+
+
+<div class="viewcode-block" id="MenuBar"><a class="viewcode-back" href="../../../appbase.mainWindowRessources.html#appbase.mainWindowRessources.menubar.MenuBar">[docs]</a><span class="k">class</span> <span class="nc">MenuBar</span><span class="p">(</span><span class="n">FWMenuBar</span><span class="p">):</span>
+	
+<div class="viewcode-block" id="MenuBar.__init__"><a class="viewcode-back" href="../../../appbase.mainWindowRessources.html#appbase.mainWindowRessources.menubar.MenuBar.__init__">[docs]</a>	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="nb">super</span><span class="p">(</span><span class="n">MenuBar</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">()</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">app</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QApplication</span><span class="o">.</span><span class="n">instance</span><span class="p">()</span>
+		<span class="c">#MENU - FILE</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">menu_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">addMenu</span><span class="p">(</span><span class="s">&#39;&amp;File&#39;</span><span class="p">)</span>
+		<span class="n">new_add</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">menu_file</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="s">&#39;New&#39;</span><span class="p">)</span>
+		<span class="n">new_add</span><span class="o">.</span><span class="n">setStatusTip</span><span class="p">(</span><span class="s">&#39;...in new window&#39;</span><span class="p">)</span>
+		<span class="n">new_add</span><span class="o">.</span><span class="n">setShortcuts</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QKeySequence</span><span class="o">.</span><span class="n">New</span><span class="p">)</span>
+
+		<span class="bp">self</span><span class="o">.</span><span class="n">menu_file</span><span class="o">.</span><span class="n">addSeparator</span><span class="p">()</span>
+
+		<span class="n">save</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">menu_file</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="s">&#39;Save&#39;</span><span class="p">)</span>
+		<span class="n">save</span><span class="o">.</span><span class="n">setStatusTip</span><span class="p">(</span><span class="s">&#39;Override last saved session&#39;</span><span class="p">)</span>
+		<span class="n">save</span><span class="o">.</span><span class="n">setShortcuts</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QKeySequence</span><span class="o">.</span><span class="n">Save</span><span class="p">)</span>
+		<span class="n">save_as</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">menu_file</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="s">&#39;Save As&#39;</span><span class="p">)</span>
+		<span class="n">save</span><span class="o">.</span><span class="n">setStatusTip</span><span class="p">(</span><span class="s">&#39;Choose a name&#39;</span><span class="p">)</span>
+		<span class="n">save_as</span><span class="o">.</span><span class="n">setShortcuts</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QKeySequence</span><span class="o">.</span><span class="n">SaveAs</span><span class="p">)</span>
+
+		<span class="n">open_add</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">menu_file</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="s">&#39;Open&#39;</span><span class="p">)</span>
+		<span class="n">open_add</span><span class="o">.</span><span class="n">setStatusTip</span><span class="p">(</span><span class="s">&#39;...in new window&#39;</span><span class="p">)</span>
+		<span class="n">open_add</span><span class="o">.</span><span class="n">setShortcuts</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QKeySequence</span><span class="o">.</span><span class="n">Open</span><span class="p">)</span>
+
+		<span class="bp">self</span><span class="o">.</span><span class="n">menu_file</span><span class="o">.</span><span class="n">addSeparator</span><span class="p">()</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">file_preferences</span> <span class="o">=</span> <span class="n">MenuPreferences</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">menu_file</span><span class="o">.</span><span class="n">action_preferences</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">menu_file</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="s">&#39;Preferences&#39;</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">menu_file</span><span class="o">.</span><span class="n">action_preferences</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_preferences</span><span class="o">.</span><span class="n">show</span><span class="p">)</span>
+
+		<span class="bp">self</span><span class="o">.</span><span class="n">menu_file</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="s">&#39;Exit&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">closeAllWindows</span><span class="p">)</span>
+
+		<span class="c">#MENU - STATE</span>
+		<span class="n">menu_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">addMenu</span><span class="p">(</span><span class="s">&#39;&amp;State&#39;</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">a_previous</span> <span class="o">=</span> <span class="n">menu_state</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="s">&#39;Previous&#39;</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">a_previous</span><span class="o">.</span><span class="n">setStatusTip</span><span class="p">(</span><span class="s">&#39;Restore a previously saved state&#39;</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">a_previous</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">restorePreviousState</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">a_previous</span><span class="o">.</span><span class="n">setShortcuts</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QKeySequence</span><span class="o">.</span><span class="n">Undo</span><span class="p">)</span>
+
+		<span class="bp">self</span><span class="o">.</span><span class="n">a_next</span> <span class="o">=</span> <span class="n">menu_state</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="s">&#39;Next&#39;</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">a_next</span><span class="o">.</span><span class="n">setStatusTip</span><span class="p">(</span><span class="s">&#39;Restore a previously saved state&#39;</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">a_next</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">restoreNextState</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">a_next</span><span class="o">.</span><span class="n">setShortcuts</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QKeySequence</span><span class="o">.</span><span class="n">Redo</span><span class="p">)</span>
+
+		<span class="bp">self</span><span class="o">.</span><span class="n">m_setState</span> <span class="o">=</span> <span class="n">menu_state</span><span class="o">.</span><span class="n">addMenu</span><span class="p">(</span><span class="s">&#39;Set&#39;</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">m_setState</span><span class="o">.</span><span class="n">aboutToShow</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_updateSetStateActions</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">m_renameState</span> <span class="o">=</span> <span class="n">menu_state</span><span class="o">.</span><span class="n">addMenu</span><span class="p">(</span><span class="s">&#39;Rename&#39;</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">m_renameState</span><span class="o">.</span><span class="n">aboutToShow</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_updateRenameStateActions</span><span class="p">)</span>
+
+		<span class="c">#MENU - VIEW</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">menu_view</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">addMenu</span><span class="p">(</span><span class="s">&#39;&amp;View&#39;</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">ckBox_fullscreen</span> <span class="o">=</span>  <span class="n">QtGui</span><span class="o">.</span><span class="n">QAction</span><span class="p">(</span><span class="s">&#39;Fullscreen&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">menu_view</span><span class="p">,</span> <span class="n">checkable</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">menu_view</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ckBox_fullscreen</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">ckBox_fullscreen</span><span class="o">.</span><span class="n">setStatusTip</span><span class="p">(</span><span class="s">&#39;Toggle between window and fullscreen&#39;</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">ckBox_fullscreen</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">setFullscreen</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">ckBox_fullscreen</span><span class="o">.</span><span class="n">setShortcuts</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QKeySequence</span><span class="p">(</span><span class="s">&#39;F11&#39;</span><span class="p">))</span>
+
+		<span class="c">#MENU - HELP</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">menu_help</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">addMenu</span><span class="p">(</span><span class="s">&#39;&amp;Help&#39;</span><span class="p">)</span>
+		<span class="n">sc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">menu_help</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="s">&#39;Shortcuts&#39;</span><span class="p">)</span>
+		<span class="n">sc</span><span class="o">.</span><span class="n">setStatusTip</span><span class="p">(</span><span class="s">&#39;...list all shortcuts&#39;</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">menu_help</span><span class="o">.</span><span class="n">addSeparator</span><span class="p">()</span>
+		<span class="n">about</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">menu_help</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="s">&#39;About&#39;</span><span class="p">)</span>
+		<span class="n">about</span><span class="o">.</span><span class="n">setShortcuts</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QKeySequence</span><span class="p">(</span><span class="s">&#39;F1&#39;</span><span class="p">))</span>
+		<span class="n">aboutWidget</span> <span class="o">=</span> <span class="n">MenuAbout</span><span class="p">()</span>
+		<span class="n">about</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">aboutWidget</span><span class="o">.</span><span class="n">show</span><span class="p">)</span>
+
+		<span class="c">#CONNECTING TO APPLICATION.SESSION</span>
+		<span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">session</span>
+		<span class="n">new_add</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">new</span><span class="p">)</span>
+		<span class="n">save</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">save</span><span class="p">)</span>
+		<span class="n">save_as</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">s</span><span class="o">.</span><span class="n">saveAs</span><span class="p">)</span>
+		<span class="n">open_add</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">open</span><span class="p">)</span>
+
+</div>
+	<span class="k">def</span> <span class="nf">_updateRenameStateActions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">m_renameState</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+		<span class="n">se</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">session</span>
+		<span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">se</span><span class="o">.</span><span class="n">stateNames</span><span class="p">():</span>
+			<span class="n">txt</span> <span class="o">=</span> <span class="s">&#39;[</span><span class="si">%s</span><span class="s">]&#39;</span> <span class="o">%</span><span class="n">s</span>
+			<span class="k">if</span> <span class="n">s</span> <span class="o">==</span> <span class="n">se</span><span class="o">.</span><span class="n">current_session</span><span class="p">:</span>
+				<span class="n">txt</span> <span class="o">+=</span> <span class="s">&#39; &lt;-&#39;</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">m_renameState</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="n">txt</span><span class="p">)</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
+							<span class="k">lambda</span> <span class="n">checked</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="n">s</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_showRenameStateDialog</span><span class="p">(</span><span class="n">s</span><span class="p">))</span>
+
+
+	<span class="k">def</span> <span class="nf">_showRenameStateDialog</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">oldStateName</span><span class="p">):</span>
+		<span class="n">r</span> <span class="o">=</span> <span class="n">_RenameStateDialog</span><span class="p">(</span><span class="n">oldStateName</span><span class="p">)</span>
+		<span class="n">ret</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">exec_</span><span class="p">()</span>
+		<span class="n">t</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">text</span><span class="p">())</span>
+		<span class="k">if</span> <span class="n">ret</span> <span class="o">==</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QDialog</span><span class="o">.</span><span class="n">Accepted</span> <span class="ow">and</span> <span class="n">t</span> <span class="ow">and</span> <span class="n">t</span> <span class="o">!=</span> <span class="n">oldStateName</span><span class="p">:</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">renameState</span><span class="p">(</span><span class="n">oldStateName</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+
+
+	<span class="k">def</span> <span class="nf">_updateSetStateActions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">m_setState</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+		<span class="n">se</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">session</span>
+		<span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">se</span><span class="o">.</span><span class="n">stateNames</span><span class="p">():</span>
+			<span class="n">txt</span> <span class="o">=</span> <span class="s">&#39;[</span><span class="si">%s</span><span class="s">]&#39;</span> <span class="o">%</span><span class="n">s</span>
+			<span class="k">if</span> <span class="n">s</span> <span class="o">==</span> <span class="n">se</span><span class="o">.</span><span class="n">current_session</span><span class="p">:</span>
+				<span class="n">txt</span> <span class="o">+=</span> <span class="s">&#39; &lt;-&#39;</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">m_setState</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="n">txt</span><span class="p">)</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
+							<span class="k">lambda</span> <span class="n">checked</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="n">s</span><span class="p">:</span> <span class="n">se</span><span class="o">.</span><span class="n">restoreStateName</span><span class="p">(</span><span class="n">s</span><span class="p">))</span>
+
+
+	<span class="k">def</span> <span class="nf">_newReplace</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="c">#ask: are you sure</span>
+		<span class="n">reply</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QMessageBox</span><span class="o">.</span><span class="n">question</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> 
+			<span class="s">&#39;Replace this Program&#39;</span><span class="p">,</span> <span class="s">&#39;Are you sure?&#39;</span><span class="p">,</span> 
+			<span class="n">QtGui</span><span class="o">.</span><span class="n">QMessageBox</span><span class="o">.</span><span class="n">Yes</span><span class="p">,</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QMessageBox</span><span class="o">.</span><span class="n">No</span><span class="p">)</span>
+		<span class="k">if</span> <span class="n">reply</span> <span class="o">==</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QMessageBox</span><span class="o">.</span><span class="n">Yes</span><span class="p">:</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">newReplace</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="MenuBar.setFullscreen"><a class="viewcode-back" href="../../../appbase.mainWindowRessources.html#appbase.mainWindowRessources.menubar.MenuBar.setFullscreen">[docs]</a>	<span class="k">def</span> <span class="nf">setFullscreen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fullscreen</span><span class="p">):</span>
+		<span class="sd">&#39;&#39;&#39;toggle between fullscreen and normal window&#39;&#39;&#39;</span>
+		<span class="k">if</span> <span class="ow">not</span> <span class="n">fullscreen</span><span class="p">:</span><span class="c">#self.parent().isFullScreen():</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">ckBox_fullscreen</span><span class="o">.</span><span class="n">setChecked</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">()</span><span class="o">.</span><span class="n">showNormal</span><span class="p">()</span>
+		<span class="k">else</span><span class="p">:</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">ckBox_fullscreen</span><span class="o">.</span><span class="n">setChecked</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">()</span><span class="o">.</span><span class="n">showFullScreen</span><span class="p">()</span></div></div>
+</pre></div>
+
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2014, Karl Bedrich.
+    </p>
+  </div>
+
+  <a href="https://github.com/snide/sphinx_rtd_theme">Sphinx theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

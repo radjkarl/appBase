@@ -1,97 +1,50 @@
 # -*- coding: utf-8 -*-
-import QtRec
-from QtRec import QtGui, QtCore
 
+#foreign
+from PyQt4 import QtGui, QtCore
 
+#this pgk
 from menupreferences import MenuPreferences
 from menuabout import MenuAbout
 
-class _MenuBarAppend(QtGui.QMenuBar):
+#own
+from fancywidgets.pyQtBased.MenuBar import MenuBar as FWMenuBar
+
+
+
+class _RenameStateDialog(QtGui.QDialog):
 	'''
-	QMenuBar with easier insertMenu methods
-	methods are used from:
-	http://scribus.info/svn/Scribus/trunk/Scribus/scribus/plugins/scripter/python/scripter_hooks.py
+	A simple QDialog asking for a new name for a given save state
 	'''
-	
-	def __init__(self):
-		super(_MenuBarAppend, self).__init__()
-
-	def iter_menus(self):
-		for action in self.actions():
-			menu = action.menu()
-			if menu:
-				yield menu
-
-	def iter_inner_menus(self, menu):
-		for action in menu.actions():
-			menu = action.menu()
-			if menu:
-				yield menu
-
-
-	#TODO: debug: menus ares added to the end if insertMenu('menuStr', menu)
-	#evtl. delete
-	def findMenu(self, title):
-		"""
-		find a menu with a given title
-
-		@type  title: string
-		@param title: English title of the menu
-		@rtype:	   QMenu
-		@return:	  None if no menu was found, else the menu with title
-		"""
-		# See also http://www.riverbankcomputing.co.uk/static/Docs/PyQt4/pyqt4ref.html#differences-between-pyqt-and-qt
-		#title = QApplication.translate(mikro.classname(self.window), title) 
-		for menu in self.iter_menus():
-			if menu.title() == title:
-				return menu
-			for innerMenu in self.iter_inner_menus(menu):
-				if innerMenu.title() == title:
-					return innerMenu
-	
-	def actionForMenu(self, menu):
-		for action in self.actions():
-			if action.menu() == menu:
-				return action
-
-
-	def insertMenuBefore(self, before_menu, new_menu):
-		"""
-		Insert a menu after another menu in the menubar
-
-		@type: before_menu QMenu instance or title string of menu
-		@param before_menu: menu which should be after the newly inserted menu
-		@rtype: QAction instance
-		@return: action for inserted menu
-		"""
-		if isinstance(before_menu, basestring):
-			before_menu = self.findMenu(before_menu)
-		before_action = self.actionForMenu(before_menu)
-		# I have no clue why QMenuBar::insertMenu only allows
-		# to insert before another menu and not after a menu...
-		new_action = self.insertMenu(before_action, new_menu)
-		return new_action
+	def __init__(self, oldStateName):
+		QtGui.QDialog.__init__(self)
+		self.setWindowTitle('Rename State')
+		l = QtGui.QVBoxLayout()
+		self.setLayout(l)
+		hl = QtGui.QHBoxLayout()
+		hl.addWidget(QtGui.QLabel(oldStateName))
+		self.editor = QtGui.QLineEdit(oldStateName)
+		hl.addWidget(self.editor)
+		
+		l.addLayout(hl)
+		
+		self.btn_done = QtGui.QPushButton('Done')
+		self.btn_done.clicked.connect(self.accept)
+		l.addWidget(self.btn_done) 
 
 
 
-			
-
-class MenuBar(_MenuBarAppend):
+class MenuBar(FWMenuBar):
 	
 	def __init__(self):
 		super(MenuBar, self).__init__()
 		self.app = QtGui.QApplication.instance()
 		#MENU - FILE
-
 		self.menu_file = self.addMenu('&File')
-		new_add = self.menu_file.addAction('New - add')
+		new_add = self.menu_file.addAction('New')
 		new_add.setStatusTip('...in new window')
 		new_add.setShortcuts(QtGui.QKeySequence.New)
 
-		new_rep = self.menu_file.addAction('New - replace')
-		new_rep.setStatusTip('...replace this window')
-		key_new_replace = QtGui.QKeySequence(QtCore.Qt.CTRL + QtCore.Qt.SHIFT + QtCore.Qt.Key_N)
-		new_rep.setShortcuts(key_new_replace)
 		self.menu_file.addSeparator()
 
 		save = self.menu_file.addAction('Save')
@@ -101,90 +54,88 @@ class MenuBar(_MenuBarAppend):
 		save.setStatusTip('Choose a name')
 		save_as.setShortcuts(QtGui.QKeySequence.SaveAs)
 
-		self.menu_file.addSeparator()
-		open_add = self.menu_file.addAction('Open - add')
+		open_add = self.menu_file.addAction('Open')
 		open_add.setStatusTip('...in new window')
 		open_add.setShortcuts(QtGui.QKeySequence.Open)
 
-		open_rep = self.menu_file.addAction('Open - replace')
-		open_rep.setStatusTip('...replace this window')
-		key_open_replace = QtGui.QKeySequence(QtCore.Qt.CTRL + QtCore.Qt.SHIFT + QtCore.Qt.Key_O)
-		open_rep.setShortcuts(key_open_replace)
 		self.menu_file.addSeparator()
 		self.file_preferences = MenuPreferences(self)
-		#print preferences, preferences.show()
 		self.menu_file.action_preferences = self.menu_file.addAction('Preferences')
 		self.menu_file.action_preferences.triggered.connect(self.file_preferences.show)
 
-		self.menu_file.addAction('Exit').triggered.connect(self.app.exit)
+		self.menu_file.addAction('Exit').triggered.connect(self.app.closeAllWindows)
 
-		#MENU - EDIT
-		self.menu_edit = self.addMenu('&Edit')
+		#MENU - STATE
+		menu_state = self.addMenu('&State')
+		self.a_previous = menu_state.addAction('Previous')
+		self.a_previous.setStatusTip('Restore a previously saved state')
+		self.a_previous.triggered.connect(self.app.session.restorePreviousState)
+		self.a_previous.setShortcuts(QtGui.QKeySequence.Undo)
 
-		undo = self.menu_edit.addAction('Undo')
-		#undo.setStatusTip('...')
-		undo.triggered.connect(QtRec.core.undo)
-		undo.setShortcuts(QtGui.QKeySequence.Undo)
+		self.a_next = menu_state.addAction('Next')
+		self.a_next.setStatusTip('Restore a previously saved state')
+		self.a_next.triggered.connect(self.app.session.restoreNextState)
+		self.a_next.setShortcuts(QtGui.QKeySequence.Redo)
 
-		redo = self.menu_edit.addAction('Redo')
-		#redo.setStatusTip('...')
-		redo.triggered.connect(QtRec.core.redo)
-		redo.setShortcuts(QtGui.QKeySequence.Redo)
-
-		#self.menu_edit.addSeparator()
-
-		#cut = self.menu_edit.addAction('Cut')
-		##cut.setStatusTip('...')
-		#cut.triggered.connect(QtRec.redo)#######################
-		#cut.setShortcuts(QtGui.QKeySequence.Cut)
-
-		#copy = self.menu_edit.addAction('Copy')
-		##copy.setStatusTip('...')
-		#copy.triggered.connect(QtRec.redo)#######################
-		#copy.setShortcuts(QtGui.QKeySequence.Copy)
-
-		#paste = self.menu_edit.addAction('Paste')
-		##paste.setStatusTip('...')
-		#paste.triggered.connect(QtRec.redo)#######################
-		#paste.setShortcuts(QtGui.QKeySequence.Paste)
-
-		#self.menu_edit.addSeparator()
-
+		self.m_setState = menu_state.addMenu('Set')
+		self.m_setState.aboutToShow.connect(self._updateSetStateActions)
+		self.m_renameState = menu_state.addMenu('Rename')
+		self.m_renameState.aboutToShow.connect(self._updateRenameStateActions)
 
 		#MENU - VIEW
 		self.menu_view = self.addMenu('&View')
 		self.ckBox_fullscreen =  QtGui.QAction('Fullscreen', self.menu_view, checkable=True)
 		self.menu_view.addAction(self.ckBox_fullscreen)
 		self.ckBox_fullscreen.setStatusTip('Toggle between window and fullscreen')
-		self.ckBox_fullscreen.triggered.connect(self.toggleFullScreen)
+		self.ckBox_fullscreen.triggered.connect(self.setFullscreen)
 		self.ckBox_fullscreen.setShortcuts(QtGui.QKeySequence('F11'))
-
 
 		#MENU - HELP
 		self.menu_help = self.addMenu('&Help')
-
-
-		#TODO: hier alle doc pdfs und rts listen - schön mit pdf und rtf logo
-
 		sc = self.menu_help.addAction('Shortcuts')
 		sc.setStatusTip('...list all shortcuts')
-	
 		self.menu_help.addSeparator()
-
 		about = self.menu_help.addAction('About')
 		about.setShortcuts(QtGui.QKeySequence('F1'))
 		aboutWidget = MenuAbout()
 		about.triggered.connect(aboutWidget.show)
 
-		#connecting to app
-		#try:
+		#CONNECTING TO APPLICATION.SESSION
 		s = self.app.session
-		new_add.triggered.connect(s.newAdd)
-		new_rep.triggered.connect(self._newReplace)
+		new_add.triggered.connect(s.new)
 		save.triggered.connect(s.save)
-		save_as.triggered.connect(s.saveAs)
-		open_add.triggered.connect(s.openAdd)
-		open_rep.triggered.connect(s.openReplace)
+		save_as.triggered.connect(lambda: s.saveAs)
+		open_add.triggered.connect(s.open)
+
+
+	def _updateRenameStateActions(self):
+		self.m_renameState.clear()
+		se = self.app.session
+		for s in se.stateNames():
+			txt = '[%s]' %s
+			if s == se.current_session:
+				txt += ' <-'
+			self.m_renameState.addAction(txt).triggered.connect(
+							lambda checked, s=s: self._showRenameStateDialog(s))
+
+
+	def _showRenameStateDialog(self, oldStateName):
+		r = _RenameStateDialog(oldStateName)
+		ret = r.exec_()
+		t = str(r.editor.text())
+		if ret == QtGui.QDialog.Accepted and t and t != oldStateName:
+			self.app.session.renameState(oldStateName, t)
+
+
+	def _updateSetStateActions(self):
+		self.m_setState.clear()
+		se = self.app.session
+		for s in se.stateNames():
+			txt = '[%s]' %s
+			if s == se.current_session:
+				txt += ' <-'
+			self.m_setState.addAction(txt).triggered.connect(
+							lambda checked, s=s: se.restoreStateName(s))
 
 
 	def _newReplace(self):
@@ -196,9 +147,9 @@ class MenuBar(_MenuBarAppend):
 			self.app.session.newReplace()
 
 
-	def toggleFullScreen(self):
+	def setFullscreen(self, fullscreen):
 		'''toggle between fullscreen and normal window'''
-		if self.parent().isFullScreen():
+		if not fullscreen:#self.parent().isFullScreen():
 			self.ckBox_fullscreen.setChecked(False)
 			self.parent().showNormal()
 		else:

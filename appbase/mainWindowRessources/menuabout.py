@@ -1,19 +1,11 @@
 # -*- coding: utf-8 -*-
-from QtRec import QtGui, QtCore
-#import os
-#from fancywidgets.pyQtBased.FwMinimalTextEditor import FwMinimalTextEditor
-
-
-#from fancytools.os.userName import userName
-#import appbase
-
-
+from PyQt4 import QtGui
 
 class MenuAbout(QtGui.QWidget):
-#TODO: erstellen
+#TODO: create
 	def __init__(self, parent=None):
 		self.app = QtGui.QApplication.instance()
 
-		super(MenuAbout, self).__init__(parent, logparent=self.app)
+		super(MenuAbout, self).__init__(parent)
 		self.setWindowTitle('About')
 

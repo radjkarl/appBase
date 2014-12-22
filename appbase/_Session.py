@@ -1,150 +1,180 @@
 # -*- coding: utf-8 -*-
 
 
-#from structure import Structure
-
+#from this pgk:
 import appbase
 from appbase.Launcher import Launcher
+from appbase.Server import Server
 
-#own
+#other own pgks:
 from fancytools.os.PathStr import PathStr
 from fancytools.os.legalizeFilename import legalizeFilename
 from fancytools.utils.StreamSignal import StreamSignal
-
+from fancytools.fcollections.naturalSorting import naturalSorting
 from fancywidgets.pyQtBased.Dialogs import Dialogs
 
-
-#foreign
+#foreign pkg:
 import tempfile
 import os
 import sys
-import atexit
 import shutil
 import distutils
 from zipfile import ZipFile
 from time import gmtime, strftime
+from PyQt4 import QtCore
+import pprint
 
 
-import __main__
+class _Opts(dict):
+    def __init__(self, d, session):
+        dict.__init__(self, d)
+        self.session = session
+        self._fn_write_log = None
+        self._activated = False
+        
+        
+    def activate(self):
+        self._activated = True
+        self.update(self)
+        
+    def update(self, d):
+        for key, val in d.iteritems():
+            self.__setitem__(key, val)
+        
+    def __setitem__(self, item, value):
+        if self._activated:
+            if item == 'writeToShell':
+                self.session.streamOut.setWriteToShell(value)              
 
-import QtRec
-from QtRec import QtCore
+            elif item == 'createLog':
+                if value:  
+                    if not self._fn_write_log:
+                        self._fn_write_log = lambda val: self.session.log_file.write(val)
+                        #connect those to different addText-methods
+                        self.session.streamOut.message.connect(self._fn_write_log)
+                        self.session.streamErr.message.connect(self._fn_write_log)                
+                elif self._fn_write_log:
+                    #connect those to different addText-methods
+                    self.session.streamOut.message.disconnect(self._fn_write_log)
+                    self.session.streamErr.message.disconnect(self._fn_write_log)  
+    
+            elif item == 'autosaveIntervalMin':
+                self.session.timerAutosave.setInterval(value*60*1000)
+    
+            elif item == 'autosave':
+                t = self.session.timerAutosave
+                if not t.isActive() and value:
+                    t.start()
+                elif t.isActive() and not value:
+                    t.stop()
+    
+            elif item == 'maxSessions':
+                self.session.checkMaxSessions(value)
 
-WRITE_TO_SHELL = True
+        return dict.__setitem__(self, item, value)
+
+
+
 
 class Session(QtCore.QObject):
     '''
-        * extract the opened (as pyz-zipped) session in a temp folder
-        * create 2nd temp-folder for sessions to be saved
-        * send a close signal to all child structures when exit
-        * write a log file with all output
-        * enable icons in menues of gnome-sessions
-        * gives option of debug mode
+    * extract the opened (as pyz-zipped) session in a temp folder
+    * create 2nd temp-folder for sessions to be saved
+    * send a close signal to all child structures when exit
+    * write a log file with all output
+    * enable icons in menues of gnome-sessions
+    * gives option of debug mode
     '''
 
-    sigPathChanged = QtCore.pyqtSignal(object)#path
-    sigSave = QtCore.pyqtSignal(object)#save-dir
+    sigPathChanged = QtCore.pyqtSignal(object) #path
+    sigSave = QtCore.pyqtSignal(object)        #save-dir
+    sigRestore = QtCore.pyqtSignal(object)     #restore-dir
 
     def __init__(self, args):
         QtCore.QObject.__init__(self)
-        MAX_N_LOG_FILES = 30
-        ENABLE_GUI_ICONS = True
+        
+        self.opts = _Opts({
+                    'maxSessions':10,
+                    'enableGuiIcons':True,
+                    'writeToShell':True,
+                    'createLog':True,
+                    'debugMode':False,
+                    'autosave':True,
+                    'autosaveIntervalMin':15,
+                    'showCloseDialog':True,
+                    'server':False,
+                     }, self)
+        
+        self._icons_enabled = False        
         self.log_file = None
+        self.dialogs = Dialogs()
+        self._createdAutosaveFile = None
         #make temp-dir
             #the directory where the content of the *pyz-file will be copied:
         self.tmp_dir_session = PathStr(tempfile.mkdtemp('%s_session' %__name__))
-            #dir containing all items to save into a new *pyz:
-        self.tmp_dir_save_session = PathStr(tempfile.mkdtemp('%s_save_session' %__name__))
+        self.tmp_dir_save_session = None
             #a work-dir for temp. storage:
         self.tmp_dir_work = PathStr(tempfile.mkdtemp('%s_work' %__name__))
 
-        self.dialogs = Dialogs()
+        pathName = self._inspectArguments(args)
+        
+        self.setSessionPath(pathName)
+        
+        self._setupLogFile()
+        
+        # create connectable stdout and stderr signal:
+        self.streamOut = StreamSignal('out')
+        self.streamErr = StreamSignal('err')
+        self._enableGuiIcons()
+        path= self.dir.join('autoSave.pyz')
+        #Timer
+        self.timerAutosave = QtCore.QTimer()
+        self.timerAutosave.timeout.connect(self._autoSave)
 
-        self._icons_enabled = False
+        self.opts.activate()
+        
 
-        (pathName, self.debug_mode, 
-        createlog, QtRec.restore) = self._inspectArguments(args)
-        #TODO: brauchen wir eigentlich 2 forder _tmp und _tmp_save? kann nicht beides in einem sein?
-        if pathName.endswith('.pyz'):
-            # this script was opend out from a zip-container (named as '*.pyz')
-            self._path = PathStr(pathName)
+    def setSessionPath(self, path, statename=None):
+        if path.endswith('.pyz'):
+            # this script was opened out from a zip-container (named as '*.pyz')
+            self._path = PathStr(path)
             self.dir = self._path.dirname().abspath()
             # extract the zip temporally
             ZipFile(self._path,'r').extractall(path=self.tmp_dir_session)
-            #move the log files to the 'to-save-dir' that those will be saved again
-            for fname in ('log','save', '__main__.py'):
-                folder = self.tmp_dir_session.join(fname)
-                if folder.exists():
-                    folder.move(self.tmp_dir_save_session)
+            self.n_sessions = len(self.stateNames()) 
+            #SET STATE
+            snames = self.stateNames()
+            if statename == None:
+                #last one
+                self.current_session = snames[-1]
+            elif statename in snames:
+                self.current_session = statename
+            else:
+                raise Exception("state '%s' not in saved states %s" %(statename, snames))
+            
         else:
             self.dir = Launcher.rootDir()
-            #print self.dir
-            self._path = None#self.dir.join('unknown.pyz')
-            self.tmp_dir_save_session.mkdir('log')
-            self.tmp_dir_save_session.mkdir('save')
+            self._path = None
+            self.n_sessions = 0
+            self.current_session = None
+            #self._createStarter()
 
 
-        #create new log-filename
-        logFolder = self.tmp_dir_save_session.join('log')
-        d = logFolder.listdir()
-        if d:
-            d.sort()
-            #...as last log-number +1
-            logfilename = logFolder.join( '%s.log' %str(int(d[-1][:-4]) + 1 ))
-            #save only the last MAX_N_LOG_FILES
-            for f in d[MAX_N_LOG_FILES:]:
-                logFolder.remove(f)
-        else:
-            logfilename = logFolder.join('1.log')
-
-        #create new save-filename
-        savefolder = self.tmp_dir_save_session.join('save')
-        d = savefolder.listdir()
-
-        QtRec.log_file_name = self.tmp_dir_work.join('save.py')
-        if d:
-            d.sort()
-            #...as last save-number +1
-            self._save_file_name = savefolder.join( '%s.py' %str(int(d[-1][:-3]) + 1 ))
-            #create one singe file form all saved ones
-            with open(QtRec.core.log_file_name, "wb") as outfile:
-                for f in d:
-                    with open(savefolder.join(f), "rb") as infile:
-                        outfile.write(infile.read())
-        else:
-            #save empty
-            self._save_file_name = savefolder.join('1.py')
-
-        # create connectable stdout and stderr signal:
-        self.streamOut = StreamSignal()
-        self.streamErr = StreamSignal()
-        # save the std output funcs:
-        stdoutW = sys.stdout.write
-        stderrW = sys.stderr.write
-        # forward the std-signals to the new ones:
-        sys.stdout = self.streamOut
-        sys.stderr = self.streamErr
-        if WRITE_TO_SHELL:
-            self.streamOut.message.connect(stdoutW)
-            self.streamErr.message.connect(stderrW)
-        if createlog:
-            #write stout to file:
-            self.log_file = file(logfilename, 'a')
-            self.log_file.write('''
-
-####################################
-New run at %s
-####################################
-
-''' %strftime( "%d.%m.%Y|%H:%M:%S", gmtime() ) )
-            #connect those to different addText-methods
-            self.streamOut.message.connect(self.log_file.write)
-            self.streamErr.message.connect(self.log_file.write)
+   # def _createStarter(self):
+     #   pass
+#         content = '''
+#         from PyQt4 import QtGui
+#         '''
+#         self.addContentToSave(self, content, '__main__.py')
+#         
+#                 if not self.tmp_dir_save_session.join('__main__.py').exists():
+#             #because opened from regular .py
+#             self.addFileToSave(__main__.__file__, '__main__.py')
 
 
-
-        #enable icons in all QMenuBars only for this programm if generally disabled
-        if ENABLE_GUI_ICONS:
+    def _enableGuiIcons(self):
+        #enable icons in all QMenuBars only for this program if generally disabled
+        if self.opts['enableGuiIcons']:
             if os.name == 'posix':#linux
                 this_env = str(os.environ.get('DESKTOP_SESSION'))
                 relevant_env = 'gnome', 'gnome-shell', 'ubuntustudio', 'xubuntu'
@@ -156,15 +186,138 @@ New run at %s
                     'gconftool-2 --type Boolean --set /desktop/gnome/interface/menus_have_icons True')
                         self._icons_enabled = True
 
-        #execute the following functions before the programm ends:
-        atexit.register(self.quit)
 
-        #Timer
-        path= self.dir.join('autoSave.pyz')
-        self.timerAutosave = QtCore.QTimer()
-        self.autosave_interval = 5
-        self.timerAutosave.setInterval(self.autosave_interval*60*1000)
-        self.timerAutosave.timeout.connect(lambda path=path: self._save(path))
+    def _setupLogFile(self):
+        lfile = self.tmp_dir_session.join('log.txt')
+        if lfile.exists():
+            self.log_file = open(lfile, 'a') 
+        else:
+            self.log_file = open(lfile, 'w')
+        self.log_file.write('''
+
+####################################
+New run at %s
+####################################
+            
+''' %strftime( "%d.%m.%Y|%H:%M:%S", gmtime() ) )
+
+
+    def checkMaxSessions(self, nMax=None):
+        '''
+        check whether max. number of saved sessions is reached
+        if: remove the oldest session
+        '''
+        if nMax == None:
+            nMax = self.opts['maxSessions']
+        l = self.stateNames()
+        if len(l) > nMax:
+            for f in l[:len(l)-nMax]:
+                self.tmp_dir_session.remove(str(f))
+
+
+    def stateNames(self):
+        '''
+        return the names of all saved sessions
+        '''
+        s = self.tmp_dir_session
+        l = s.listdir()
+        l = [x for x in l if s.join(x).isdir()]
+        naturalSorting(l)
+        return l
+
+
+    def restorePreviousState(self):
+        s = self.stateNames()
+        i = s.index(self.current_session)
+        if i > 0:
+            self.current_session = s[i-1]
+            self.restoreCurrentState()
+       
+             
+    def restoreNextState(self):
+        s = self.stateNames()
+        i = s.index(self.current_session)
+        if i < len(s):
+            self.current_session = s[i+1]
+            self.restoreCurrentState()
+
+
+    def restoreStateName(self, name):
+        '''restore the state of given [name]''' 
+        self.current_session = name
+        self.restoreCurrentState()
+    
+    def renameState(self, oldStateName, newStateName):
+        s = self.tmp_dir_session.join(oldStateName)
+        s.rename(newStateName)
+        if self.current_session == oldStateName:
+            self.current_session = newStateName
+        print "==> State [%s] renamed to  [%s]" %(oldStateName, newStateName)
+
+
+    def restoreCurrentState(self):
+        if self.current_session:
+            orig = self.tmp_dir_save_session
+            self.tmp_dir_save_session = self.tmp_dir_session.join(
+                                            self.current_session)
+            self.opts.update(eval(self.getSavedContent('session.txt')))
+            self.sigRestore.emit(self)
+            self.tmp_dir_save_session = orig           
+            print "==> State [%s] restored from '%s'" %(self.current_session, self.tmp_dir_session)
+
+
+    def addSession(self):
+        self.current_session = self.n_sessions
+        self.n_sessions += 1
+
+        self.tmp_dir_save_session = self.tmp_dir_session.join(
+                                        str(self.n_sessions)).mkdir()
+        
+        #self._setupLogFile()
+        self.checkMaxSessions()
+       
+#         
+#                 #create new log-filename
+#         logFolder = self.tmp_dir_save_session.join('log')
+#         d = logFolder.listdir()
+#         if d:
+#             d.sort()
+#         ####raus
+#             #...as last log-number +1
+#             logfilename = logFolder.join( '%s.log' %str(int(d[-1][:-4]) + 1 ))
+#             #save only the last MAX_N_LOG_FILES
+#             for f in d[MAX_N_LOG_FILES:]:
+#                 logFolder.remove(f)
+#         else:
+#             logfilename = logFolder.join('1.log')
+# 
+#         #create new save-filename
+#         savefolder = self.tmp_dir_save_session.join('save')
+#         d = savefolder.listdir()
+# 
+#         QtRec.log_file_name = self.tmp_dir_work.join('save.py')
+#         if d:
+#             d.sort()
+#             #...as last save-number +1
+#             self._save_file_name = savefolder.join( '%s.py' %str(int(d[-1][:-3]) + 1 ))
+#             #create one singe file form all saved ones
+#             with open(QtRec.core.log_file_name, "wb") as outfile:
+#                 for f in d:
+#                     with open(savefolder.join(f), "rb") as infile:
+#                         outfile.write(infile.read())
+#         else:
+#             #save empty
+#             self._save_file_name = savefolder.join('1.py')
+
+
+
+    def createSavePath(self, *fileNames):
+        '''create a file-path within the saved sessions temp folder
+        if not already existent'''
+        path = self.tmp_dir_save_session
+        for s in fileNames[:-1]:
+            path = path.join(s).mkdir()
+        return path.join(fileNames[-1])
 
 
     #TODO: copy evtl. in PathStr rein
@@ -179,19 +332,33 @@ New run at %s
         return fileName
 
 
-    def addContentToSave(self, content, fileName):
-        with file(self.tmp_dir_save_session.join(fileName),'w') as f:
-            f.write(content)
+    def addContentToSave(self, content, *path):
+        '''write content to save to the file path 
+        given by [*path]'''
+        path = self.createSavePath(*path)
+        with file(path,'w') as f:
+#             if isinstance(content, np.ndarray):
+#                 np.save(f, content)
+            if isinstance(content, QtCore.QString):
+                f.write(unicode(content))
+            elif isinstance(content, basestring):
+                f.write(content)
+            else: 
+                pp = pprint.PrettyPrinter(indent=4)
+                f.write(pp.pformat(content))
 
 
-    def getSavedFile(self,filePath):
-        t = self.tmp_dir_session.join(filePath)
-        if t.exists():
-            return t
+    def getSavedFile(self,*path):
+        '''return the absolute file path within the temp folder for saved sessions'''
+        if self.tmp_dir_save_session:
+            t = self.tmp_dir_save_session.join(*path)
+            if t.exists():
+                return t
 
 
-    def getSavedContent(self,filePath):
-        t = self.getSavedFile(filePath)
+    def getSavedContent(self,*path):
+        '''open the file given by [*path] and return its content'''
+        t = self.getSavedFile(*path)
         if t:
             with open(t,'r') as content:
                 return content.read()
@@ -199,7 +366,8 @@ New run at %s
 
     @property
     def path(self):
-        '''dirname + sessionname e.g. /home/USER/.../test.pyz'''
+        '''return the path of the saved session, like
+        /home/USER/.../test.pyz'''
         return self._path
 
 
@@ -211,109 +379,141 @@ New run at %s
 
     def quit(self):
         print 'exiting...'
-#        self._recursiveClose(self)
+        #RESET ICONS
         if self._icons_enabled:
             print 'disable menu-icons'
             os.system( #restore the standard-setting for seeing icons in the menus
             'gconftool-2 --type Boolean --set /desktop/gnome/interface/menus_have_icons False')
 
+        #WAIT FOR PROMT IF IN DEBUG MODE
+        if self.opts['debugMode']:
+            raw_input("Press any key to end the session...")
+        #REMOVE TEMP FOLDERS
+        try:
+            self.tmp_dir_session.remove()
+            self.tmp_dir_work.remove()
+        except OSError:
+            pass #in case the folders are used by another process
+        #CLOSE LOG FILE
         if self.log_file:
             self.log_file.close()
-
-        if self.debug_mode:
-            raw_input("Press any key to end the session...")
-
 
 
     def _inspectArguments(self, args):
         '''inspect the command-line-args and give them to appBase'''
-        d = os.path.dirname(args[0])
+        self.exec_path = PathStr(args[0])
+        d = os.path.dirname(self.exec_path)
         if d and appbase.__path__[0].startswith(d): #executed from installpath
-            progName = os.path.basename(args[0])
+            progName = os.path.basename(self.exec_path)
             folder = Launcher.rootDir()
-            #if not folder:
-            #    folder = PathStr.home()
+
             projectName = folder.join(progName)
         else:
-            projectName = args[0]
+            projectName = self.exec_path
         args = args[1:]
-        debugMode = False
-        createlog = True
-        restore = True
+        
+        openSession = False
         for arg in args:
             if arg in ('-h','--help'):
                 self._showHelp()
             elif arg in ('-d','--debug'):
                 print 'RUNNGING IN DEBUG-MODE'
-                debugMode = True
+                self.opts['debugMode'] = True
             elif arg in ('-l','--nolog'):
                 print 'CREATE NO LOG'
-                createlog = False
-            elif arg in ('-n','--new'):
-                print 'START A NEW SESSION - DONT LOAD SAVED PROPERTIES'
-                restore = False
+                self.opts['createLog'] = False
+            elif arg in ('-s', '--server'):
+                self.opts['server'] = True
+            elif arg in ('-o','--o'):
+                openSession = True
+            elif openSession:
+                projectName = arg
             else:
+                print  "Argument '%s' not known." %arg
                 return self._showHelp()
-        return projectName, debugMode, createlog, restore
+        return projectName
 
 
     def _showHelp(self):
         sys.exit('''
-    appBase-sessions can started with the following arguments:
+    %s-sessions can started with the following arguments:
         [-h or --help] - show the help-page
         [-d or --debug] - run in debuging-mode
         [-l or --nolog] - create no log file
         [-n or --new] - start a new session, don'l load saved properties
-        ''')
-
-
-    def newAdd(self):
-        self._newProgram(__main__.__file__)
-
-    
-
-    def newReplace(self):
-        self._replaceProgram(__main__.__file__)
+        ''' %self.__class__.__name__)
 
 
     def save(self):
+        '''save the current session
+        override, if session was saved earlier'''
         if self._path:
-            self._save(self._path)
+            self._saveState(self._path)
         else:
             self.saveAs()
 
 
-    def saveAs(self):
-        filename = self.dialogs.getSaveFileName(filter="*.pyz")
+    def saveAs(self, filename=None):
+        if filename == None:
+            #ask for filename:
+            filename = self.dialogs.getSaveFileName(filter="*.pyz")
         if filename:
             self.path = filename
-            self._save(self.path)
+            self._saveState(self.path)
+            if self._createdAutosaveFile:
+                self._createdAutosaveFile.remove()
+                print "removed automatically created '%s'" %self._createdAutosaveFile
+                self._createdAutosaveFile = None
+                
 
-
-    def openAdd(self):
+    def open(self):
+        '''open a session to define in a dialog in an extra window''' 
         filename = self.dialogs.getOpenFileName(filter="*.pyz")
         if filename:
-            self._newProgram(filename)
+            self.new(filename)
 
 
-    def openReplace(self):
-        filename = self.dialogs.getOpenFileName(filter="*.pyz")
+    def new(self, filename=None):
+        '''start a session an independent process'''
+        path = (self.exec_path,)
+        if self.exec_path.filetype() in ('py', 'pyw', 'pyz'):
+            #get the absolute path to the python-executable
+            p = distutils.spawn.find_executable("python")
+            path = (p, 'python') + path
+        else:
+            #for some reason the first arg is ignored in spawnv -> set a dummy arg
+            path += ('DUMMY',)
         if filename:
-            self._replaceProgram(filename)
-
-
-    def _newProgram(self, filename):
-        #get the absolute path to the python-executable
-        p = distutils.spawn.find_executable("python")
-        #start an indepentent python-process
-        os.spawnl(os.P_NOWAIT, p, 'python', '%s' %filename)
-   
+            path += ('-o', filename)
+        #print path, 876786
+        os.spawnl(os.P_NOWAIT, *path)
  
-    def _replaceProgram(self, filename):
-        #get the absolute path to the python-executable
-        p = distutils.spawn.find_executable("python")
-        self.quit()#ensure all sources were closed etc.
-        os.execv(p, [p, '%s' %filename])
+
+    def registerMainWindow(self, win):
+        self._mainWindow = win
+        win.show = self._showMainWindow
+        win.hide = self._hideMainWindow
+        if self.opts['server']:
+            server = Server(win)
+            win.hide()
+        else:
+            win.show()
+            
+
+    def _showMainWindow(self):
+        try:
+            #restore autosave
+            del self._autosave
+        except AttributeError:
+            pass
+        self._mainWindow.__class__.show(self._mainWindow)
+
+
+    def _hideMainWindow(self):
+        #disable autosave on hidden window
+        self._autosave = self.opts['autosave']
+        self.opts['autosave'] = False
+        self._mainWindow.__class__.hide(self._mainWindow)
 
 
     def _saveDir(self, dirpath):
@@ -325,35 +525,29 @@ New run at %s
                 self._zipFile.write( os.path.join(root,f), os.path.join(dirname,f) )
 
 
-    def _save(self, name):
-        self.sigSave.emit(self.tmp_dir_save_session)
-        QtRec.core.saveAs(self._save_file_name)
-        if not self.tmp_dir_save_session.join('__main__.py').exists():
-            #because opened from regular .py
-            self.addFileToSave(__main__.__file__, '__main__.py')
-        with ZipFile(name,'w') as self._zipFile:
-            #files written in tmp/appBase:
-            self._saveDir(self.tmp_dir_save_session)
-        print "===========\neverything saved in a zipped *.pyz: %s" %name
+    def _saveState(self, path):
+        '''save current state and add a new state'''
+        self.addSession()#next session
+        self._save(str(self.n_sessions), path)
 
 
 
+    def _autoSave(self):
+        '''save state into 'autosave' '''
+        a = 'autoSave'
+        path = self._path
+        if not path:
+            path= self.dir.join('%s.pyz' %a)
+            self._createdAutosaveFile = path
+        self.tmp_dir_save_session = self.tmp_dir_session.join(a).mkdir()
+        self._save(a, path)
+        
 
-    def _writeToZip(self, name, folder='',content=None, removeSource=False):
-        folder = PathStr(folder)
-        #create temp.file containing all saved information
-        if content:
-            with open(name, "w") as prefFile:
-                prefFile.write(str(content))
-            path = PathStr(name).filename()
-        else:
-            path = name
-        #print name, path, folder,999
-        self._zipFile.write(name, folder.join(path))
-        #remove tempfile
-        if content or removeSource:
-            os.remove(name)
-
-
-
-
+    def _save(self, stateName, path):
+        '''save into 'stateName' to pyz-path'''
+        self.addContentToSave(self.opts, 'session.txt')
+        self.sigSave.emit(self)
+        with ZipFile(path,'w') as self._zipFile:
+            self._saveDir(self.tmp_dir_session)
+        self.current_session = stateName
+        print "==> State [%s] saved to '%s'" %(stateName, path)

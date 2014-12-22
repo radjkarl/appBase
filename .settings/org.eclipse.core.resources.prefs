@@ -1,10 +1,12 @@
 eclipse.preferences.version=1
 encoding//appbase/Application.py=utf-8
-encoding//appbase/Launcher.pyw=utf-8
-encoding//appbase/MainWindow.pyw=utf-8
+encoding//appbase/Launcher.py=utf-8
+encoding//appbase/MainWindow.py=utf-8
 encoding//appbase/_Session.py=utf-8
 encoding//appbase/__init__.py=utf-8
 encoding//appbase/mainWindowRessources/__init__.py=utf-8
 encoding//appbase/mainWindowRessources/menuabout.py=utf-8
 encoding//appbase/mainWindowRessources/menubar.py=utf-8
 encoding//appbase/mainWindowRessources/menupreferences.py=utf-8
+encoding//doc/conf.py=utf-8
+encoding/setup.py=utf-8

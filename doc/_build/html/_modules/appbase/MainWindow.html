@@ -1,0 +1,265 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>appbase.MainWindow &mdash; appbase  documentation</title>
+  
+
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="top" title="appbase  documentation" href="../../index.html"/>
+        <link rel="up" title="Module code" href="../index.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        <a href="../../index.html" class="fa fa-home"> appbase</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+        
+            <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../appbase.html">appbase package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../appbase.html#subpackages">Subpackages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../appbase.html#module-appbase.Application">Submodules</a></li>
+</ul>
+</li>
+</ul>
+
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../index.html">appbase</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      
+    <li>appbase.MainWindow</li>
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            
+  <h1>Source code for appbase.MainWindow</h1><div class="highlight"><pre>
+<span class="c"># -*- coding: utf-8 -*-</span>
+
+
+<span class="c">#this pkg:</span>
+<span class="kn">from</span> <span class="nn">mainWindowRessources.menubar</span> <span class="kn">import</span> <span class="n">MenuBar</span>
+<span class="c">#try:</span>
+<span class="c">#from . import Application</span>
+<span class="c">#except:</span>
+<span class="kn">from</span> <span class="nn">appbase</span> <span class="kn">import</span> <span class="n">Application</span>
+	
+<span class="c">#foreign:</span>
+<span class="kn">from</span> <span class="nn">PyQt4</span> <span class="kn">import</span> <span class="n">QtGui</span>
+
+
+<div class="viewcode-block" id="MainWindow"><a class="viewcode-back" href="../../appbase.html#appbase.MainWindow.MainWindow">[docs]</a><span class="k">class</span> <span class="nc">MainWindow</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QMainWindow</span><span class="p">):</span>
+	<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">	template for QMainWindow including:</span>
+<span class="sd">	* a menu bar with all common features</span>
+<span class="sd">	* fullscreen with F11</span>
+<span class="sd">	* changed window title when saved under a new name</span>
+<span class="sd">	* Preferences in Menubar-&gt;File</span>
+<span class="sd">	* autosave</span>
+<span class="sd">	* close dialog</span>
+<span class="sd">	&#39;&#39;&#39;</span>
+<div class="viewcode-block" id="MainWindow.__init__"><a class="viewcode-back" href="../../appbase.html#appbase.MainWindow.MainWindow.__init__">[docs]</a>	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">):</span>
+		<span class="nb">super</span><span class="p">(</span><span class="n">MainWindow</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">()</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">app</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QApplication</span><span class="o">.</span><span class="n">instance</span><span class="p">()</span>
+		<span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="p">,</span> <span class="n">Application</span><span class="p">):</span>
+			<span class="k">print</span> <span class="s">&#39;Error: QApp is no instance from appbase.Application&#39;</span>
+			<span class="k">return</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">sigPathChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">setTitlePath</span><span class="p">)</span>
+
+		<span class="bp">self</span><span class="o">.</span><span class="n">_window_title</span> <span class="o">=</span> <span class="n">title</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">_window_title_additive</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">_window_title_path</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+		
+		<span class="bp">self</span><span class="o">.</span><span class="n">setMenuBar</span><span class="p">(</span><span class="n">MenuBar</span><span class="p">())</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">_setTitle</span><span class="p">()</span>
+			
+</div>
+<div class="viewcode-block" id="MainWindow.setTitleAdditive"><a class="viewcode-back" href="../../appbase.html#appbase.MainWindow.MainWindow.setTitleAdditive">[docs]</a>	<span class="k">def</span> <span class="nf">setTitleAdditive</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">):</span>
+		<span class="k">if</span> <span class="n">value</span><span class="p">:</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">_window_title_additive</span> <span class="o">=</span> <span class="s">&#39;- </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span><span class="n">value</span>
+		<span class="k">else</span><span class="p">:</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">_window_title_additive</span> <span class="o">=</span> <span class="n">value</span>		
+		<span class="bp">self</span><span class="o">.</span><span class="n">_setTitle</span><span class="p">()</span>
+
+</div>
+<div class="viewcode-block" id="MainWindow.setTitlePath"><a class="viewcode-back" href="../../appbase.html#appbase.MainWindow.MainWindow.setTitlePath">[docs]</a>	<span class="k">def</span> <span class="nf">setTitlePath</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">):</span>
+		<span class="k">if</span> <span class="n">value</span><span class="p">:</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">_window_title_path</span> <span class="o">=</span> <span class="s">&#39;- </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span><span class="n">value</span>
+		<span class="k">else</span><span class="p">:</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">_window_title_path</span> <span class="o">=</span> <span class="n">value</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">_setTitle</span><span class="p">()</span>
+		
+		</div>
+	<span class="k">def</span> <span class="nf">_setTitle</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">setWindowTitle</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%s</span><span class="s"> </span><span class="si">%s</span><span class="s"> </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_window_title</span><span class="p">,</span> 
+										<span class="bp">self</span><span class="o">.</span><span class="n">_window_title_additive</span><span class="p">,</span> 
+										<span class="bp">self</span><span class="o">.</span><span class="n">_window_title_path</span><span class="p">)</span> <span class="p">)</span>
+
+
+<div class="viewcode-block" id="MainWindow.closeEvent"><a class="viewcode-back" href="../../appbase.html#appbase.MainWindow.MainWindow.closeEvent">[docs]</a>	<span class="k">def</span> <span class="nf">closeEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">evt</span><span class="p">):</span>
+		<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">opts</span><span class="p">[</span><span class="s">&#39;showCloseDialog&#39;</span><span class="p">]:</span>
+			<span class="n">b</span> <span class="o">=</span> <span class="n">_CloseDialog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+			<span class="n">ret</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">exec_</span><span class="p">()</span>
+			<span class="k">if</span> <span class="n">ret</span> <span class="o">==</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QMessageBox</span><span class="o">.</span><span class="n">Save</span><span class="p">:</span>
+				<span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+			<span class="k">elif</span> <span class="n">ret</span> <span class="o">==</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QMessageBox</span><span class="o">.</span><span class="n">Cancel</span><span class="p">:</span>
+				<span class="k">return</span> <span class="n">evt</span><span class="o">.</span><span class="n">ignore</span><span class="p">()</span>
+		<span class="k">return</span> <span class="n">evt</span><span class="o">.</span><span class="n">accept</span><span class="p">()</span>
+		
+			
+			</div></div>
+<span class="k">class</span> <span class="nc">_CloseDialog</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QMessageBox</span><span class="p">):</span>	
+	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mainWindow</span><span class="p">):</span>
+		<span class="n">QtGui</span><span class="o">.</span><span class="n">QMessageBox</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mainWindow</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">setIcon</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QMessageBox</span><span class="o">.</span><span class="n">Warning</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="s">&quot;Close the program...&quot;</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">setInformativeText</span><span class="p">(</span><span class="s">&quot;Save changes?&quot;</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">setStandardButtons</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QMessageBox</span><span class="o">.</span><span class="n">Save</span> <span class="o">|</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QMessageBox</span><span class="o">.</span><span class="n">Discard</span> <span class="o">|</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QMessageBox</span><span class="o">.</span><span class="n">Cancel</span><span class="p">)</span>
+
+
+		<span class="n">c</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QCheckBox</span><span class="p">(</span><span class="s">&quot;don&#39;t ask me again&quot;</span><span class="p">)</span>
+		<span class="n">c</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="k">lambda</span> <span class="n">val</span><span class="p">:</span> <span class="n">mainWindow</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">opts</span><span class="o">.</span><span class="n">__setitem__</span><span class="p">(</span><span class="s">&#39;showCloseDialog&#39;</span><span class="p">,</span> <span class="ow">not</span> <span class="n">val</span><span class="p">))</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">()</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">c</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">7</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+
+
+
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+	<span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="n">session</span><span class="p">):</span>
+		<span class="k">print</span><span class="p">(</span><span class="s">&#39;saveTest&#39;</span><span class="p">)</span>
+		<span class="k">print</span><span class="p">(</span><span class="n">session</span><span class="o">.</span><span class="n">getSavedFile</span><span class="p">()</span> <span class="p">)</span>
+		<span class="k">print</span><span class="p">(</span><span class="n">session</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+
+	<span class="k">def</span> <span class="nf">restore</span><span class="p">(</span><span class="n">session</span><span class="p">):</span>
+		<span class="k">print</span> <span class="p">(</span><span class="s">&#39;restore&#39;</span><span class="p">)</span>
+	
+	<span class="kn">import</span> <span class="nn">sys</span>
+	<span class="n">app</span> <span class="o">=</span> <span class="n">Application</span><span class="p">([])</span>
+	<span class="n">win</span> <span class="o">=</span> <span class="n">MainWindow</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s">&#39;Hello World&#39;</span><span class="p">)</span>
+	<span class="c">#CONNECT OWN SAVE/RESTORE FUNCTIONS TO THE SESSION</span>
+	<span class="n">app</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">sigSave</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">save</span><span class="p">)</span>
+	<span class="n">app</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">sigRestore</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">restore</span><span class="p">)</span>
+	
+	<span class="n">win</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+	<span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="n">app</span><span class="o">.</span><span class="n">exec_</span><span class="p">())</span>
+</pre></div>
+
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2014, Karl Bedrich.
+    </p>
+  </div>
+
+  <a href="https://github.com/snide/sphinx_rtd_theme">Sphinx theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

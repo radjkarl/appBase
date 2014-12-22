@@ -1,0 +1,768 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>appbase.Launcher &mdash; appbase  documentation</title>
+  
+
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="top" title="appbase  documentation" href="../../index.html"/>
+        <link rel="up" title="Module code" href="../index.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        <a href="../../index.html" class="fa fa-home"> appbase</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+        
+            <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../appbase.html">appbase package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../appbase.html#subpackages">Subpackages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../appbase.html#module-appbase.Application">Submodules</a></li>
+</ul>
+</li>
+</ul>
+
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../index.html">appbase</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      
+    <li>appbase.Launcher</li>
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            
+  <h1>Source code for appbase.Launcher</h1><div class="highlight"><pre>
+<span class="c"># -*- coding: utf-8 -*-</span>
+<span class="c">#own</span>
+<span class="kn">import</span> <span class="nn">appbase</span>
+<span class="kn">from</span> <span class="nn">fancytools.os.PathStr</span> <span class="kn">import</span> <span class="n">PathStr</span>
+<span class="kn">from</span> <span class="nn">fancywidgets.pyQtBased.Dialogs</span> <span class="kn">import</span> <span class="n">Dialogs</span>
+
+<span class="c">#foreign</span>
+<span class="kn">from</span> <span class="nn">PyQt4</span> <span class="kn">import</span> <span class="n">QtGui</span><span class="p">,</span> <span class="n">QtCore</span><span class="p">,</span> <span class="n">QtSvg</span>
+
+<span class="c">#built-in</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span>  <span class="nn">zipfile</span> <span class="kn">import</span> <span class="n">ZipFile</span>
+<span class="kn">import</span> <span class="nn">distutils</span>
+<span class="kn">from</span> <span class="nn">distutils</span> <span class="kn">import</span> <span class="n">spawn</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">tempfile</span>
+
+
+
+
+<div class="viewcode-block" id="Launcher"><a class="viewcode-back" href="../../appbase.html#appbase.Launcher.Launcher">[docs]</a><span class="k">class</span> <span class="nc">Launcher</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QMainWindow</span><span class="p">):</span>
+	<span class="sd">&#39;&#39;&#39;main class for the Launcher&#39;&#39;&#39;</span>
+	<span class="n">CONFIG_FILE</span> <span class="o">=</span> <span class="n">PathStr</span><span class="o">.</span><span class="n">home</span><span class="p">()</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Launcher.__init__"><a class="viewcode-back" href="../../appbase.html#appbase.Launcher.Launcher.__init__">[docs]</a>	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+			<span class="n">title</span><span class="o">=</span><span class="s">&#39;PYZ-Launcher&#39;</span><span class="p">,</span>
+			<span class="n">icon</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+			<span class="n">start_script</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span>
+			<span class="n">left_header</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+			<span class="n">right_header</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+			<span class="n">file_type</span><span class="o">=</span><span class="s">&#39;pyz&#39;</span>
+			<span class="p">):</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">dialogs</span> <span class="o">=</span> <span class="n">Dialogs</span><span class="p">()</span>
+
+		<span class="n">_path</span> <span class="o">=</span> <span class="n">PathStr</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
+		<span class="n">_default_text_color</span> <span class="o">=</span> <span class="s">&#39;#3c3c3c&#39;</span>
+
+		<span class="k">if</span> <span class="n">icon</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+			<span class="n">icon</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_path</span><span class="p">,</span><span class="s">&#39;media&#39;</span><span class="p">,</span><span class="s">&#39;launcher_logo.svg&#39;</span><span class="p">)</span>
+		<span class="k">if</span> <span class="n">start_script</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+			<span class="n">start_script</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_path</span><span class="p">,</span><span class="s">&#39;test_session.py&#39;</span><span class="p">)</span>
+		<span class="k">if</span> <span class="n">left_header</span> <span class="o">==</span><span class="bp">None</span><span class="p">:</span>
+			<span class="n">_description</span> <span class="o">=</span> <span class="s">&quot;&lt;a href=</span><span class="si">%s</span><span class="s"> style=&#39;color: </span><span class="si">%s</span><span class="s">&#39;&gt;</span><span class="si">%s</span><span class="s">&lt;/a&gt;&quot;</span> <span class="o">%</span><span class="p">(</span>
+				<span class="n">appbase</span><span class="o">.</span><span class="n">__url__</span><span class="p">,</span><span class="n">_default_text_color</span><span class="p">,</span><span class="n">appbase</span><span class="o">.</span><span class="n">__description__</span><span class="p">)</span>
+			
+			<span class="n">left_header</span> <span class="o">=</span> <span class="s">&quot;&quot;&quot;&lt;b&gt;</span><span class="si">%s</span><span class="s">&lt;/b&gt;&lt;br&gt;</span>
+<span class="s">				version&amp;nbsp;&amp;nbsp;</span>
+<span class="s">				&lt;a href=</span><span class="si">%s</span><span class="s"> style=&#39;color: </span><span class="si">%s</span><span class="s">&#39;&gt;</span><span class="si">%s</span><span class="s">&lt;/a&gt;&lt;br&gt;</span>
+<span class="s">				autor&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;</span>
+<span class="s">					&lt;a href=mailto:</span><span class="si">%s</span><span class="s"> style=&#39;color: </span><span class="si">%s</span><span class="s">&#39;&gt;</span><span class="si">%s</span><span class="s">&lt;/a&gt; &quot;&quot;&quot;</span> <span class="o">%</span><span class="p">(</span> <span class="c">#text-decoration:underline</span>
+				<span class="n">_description</span><span class="p">,</span>
+				<span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_path</span><span class="p">,</span><span class="s">&#39;media&#39;</span><span class="p">,</span><span class="s">&#39;recent_changes.txt&#39;</span><span class="p">),</span>
+				<span class="n">_default_text_color</span><span class="p">,</span>
+				<span class="n">appbase</span><span class="o">.</span><span class="n">__version__</span><span class="p">,</span>
+				<span class="n">appbase</span><span class="o">.</span><span class="n">__email__</span><span class="p">,</span>
+				<span class="n">_default_text_color</span><span class="p">,</span>
+				<span class="n">appbase</span><span class="o">.</span><span class="n">__author__</span>
+				<span class="p">)</span>
+		<span class="k">if</span> <span class="n">right_header</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+			<span class="c">#if no header is given, list all pdfs in folder media as link</span>
+			<span class="n">d</span> <span class="o">=</span> <span class="n">_path</span>
+			<span class="n">right_header</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+			<span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="s">&#39;media&#39;</span><span class="p">)):</span>
+				<span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s">&#39;.pdf&#39;</span><span class="p">):</span>
+					<span class="n">_guidePath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="s">&#39;media&#39;</span><span class="p">,</span><span class="n">f</span><span class="p">)</span>
+					<span class="n">right_header</span> <span class="o">+=</span> <span class="s">&quot;&lt;a href=</span><span class="si">%s</span><span class="s"> style=&#39;color: </span><span class="si">%s</span><span class="s">&#39;&gt;</span><span class="si">%s</span><span class="s">&lt;/a&gt;&lt;br&gt;&quot;</span> <span class="o">%</span><span class="p">(</span>
+						<span class="n">_guidePath</span><span class="p">,</span> <span class="n">_default_text_color</span><span class="p">,</span> <span class="n">f</span><span class="p">[:</span><span class="o">-</span><span class="mi">4</span><span class="p">])</span>
+			<span class="n">right_header</span> <span class="o">=</span> <span class="n">right_header</span><span class="p">[:</span><span class="o">-</span><span class="mi">4</span><span class="p">]</span>
+
+		<span class="n">QtGui</span><span class="o">.</span><span class="n">QMainWindow</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+
+		<span class="bp">self</span><span class="o">.</span><span class="n">_start_script</span> <span class="o">=</span> <span class="n">start_script</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">setWindowTitle</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">setWindowIcon</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QIcon</span><span class="p">(</span><span class="n">icon</span><span class="p">))</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="mi">900</span><span class="p">,</span><span class="mi">500</span><span class="p">)</span>
+		<span class="c">#BASE STRUTURE</span>
+		<span class="n">area</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QWidget</span><span class="p">()</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">setCentralWidget</span><span class="p">(</span><span class="n">area</span><span class="p">)</span>
+		<span class="n">layout</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QVBoxLayout</span><span class="p">()</span>
+		<span class="n">area</span><span class="o">.</span><span class="n">setLayout</span><span class="p">(</span><span class="n">layout</span><span class="p">)</span>
+		<span class="c">#header = QtGui.QHBoxLayout()</span>
+		<span class="c">#layout.addLayout(header)</span>
+		<span class="c">#grab the default text color of a qlabel to color all links from blue to it:</span>
+		<span class="c">#LEFT TEXT</span>
+		<span class="n">info</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QLabel</span><span class="p">(</span><span class="n">left_header</span><span class="p">)</span>
+		<span class="n">info</span><span class="o">.</span><span class="n">setOpenExternalLinks</span> <span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+		<span class="c">#LOGO</span>
+		<span class="n">header</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QWidget</span><span class="p">()</span>
+		<span class="n">header</span><span class="o">.</span><span class="n">setFixedHeight</span><span class="p">(</span><span class="mi">70</span><span class="p">)</span>
+		<span class="n">headerlayout</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QHBoxLayout</span><span class="p">()</span>
+		<span class="n">header</span><span class="o">.</span><span class="n">setLayout</span><span class="p">(</span><span class="n">headerlayout</span><span class="p">)</span>
+		<span class="n">logo</span> <span class="o">=</span> <span class="n">QtSvg</span><span class="o">.</span><span class="n">QSvgWidget</span><span class="p">(</span><span class="n">icon</span><span class="p">)</span>
+		<span class="n">logo</span><span class="o">.</span><span class="n">setFixedWidth</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span>
+		<span class="n">logo</span><span class="o">.</span><span class="n">setFixedHeight</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span>
+		<span class="n">headerlayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">logo</span><span class="p">)</span>
+		<span class="n">headerlayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">info</span><span class="p">)</span>
+		<span class="n">layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">header</span><span class="p">)</span>
+		<span class="c">#RIGHT_HEADER</span>
+		<span class="n">userGuide</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QLabel</span><span class="p">(</span><span class="n">right_header</span><span class="p">)</span>
+		<span class="n">userGuide</span><span class="o">.</span><span class="n">setOpenExternalLinks</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+		<span class="n">userGuide</span><span class="o">.</span><span class="n">setAlignment</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">AlignTop</span> <span class="o">|</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">AlignRight</span><span class="p">)</span>
+		<span class="n">headerlayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">userGuide</span><span class="p">)</span>
+		<span class="c">#ROOT-PATH OF THE SESSIONS</span>
+		<span class="n">rootLayout</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QHBoxLayout</span><span class="p">()</span>
+		<span class="n">rootFrame</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QFrame</span><span class="p">()</span>
+		<span class="n">rootFrame</span><span class="o">.</span><span class="n">setFrameStyle</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QFrame</span><span class="o">.</span><span class="n">StyledPanel</span> <span class="o">|</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QFrame</span><span class="o">.</span><span class="n">Plain</span><span class="p">)</span>
+		<span class="n">rootFrame</span><span class="o">.</span><span class="n">setFixedHeight</span><span class="p">(</span><span class="mi">45</span><span class="p">)</span>
+		<span class="n">rootFrame</span><span class="o">.</span><span class="n">setLineWidth</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+		<span class="n">rootFrame</span><span class="o">.</span><span class="n">setLayout</span><span class="p">(</span><span class="n">rootLayout</span><span class="p">)</span>
+		<span class="n">layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">rootFrame</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">rootDir</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QLabel</span><span class="p">()</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">rootDir</span><span class="o">.</span><span class="n">setAutoFillBackground</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">rootDir</span><span class="o">.</span><span class="n">setStyleSheet</span><span class="p">(</span><span class="s">&quot;QLabel { background-color: white; }&quot;</span><span class="p">)</span>
+
+
+		<span class="c">#FILE-BROWSER</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">treeView</span> <span class="o">=</span> <span class="n">_TreeView</span><span class="p">()</span>
+
+		<span class="bp">self</span><span class="o">.</span><span class="n">fileSystemModel</span> <span class="o">=</span> <span class="n">_FileSystemModel</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">treeView</span><span class="p">,</span> <span class="n">file_type</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">fileSystemModel</span><span class="o">.</span><span class="n">setNameFilters</span><span class="p">([</span><span class="s">&#39;*.</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span><span class="n">file_type</span><span class="p">])</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">fileSystemModel</span><span class="o">.</span><span class="n">setNameFilterDisables</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">treeView</span><span class="o">.</span><span class="n">setModel</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fileSystemModel</span><span class="p">)</span>
+
+		<span class="n">treelayout</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QHBoxLayout</span><span class="p">()</span>
+		<span class="n">splitter</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QSplitter</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">Orientation</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+
+		<span class="bp">self</span><span class="o">.</span><span class="n">fileInfo</span> <span class="o">=</span> <span class="n">_PyzInfo</span><span class="p">(</span><span class="n">splitter</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fileSystemModel</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">treeView</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">treeView</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fileInfo</span><span class="o">.</span><span class="n">update</span><span class="p">)</span>
+
+		<span class="n">splitter</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">treeView</span><span class="p">)</span>
+		<span class="n">splitter</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fileInfo</span><span class="p">)</span>
+		<span class="n">treelayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">splitter</span><span class="p">)</span>
+		
+		<span class="n">layout</span><span class="o">.</span><span class="n">addLayout</span><span class="p">(</span><span class="n">treelayout</span><span class="p">)</span>
+
+		<span class="c">#get last root-path</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">_path</span> <span class="o">=</span> <span class="n">PathStr</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">)</span>
+		<span class="k">if</span> <span class="n">Launcher</span><span class="o">.</span><span class="n">CONFIG_FILE</span><span class="p">:</span>
+			<span class="k">try</span><span class="p">:</span>
+				<span class="bp">self</span><span class="o">.</span><span class="n">_path</span> <span class="o">=</span> <span class="n">PathStr</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="n">Launcher</span><span class="o">.</span><span class="n">CONFIG_FILE</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s">&#39;unicode-escape&#39;</span><span class="p">))</span>
+			<span class="k">except</span> <span class="ne">IOError</span><span class="p">:</span>
+				<span class="k">pass</span> <span class="c">#file not existant</span>
+		<span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+			<span class="n">msgBox</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QMessageBox</span><span class="p">()</span>
+			<span class="n">msgBox</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="s">&quot;Please choose your projectDirectory.&quot;</span><span class="p">)</span>
+			<span class="n">msgBox</span><span class="o">.</span><span class="n">exec_</span><span class="p">()</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">_changeRootDir</span><span class="p">()</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">treeView</span><span class="o">.</span><span class="n">setPath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">)</span>
+		<span class="n">abspath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">rootDir</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="n">abspath</span><span class="p">)</span>
+		<span class="n">rootLayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rootDir</span><span class="p">)</span>
+		<span class="c">#GO UPWARDS ROOT-PATH BUTTON</span>
+		<span class="n">btnUpRootDir</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QPushButton</span><span class="p">(</span><span class="s">&#39;up&#39;</span><span class="p">)</span>
+		<span class="n">btnUpRootDir</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_goUpRootDir</span><span class="p">)</span>
+		<span class="n">rootLayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">btnUpRootDir</span><span class="p">)</span>
+		<span class="c">#DEFINE CURRENT DIR AS ROOT-PATH</span>
+		<span class="n">btnDefineRootDir</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QPushButton</span><span class="p">(</span><span class="s">&#39;set&#39;</span><span class="p">)</span>
+		<span class="n">btnDefineRootDir</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_defineRootDir</span><span class="p">)</span>
+		<span class="n">rootLayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">btnDefineRootDir</span><span class="p">)</span>
+		<span class="c">#SELECT ROOT-PATH BUTTON</span>
+		<span class="n">buttonRootDir</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QPushButton</span><span class="p">(</span><span class="s">&#39;select&#39;</span><span class="p">)</span>
+		<span class="n">buttonRootDir</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_changeRootDir</span><span class="p">)</span>
+		<span class="n">rootLayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">buttonRootDir</span><span class="p">)</span>
+		<span class="c">#NEW-BUTTON</span>
+		<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_start_script</span><span class="p">:</span>
+			<span class="n">newButton</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QPushButton</span><span class="p">(</span><span class="s">&#39;NEW&#39;</span><span class="p">)</span>
+			<span class="n">newButton</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_openNew</span><span class="p">)</span>
+			<span class="n">layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">newButton</span><span class="p">)</span>
+</div>
+	<span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="Launcher.rootDir"><a class="viewcode-back" href="../../appbase.html#appbase.Launcher.Launcher.rootDir">[docs]</a>	<span class="k">def</span> <span class="nf">rootDir</span><span class="p">():</span>
+		<span class="k">try</span><span class="p">:</span>
+			<span class="k">return</span> <span class="n">PathStr</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="n">Launcher</span><span class="o">.</span><span class="n">CONFIG_FILE</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s">&#39;unicode-escape&#39;</span><span class="p">))</span>
+		<span class="k">except</span> <span class="ne">IOError</span><span class="p">:</span><span class="c">#create starter</span>
+			<span class="k">return</span> <span class="n">PathStr</span><span class="o">.</span><span class="n">home</span><span class="p">()</span>
+		
+
+</div>
+	<span class="k">def</span> <span class="nf">_goUpRootDir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">_setRootDir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="o">.</span><span class="n">dirname</span><span class="p">())</span>
+
+	<span class="k">def</span> <span class="nf">_defineRootDir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="n">i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">treeView</span><span class="o">.</span><span class="n">selectedIndexes</span><span class="p">()</span>
+		<span class="c">#if not self.treeView.isIndexHidden(i):</span>
+		<span class="k">if</span> <span class="n">i</span><span class="p">:</span>
+			<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fileSystemModel</span><span class="o">.</span><span class="n">isDir</span><span class="p">(</span><span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+				<span class="bp">self</span><span class="o">.</span><span class="n">_setRootDir</span><span class="p">(</span><span class="n">PathStr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fileSystemModel</span><span class="o">.</span><span class="n">filePath</span><span class="p">(</span><span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">])))</span>
+
+	<span class="k">def</span> <span class="nf">_changeRootDir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="n">path</span> <span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dialogs</span><span class="o">.</span><span class="n">getExistingDirectory</span><span class="p">()</span>
+		<span class="k">if</span> <span class="n">path</span><span class="p">:</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">_setRootDir</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+
+
+	<span class="k">def</span> <span class="nf">_setRootDir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">_path</span> <span class="o">=</span> <span class="n">path</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">rootDir</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">)</span>
+		<span class="n">root</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fileSystemModel</span><span class="o">.</span><span class="n">setRootPath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">treeView</span><span class="o">.</span><span class="n">setRootIndex</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
+		<span class="c">#save last path to file</span>
+		<span class="k">if</span> <span class="n">Launcher</span><span class="o">.</span><span class="n">CONFIG_FILE</span><span class="p">:</span>
+			<span class="nb">open</span><span class="p">(</span><span class="n">Launcher</span><span class="o">.</span><span class="n">CONFIG_FILE</span><span class="p">,</span> <span class="s">&#39;w&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s">&#39;unicode-escape&#39;</span><span class="p">))</span>
+
+
+	<span class="k">def</span> <span class="nf">_openNew</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="n">p</span> <span class="o">=</span> <span class="n">spawn</span><span class="o">.</span><span class="n">find_executable</span><span class="p">(</span><span class="s">&quot;python&quot;</span><span class="p">)</span>
+		<span class="n">os</span><span class="o">.</span><span class="n">spawnl</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">P_NOWAIT</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="s">&#39;python&#39;</span><span class="p">,</span> <span class="s">&#39;</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span><span class="bp">self</span><span class="o">.</span><span class="n">_start_script</span><span class="p">)</span>
+
+
+
+</div>
+<span class="k">class</span> <span class="nc">_FileEditMenu</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QWidget</span><span class="p">):</span>
+	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">treeView</span><span class="p">):</span>
+		<span class="n">QtGui</span><span class="o">.</span><span class="n">QWidget</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">_treeView</span> <span class="o">=</span> <span class="n">treeView</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">_menu</span><span class="o">=</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QMenu</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+		<span class="n">d</span> <span class="o">=</span> <span class="n">PathStr</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
+		<span class="n">iconpath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="s">&#39;media&#39;</span><span class="p">,</span><span class="s">&#39;icons&#39;</span><span class="p">,</span><span class="s">&#39;approve.svg&#39;</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">_actionStart</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QAction</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QIcon</span><span class="p">(</span><span class="n">iconpath</span><span class="p">),</span>
+			<span class="s">&#39;Start&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_treeView</span><span class="p">,</span>
+			<span class="n">triggered</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_treeView</span><span class="o">.</span><span class="n">openProject</span><span class="p">)</span>
+
+		<span class="n">iconpath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="s">&#39;media&#39;</span><span class="p">,</span><span class="s">&#39;icons&#39;</span><span class="p">,</span><span class="s">&#39;delete.svg&#39;</span><span class="p">)</span>
+		<span class="n">delete</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QAction</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QIcon</span><span class="p">(</span><span class="n">iconpath</span><span class="p">),</span>
+			<span class="s">&#39;Delete&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_treeView</span><span class="p">,</span>
+			<span class="n">triggered</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_treeView</span><span class="o">.</span><span class="n">deleteSelected</span><span class="p">)</span>
+
+		<span class="n">iconpath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="s">&#39;media&#39;</span><span class="p">,</span><span class="s">&#39;icons&#39;</span><span class="p">,</span><span class="s">&#39;rename.svg&#39;</span><span class="p">)</span>
+		<span class="n">rename</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QAction</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QIcon</span><span class="p">(</span><span class="n">iconpath</span><span class="p">),</span>
+			<span class="s">&#39;Rename&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_treeView</span><span class="p">,</span>
+			<span class="n">triggered</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_treeView</span><span class="o">.</span><span class="n">editSelected</span><span class="p">)</span>
+
+		<span class="n">iconpath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="s">&#39;media&#39;</span><span class="p">,</span><span class="s">&#39;icons&#39;</span><span class="p">,</span><span class="s">&#39;new.svg&#39;</span><span class="p">)</span>
+		<span class="n">newDir</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QAction</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QIcon</span><span class="p">(</span><span class="n">iconpath</span><span class="p">),</span>
+			<span class="s">&#39;New Directory&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_treeView</span><span class="p">,</span>
+			<span class="n">triggered</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_treeView</span><span class="o">.</span><span class="n">newDirInSelected</span><span class="p">)</span>
+
+		<span class="n">iconpath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="s">&#39;media&#39;</span><span class="p">,</span><span class="s">&#39;icons&#39;</span><span class="p">,</span><span class="s">&#39;findReplace.svg&#39;</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">_editStartScript</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QAction</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QIcon</span><span class="p">(</span><span class="n">iconpath</span><span class="p">),</span>
+			<span class="s">&#39;Edit start script&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_treeView</span><span class="p">,</span>
+			<span class="n">triggered</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_treeView</span><span class="o">.</span><span class="n">editStartScriptInSelected</span><span class="p">)</span>
+
+		<span class="n">iconpath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="s">&#39;media&#39;</span><span class="p">,</span><span class="s">&#39;icons&#39;</span><span class="p">,</span><span class="s">&#39;bug.png&#39;</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">_actionInDebugMode</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QAction</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QIcon</span><span class="p">(</span><span class="n">iconpath</span><span class="p">),</span>
+			<span class="s">&#39;Run in debug mode&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_treeView</span><span class="p">,</span>
+			<span class="n">triggered</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_treeView</span><span class="o">.</span><span class="n">runInDebugMode</span><span class="p">)</span>
+
+		<span class="bp">self</span><span class="o">.</span><span class="n">_menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_actionStart</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">_menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="n">rename</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">_menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="n">newDir</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">_menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_editStartScript</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">_menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="n">delete</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">_menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_actionInDebugMode</span><span class="p">)</span>
+
+
+	<span class="k">def</span> <span class="nf">show</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">evt</span><span class="p">):</span>
+		<span class="n">isDir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_treeView</span><span class="o">.</span><span class="n">selectedIsDir</span><span class="p">(</span><span class="n">evt</span><span class="o">.</span><span class="n">pos</span><span class="p">())</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">_actionStart</span><span class="o">.</span><span class="n">setVisible</span><span class="p">(</span><span class="ow">not</span> <span class="n">isDir</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">_editStartScript</span><span class="o">.</span><span class="n">setVisible</span><span class="p">(</span><span class="ow">not</span> <span class="n">isDir</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">_actionInDebugMode</span><span class="o">.</span><span class="n">setVisible</span><span class="p">(</span><span class="ow">not</span> <span class="n">isDir</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">_menu</span><span class="o">.</span><span class="n">popup</span><span class="p">(</span><span class="n">evt</span><span class="o">.</span><span class="n">globalPos</span><span class="p">())</span>
+		
+
+
+
+<span class="k">class</span> <span class="nc">_TreeView</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QTreeView</span><span class="p">):</span>
+
+	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="nb">super</span><span class="p">(</span><span class="n">_TreeView</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">()</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">setHeaderHidden</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">setExpandsOnDoubleClick</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span><span class="c">#connect own function for doubleclick</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">_menu</span> <span class="o">=</span> <span class="n">_FileEditMenu</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+		<span class="c">#no editing of the items when clicked, rightclicked, doubleclicked:</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">setEditTriggers</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QAbstractItemView</span><span class="o">.</span><span class="n">NoEditTriggers</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">sortByColumn</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">AscendingOrder</span><span class="p">)</span><span class="c">#sort by name</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">setSortingEnabled</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">setAnimated</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span><span class="c">#expanding/collapsing animated</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">setIconSize</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">QSize</span><span class="p">(</span><span class="mi">60</span><span class="p">,</span><span class="mi">60</span><span class="p">))</span>
+
+		<span class="c">#DRAG/DROP</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">setDragEnabled</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">setAcceptDrops</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">setDragDropMode</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QAbstractItemView</span><span class="o">.</span><span class="n">InternalMove</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">doubleClicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_doubleClicked</span><span class="p">)</span>
+
+
+	<span class="k">def</span> <span class="nf">keyPressEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+		<span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">matches</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QKeySequence</span><span class="o">.</span><span class="n">Delete</span><span class="p">):</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">deleteSelected</span><span class="p">()</span>
+
+
+	<span class="k">def</span> <span class="nf">selectionChanged</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">selected</span><span class="p">,</span> <span class="n">deselected</span><span class="p">):</span>
+		<span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">deselected</span><span class="o">.</span><span class="n">indexes</span><span class="p">():</span>
+			<span class="c">#print index</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">closePersistentEditor</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+		<span class="nb">super</span><span class="p">(</span><span class="n">_TreeView</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">selectionChanged</span><span class="p">(</span><span class="n">selected</span><span class="p">,</span> <span class="n">deselected</span><span class="p">)</span>
+
+
+	<span class="k">def</span> <span class="nf">mousePressEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+		<span class="n">mouseBtn</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">button</span><span class="p">()</span>
+		<span class="k">if</span> <span class="n">mouseBtn</span> <span class="o">==</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">RightButton</span><span class="p">:</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">_menu</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+		<span class="nb">super</span><span class="p">(</span><span class="n">_TreeView</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">mousePressEvent</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+
+
+	<span class="k">def</span> <span class="nf">deleteSelected</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="n">msgBox</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QMessageBox</span><span class="p">()</span>
+		<span class="n">msgBox</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="s">&quot;Are you sure?&quot;</span><span class="p">)</span>
+		<span class="n">msgBox</span><span class="o">.</span><span class="n">addButton</span><span class="p">(</span><span class="s">&#39;Yes&#39;</span><span class="p">,</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QMessageBox</span><span class="o">.</span><span class="n">YesRole</span><span class="p">)</span>
+		<span class="n">msgBox</span><span class="o">.</span><span class="n">addButton</span><span class="p">(</span><span class="s">&#39;No&#39;</span><span class="p">,</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QMessageBox</span><span class="o">.</span><span class="n">RejectRole</span><span class="p">)</span>
+		<span class="n">ret</span> <span class="o">=</span> <span class="n">msgBox</span><span class="o">.</span><span class="n">exec_</span><span class="p">()</span>
+		<span class="k">if</span> <span class="n">ret</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span><span class="c">#yes</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">fileSystemModel</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">currentIndex</span><span class="p">())</span>
+
+
+	<span class="k">def</span> <span class="nf">selectedIsDir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pos</span><span class="p">):</span>
+		<span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">indexAt</span><span class="p">(</span><span class="n">pos</span><span class="p">)</span>
+		<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fileSystemModel</span><span class="o">.</span><span class="n">isDir</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+
+
+	<span class="k">def</span> <span class="nf">editSelected</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">openPersistentEditor</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">currentIndex</span><span class="p">())</span>
+
+
+	<span class="k">def</span> <span class="nf">newDirInSelected</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">currentIndex</span><span class="p">()</span>
+		<span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">fileSystemModel</span><span class="o">.</span><span class="n">isDir</span><span class="p">(</span><span class="n">index</span><span class="p">):</span>
+			<span class="n">index</span> <span class="o">=</span> <span class="n">index</span><span class="o">.</span><span class="n">parent</span><span class="p">()</span>
+		<span class="k">else</span><span class="p">:</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">setExpanded</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="bp">True</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">fileSystemModel</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="s">&#39;NEW&#39;</span><span class="p">)</span>
+
+
+	<span class="k">def</span> <span class="nf">editStartScriptInSelected</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">currentIndex</span><span class="p">()</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">fileSystemModel</span><span class="o">.</span><span class="n">editStartScript</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+
+
+	<span class="k">def</span> <span class="nf">dropEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+		<span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">indexAt</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">pos</span><span class="p">())</span>
+		<span class="c">#only insert into directories</span>
+		<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fileSystemModel</span><span class="o">.</span><span class="n">isDir</span><span class="p">(</span><span class="n">index</span><span class="p">):</span>
+			<span class="nb">super</span><span class="p">(</span><span class="n">_TreeView</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">dropEvent</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+
+
+	<span class="k">def</span> <span class="nf">setModel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">):</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">fileSystemModel</span> <span class="o">=</span> <span class="n">model</span>
+		<span class="nb">super</span><span class="p">(</span><span class="n">_TreeView</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">setModel</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">setColumnWidth</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">300</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">hideColumn</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="c">#type</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">hideColumn</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="c">#size</span>
+
+
+	<span class="k">def</span> <span class="nf">setPath</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">_path</span> <span class="o">=</span> <span class="n">path</span>
+		<span class="n">root</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fileSystemModel</span><span class="o">.</span><span class="n">setRootPath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">setRootIndex</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
+
+
+	<span class="k">def</span> <span class="nf">_doubleClicked</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+		<span class="c">#if folder-&gt;toggle expanding</span>
+		<span class="k">if</span> 	<span class="bp">self</span><span class="o">.</span><span class="n">fileSystemModel</span><span class="o">.</span><span class="n">isDir</span><span class="p">(</span><span class="n">index</span><span class="p">):</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">setExpanded</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">isExpanded</span><span class="p">(</span><span class="n">index</span><span class="p">)</span> <span class="p">)</span>
+		<span class="k">else</span><span class="p">:</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">openProject</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+
+
+	<span class="k">def</span> <span class="nf">runInDebugMode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">currentIndex</span><span class="p">()</span>
+		<span class="c">#term = os.environ.get(&#39;TERM&#39;)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">fileSystemModel</span><span class="o">.</span><span class="n">updateStartStript</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+
+		<span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s">&#39;posix&#39;</span><span class="p">:</span><span class="c">#linux</span>
+			<span class="n">term</span> <span class="o">=</span> <span class="s">&#39;xterm&#39;</span>
+		<span class="k">else</span><span class="p">:</span>
+			<span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s">&#39;debug mode not supported on windows yet&#39;</span><span class="p">)</span>
+		<span class="n">subprocess</span><span class="o">.</span><span class="n">call</span><span class="p">([</span><span class="n">term</span><span class="p">,</span> <span class="s">&#39;-e&#39;</span><span class="p">,</span>
+			<span class="s">&#39;python </span><span class="si">%s</span><span class="s"> -d&#39;</span> <span class="o">%</span><span class="bp">self</span><span class="o">.</span><span class="n">fileSystemModel</span><span class="o">.</span><span class="n">filePath</span><span class="p">(</span><span class="n">index</span><span class="p">)])</span>
+
+
+	<span class="k">def</span> <span class="nf">openProject</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">index</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+		<span class="k">if</span> <span class="ow">not</span> <span class="n">index</span><span class="p">:</span>
+			<span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">currentIndex</span><span class="p">()</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">fileSystemModel</span><span class="o">.</span><span class="n">updateStartStript</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+		<span class="n">p</span> <span class="o">=</span> <span class="n">distutils</span><span class="o">.</span><span class="n">spawn</span><span class="o">.</span><span class="n">find_executable</span><span class="p">(</span><span class="s">&quot;python&quot;</span><span class="p">)</span>
+		<span class="c">#start an indepentent python-process</span>
+		<span class="n">os</span><span class="o">.</span><span class="n">spawnl</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">P_NOWAIT</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="s">&#39;python&#39;</span><span class="p">,</span> <span class="s">&#39;</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span><span class="bp">self</span><span class="o">.</span><span class="n">fileSystemModel</span><span class="o">.</span><span class="n">filePath</span><span class="p">(</span><span class="n">index</span><span class="p">))</span>
+
+
+
+<span class="k">class</span> <span class="nc">_PyzInfo</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QWidget</span><span class="p">):</span>
+	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vsplitter</span><span class="p">,</span> <span class="n">filesystemmodel</span><span class="p">,</span> <span class="n">treeView</span><span class="p">):</span>
+		<span class="n">QtGui</span><span class="o">.</span><span class="n">QWidget</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">layout</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QVBoxLayout</span><span class="p">()</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">_filesystemmodel</span> <span class="o">=</span> <span class="n">filesystemmodel</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">_treeView</span> <span class="o">=</span> <span class="n">treeView</span>
+
+		<span class="bp">self</span><span class="o">.</span><span class="n">vsplitter</span> <span class="o">=</span> <span class="n">vsplitter</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">hsplitter</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QSplitter</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">Orientation</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">vsplitter</span><span class="o">.</span><span class="n">splitterMoved</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scaleImgV</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">hsplitter</span><span class="o">.</span><span class="n">splitterMoved</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scaleImgH</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hsplitter</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">_sizeDefined</span><span class="o">=</span> <span class="bp">False</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">setLayout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">img</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QLabel</span><span class="p">()</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QTextEdit</span><span class="p">()</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">setReadOnly</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">hsplitter</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">img</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">hsplitter</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+
+		<span class="n">btnStart</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QPushButton</span><span class="p">(</span><span class="s">&#39;start&#39;</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">_btnDebug</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QCheckBox</span><span class="p">(</span><span class="s">&#39;debug mode&#39;</span><span class="p">)</span>
+
+		<span class="c">#labelOpen = QtGui.QLabel(&#39;open/edit&#39;)</span>
+		<span class="n">openBox</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QGroupBox</span><span class="p">(</span><span class="s">&#39;open/edit&#39;</span><span class="p">)</span>
+		<span class="n">openBox</span><span class="o">.</span><span class="n">setAlignment</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">AlignHCenter</span><span class="p">)</span>
+		<span class="n">btnCode</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QPushButton</span><span class="p">(</span><span class="s">&#39;startscript&#39;</span><span class="p">)</span>
+		<span class="n">btnActivities</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QPushButton</span><span class="p">(</span><span class="s">&#39;activities&#39;</span><span class="p">)</span>
+		<span class="n">btnLogs</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QPushButton</span><span class="p">(</span><span class="s">&#39;logs&#39;</span><span class="p">)</span>
+
+		<span class="n">btnStart</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_startPYZ</span><span class="p">)</span>
+		<span class="n">btnCode</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_treeView</span><span class="o">.</span><span class="n">editStartScriptInSelected</span><span class="p">)</span>
+
+		<span class="n">lBtn</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QHBoxLayout</span><span class="p">()</span>
+		<span class="n">lStart</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QVBoxLayout</span><span class="p">()</span>
+		<span class="n">lOpen</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QHBoxLayout</span><span class="p">()</span>
+		<span class="c">#lOpen.addWidget(openBox)</span>
+		<span class="n">openBox</span><span class="o">.</span><span class="n">setLayout</span><span class="p">(</span><span class="n">lOpen</span><span class="p">)</span>
+		<span class="n">lBtn</span><span class="o">.</span><span class="n">addLayout</span><span class="p">(</span><span class="n">lStart</span><span class="p">)</span>
+		<span class="n">lBtn</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">openBox</span><span class="p">)</span>
+
+		<span class="n">lStart</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">btnStart</span><span class="p">)</span>
+		<span class="n">lStart</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_btnDebug</span><span class="p">)</span>
+
+		<span class="c">#lOpen.addWidget(labelOpen, alignment=QtCore.Qt.AlignCenter)</span>
+	<span class="c">#	lOpenBtn = QtGui.QHBoxLayout()</span>
+		<span class="c">#lOpen.addLayout(lOpenBtn)</span>
+		<span class="n">lOpen</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">btnCode</span><span class="p">)</span>
+		<span class="n">lOpen</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">btnActivities</span><span class="p">)</span>
+		<span class="n">lOpen</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">btnLogs</span><span class="p">)</span>
+
+		<span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">addLayout</span><span class="p">(</span><span class="n">lBtn</span><span class="p">)</span>
+
+		<span class="bp">self</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span>
+
+
+	<span class="k">def</span> <span class="nf">_startPYZ</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_btnDebug</span><span class="o">.</span><span class="n">isChecked</span><span class="p">():</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">_treeView</span><span class="o">.</span><span class="n">runInDebugMode</span><span class="p">()</span>
+		<span class="k">else</span><span class="p">:</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">_treeView</span><span class="o">.</span><span class="n">openProject</span><span class="p">()</span>
+
+
+	<span class="k">def</span> <span class="nf">scaleImgV</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">sizeTreeView</span><span class="p">,</span><span class="n">pos</span><span class="p">):</span>
+		<span class="n">width</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vsplitter</span><span class="o">.</span><span class="n">sizes</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="mi">30</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">img</span><span class="o">.</span><span class="n">setPixmap</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QPixmap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">imgpath</span><span class="p">)</span><span class="o">.</span><span class="n">scaledToWidth</span><span class="p">(</span><span class="n">width</span><span class="p">))</span>
+
+
+	<span class="k">def</span> <span class="nf">scaleImgH</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">sizeTreeView</span><span class="p">,</span><span class="n">pos</span><span class="p">):</span>
+		<span class="n">height</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hsplitter</span><span class="o">.</span><span class="n">sizes</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="mi">30</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">img</span><span class="o">.</span><span class="n">setPixmap</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QPixmap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">imgpath</span><span class="p">)</span><span class="o">.</span><span class="n">scaledToHeight</span><span class="p">(</span><span class="n">height</span><span class="p">))</span>
+
+
+	<span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+		<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filesystemmodel</span><span class="o">.</span><span class="n">isPyz</span><span class="p">(</span><span class="n">index</span><span class="p">):</span>
+			<span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">imgpath</span><span class="p">,</span> <span class="n">description_path</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filesystemmodel</span><span class="o">.</span><span class="n">extractFiles</span><span class="p">(</span><span class="n">index</span><span class="p">,</span><span class="s">&#39;screenshot.png&#39;</span><span class="p">,</span> <span class="s">&#39;description.html&#39;</span><span class="p">)</span>
+			<span class="c">#if not self.imgpath:</span>
+			<span class="c">#	self.imgpath = self.filesystemmodel.extractFiles(index,&#39;icon&#39;)[0]</span>
+			<span class="c">#	print self.imgpath</span>
+			<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">imgpath</span><span class="p">:</span>
+				<span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sizeDefined</span><span class="p">:</span>
+					<span class="bp">self</span><span class="o">.</span><span class="n">_sizeDefined</span> <span class="o">=</span> <span class="bp">True</span>
+					<span class="n">width</span> <span class="o">=</span> <span class="mi">400</span>
+					<span class="bp">self</span><span class="o">.</span><span class="n">vsplitter</span><span class="o">.</span><span class="n">moveSplitter</span><span class="p">(</span><span class="mi">400</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span><span class="c">#self.splitter.sizes()[0]*0.5,1)</span>
+					<span class="bp">self</span><span class="o">.</span><span class="n">img</span><span class="o">.</span><span class="n">setPixmap</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QPixmap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">imgpath</span><span class="p">)</span><span class="o">.</span><span class="n">scaledToWidth</span><span class="p">(</span><span class="n">width</span><span class="p">))</span>
+				<span class="bp">self</span><span class="o">.</span><span class="n">img</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+			<span class="k">else</span><span class="p">:</span>
+				<span class="bp">self</span><span class="o">.</span><span class="n">img</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span>
+			<span class="k">if</span> <span class="n">description_path</span><span class="p">:</span>
+				<span class="bp">self</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="nb">file</span><span class="p">(</span><span class="n">description_path</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+			<span class="k">else</span><span class="p">:</span>
+				<span class="bp">self</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="s">&#39;&lt;b&gt;No Description found&lt;/b&gt;&#39;</span><span class="p">)</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+		<span class="k">else</span><span class="p">:</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span>
+
+
+
+<span class="k">class</span> <span class="nc">_FileSystemModel</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QFileSystemModel</span><span class="p">):</span>
+
+	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">view</span><span class="p">,</span> <span class="n">file_type</span><span class="p">):</span>
+		<span class="n">QtGui</span><span class="o">.</span><span class="n">QFileSystemModel</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">view</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">view</span> <span class="o">=</span> <span class="n">view</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">file_type</span> <span class="o">=</span> <span class="n">file_type</span>
+
+		<span class="bp">self</span><span class="o">.</span><span class="n">setReadOnly</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">_editedSessions</span> <span class="o">=</span> <span class="p">{}</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">_tmp_dir_work</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(</span><span class="s">&#39;PYZ-launcher&#39;</span><span class="p">)</span>
+
+
+	<span class="k">def</span> <span class="nf">isPyz</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">index</span><span class="p">):</span>
+		<span class="k">return</span> <span class="nb">unicode</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fileName</span><span class="p">(</span><span class="n">index</span><span class="p">))</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s">&#39;.</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span><span class="bp">self</span><span class="o">.</span><span class="n">file_type</span><span class="p">)</span>
+
+
+	<span class="k">def</span> <span class="nf">extractFiles</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="o">*</span><span class="n">fnames</span><span class="p">):</span>
+		<span class="n">extnames</span> <span class="o">=</span> <span class="p">[]</span>
+		<span class="k">with</span> <span class="n">ZipFile</span><span class="p">(</span><span class="nb">unicode</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filePath</span><span class="p">(</span><span class="n">index</span><span class="p">)),</span> <span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">myzip</span><span class="p">:</span>
+			<span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">fnames</span><span class="p">:</span>
+				<span class="k">try</span><span class="p">:</span>
+					<span class="n">myzip</span><span class="o">.</span><span class="n">extract</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tmp_dir_work</span><span class="p">)</span>
+					<span class="n">extnames</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_tmp_dir_work</span><span class="p">,</span> <span class="n">name</span><span class="p">))</span>
+				<span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+					<span class="n">extnames</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">None</span><span class="p">)</span>
+		<span class="k">return</span> <span class="n">extnames</span>
+
+
+	<span class="k">def</span> <span class="nf">data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">role</span><span class="p">):</span>
+		<span class="sd">&#39;&#39;&#39;use zipped icon.png as icon&#39;&#39;&#39;</span>
+		<span class="k">if</span> <span class="n">index</span><span class="o">.</span><span class="n">column</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">role</span> <span class="o">==</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">DecorationRole</span><span class="p">:</span>
+			<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">isPyz</span><span class="p">(</span><span class="n">index</span><span class="p">):</span>
+				<span class="k">with</span> <span class="n">ZipFile</span><span class="p">(</span><span class="nb">unicode</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filePath</span><span class="p">(</span><span class="n">index</span><span class="p">)),</span> <span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">myzip</span><span class="p">:</span>
+				<span class="c">#	print myzip.namelist()</span>
+					<span class="k">try</span><span class="p">:</span>
+						<span class="n">myzip</span><span class="o">.</span><span class="n">extract</span><span class="p">(</span><span class="s">&#39;icon&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tmp_dir_work</span><span class="p">)</span>
+						<span class="n">p</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_tmp_dir_work</span><span class="p">,</span><span class="s">&#39;icon&#39;</span><span class="p">)</span>
+						<span class="k">return</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QIcon</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+					<span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+						<span class="k">pass</span>
+		<span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">_FileSystemModel</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">data</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">role</span><span class="p">)</span>
+
+
+	<span class="k">def</span> <span class="nf">editStartScript</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+		<span class="sd">&#39;&#39;&#39;open, edit, replace __main__.py&#39;&#39;&#39;</span>
+		<span class="n">f</span> <span class="o">=</span> <span class="nb">unicode</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fileName</span><span class="p">(</span><span class="n">index</span><span class="p">))</span>
+		<span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s">&#39;.</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span><span class="bp">self</span><span class="o">.</span><span class="n">file_type</span><span class="p">):</span>
+			<span class="n">zipname</span> <span class="o">=</span> <span class="nb">unicode</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filePath</span><span class="p">(</span><span class="n">index</span><span class="p">))</span>
+			<span class="k">with</span> <span class="n">ZipFile</span><span class="p">(</span><span class="n">zipname</span><span class="p">,</span> <span class="s">&#39;a&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">myzip</span><span class="p">:</span>
+				<span class="c">#extract+save script in tmp-dir:</span>
+				<span class="n">myzip</span><span class="o">.</span><span class="n">extract</span><span class="p">(</span><span class="s">&#39;__main__.py&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tmp_dir_work</span><span class="p">)</span>
+				<span class="n">tempfilename</span> <span class="o">=</span> <span class="n">f</span><span class="p">[:</span><span class="o">-</span><span class="mi">4</span><span class="p">]</span>
+				<span class="n">tempfilepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_tmp_dir_work</span><span class="p">,</span> <span class="n">tempfilename</span><span class="p">)</span>
+				<span class="n">os</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_tmp_dir_work</span><span class="p">,</span> <span class="s">&#39;__main__.py&#39;</span><span class="p">),</span><span class="n">tempfilepath</span><span class="p">)</span>
+				<span class="bp">self</span><span class="o">.</span><span class="n">openTxt</span><span class="p">(</span><span class="n">tempfilepath</span><span class="p">)</span>
+				<span class="bp">self</span><span class="o">.</span><span class="n">_editedSessions</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">zipname</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">_tmp_dir_work</span><span class="p">,</span> <span class="n">tempfilename</span><span class="p">)</span>
+
+
+	<span class="k">def</span> <span class="nf">openTxt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">path</span><span class="p">):</span>
+		<span class="c">#open and editor (depending on platform):</span>
+		<span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;darwin&#39;</span><span class="p">):</span>
+			<span class="n">subprocess</span><span class="o">.</span><span class="n">call</span><span class="p">((</span><span class="s">&#39;open&#39;</span><span class="p">,</span> <span class="n">path</span><span class="p">))</span>
+		<span class="k">elif</span> <span class="n">os</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s">&#39;nt&#39;</span><span class="p">:</span>
+			<span class="n">os</span><span class="o">.</span><span class="n">startfile</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+		<span class="k">elif</span> <span class="n">os</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s">&#39;posix&#39;</span><span class="p">:</span>
+			<span class="n">subprocess</span><span class="o">.</span><span class="n">call</span><span class="p">((</span><span class="s">&#39;xdg-open&#39;</span><span class="p">,</span> <span class="n">path</span><span class="p">))</span>
+
+
+	<span class="k">def</span> <span class="nf">updateStartStript</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">index</span><span class="p">):</span>
+		<span class="k">if</span> <span class="n">index</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_editedSessions</span><span class="p">:</span>
+			<span class="n">zipname</span><span class="p">,</span><span class="n">dirname</span><span class="p">,</span> <span class="n">tempfilename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_editedSessions</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+			<span class="n">tempfilepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dirname</span><span class="p">,</span><span class="n">tempfilename</span><span class="p">)</span>
+			<span class="c">#print dirname, tempfilename</span>
+			<span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">tempfilepath</span><span class="p">):</span>
+				<span class="k">print</span> <span class="s">&quot;adopt changed startScript &#39;</span><span class="si">%s</span><span class="s">&#39;&quot;</span> <span class="o">%</span><span class="n">tempfilename</span>
+				<span class="k">with</span> <span class="n">ZipFile</span><span class="p">(</span><span class="n">zipname</span><span class="p">,</span> <span class="s">&#39;a&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">myzip</span><span class="p">:</span>
+					<span class="n">myzip</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">tempfilepath</span><span class="p">,</span> <span class="s">&#39;__main__.py&#39;</span><span class="p">)</span>
+				<span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">tempfilepath</span><span class="p">)</span>
+
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+	<span class="n">app</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QApplication</span><span class="p">([])</span>
+	<span class="n">a</span><span class="o">=</span> <span class="n">Launcher</span><span class="p">()</span>
+	<span class="n">a</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+	<span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="n">app</span><span class="o">.</span><span class="n">exec_</span><span class="p">())</span>
+
+
+
+
+<span class="c">#def _getDefaultOptions():</span>
+
+	<span class="c">#defaultTextColor = &#39;#3c3c3c&#39;</span>
+	<span class="c">#pack_path = os.path.abspath(os.path.dirname(__file__))</span>
+	<span class="c">#description = &quot;&lt;a href=%s style=&#39;color: %s&#39;&gt;%s&lt;/a&gt;&quot; %(</span>
+			<span class="c">#appbase.__url__,defaultTextColor,appbase.__description__)</span>
+	<span class="c">##TODO: recent changes ... ist ja jetzt in changes und nicht mehr im scipteordner drin</span>
+	<span class="c">#LAUNCHER_LEFT_HEADER = &quot;&quot;&quot;&lt;b&gt;%s&lt;/b&gt;&lt;br&gt;</span>
+				<span class="c">#version&amp;nbsp;&amp;nbsp;&lt;a href=%s style=&#39;color: %s&#39;&gt;%s&lt;/a&gt;&lt;br&gt;</span>
+				<span class="c">#autor&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;</span>
+					<span class="c">#&lt;a href=mailto:%s style=&#39;color: %s&#39;&gt;%s&lt;/a&gt; &quot;&quot;&quot; %( #text-decoration:underline</span>
+				<span class="c">#description,</span>
+				<span class="c">#os.path.join(&#39;media&#39;,&#39;recent_changes.txt&#39;),</span>
+				<span class="c">#defaultTextColor,</span>
+				<span class="c">#appbase.__version__,</span>
+				<span class="c">#appbase.__email__,</span>
+				<span class="c">#defaultTextColor,</span>
+				<span class="c">#appbase.__author__</span>
+				<span class="c">#)</span>
+	<span class="c">#d = pack_path</span>
+	<span class="c">#LAUNCHER_RIGHT_HEADER = &#39;&#39;</span>
+	<span class="c">#for f in os.listdir(os.path.join(d, &#39;media&#39;)):</span>
+		<span class="c">#if f.endswith(&#39;.pdf&#39;):</span>
+			<span class="c">#_guidePath = os.path.join(d, &#39;media&#39;,f)</span>
+			<span class="c">#LAUNCHER_RIGHT_HEADER += &quot;&lt;a href=%s style=&#39;color: %s&#39;&gt;%s&lt;/a&gt;&lt;br&gt;&quot; %(</span>
+				<span class="c">#_guidePath, defaultTextColor, f[:-4])</span>
+	<span class="c">#LAUNCHER_RIGHT_HEADER = LAUNCHER_RIGHT_HEADER[:-4]</span>
+	<span class="c">#</span>
+	<span class="c">#START_SCRIPT = os.path.join(pack_path,&#39;test_session.py&#39;)</span>
+	<span class="c">#</span>
+	<span class="c">#</span>
+	
+</pre></div>
+
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2014, Karl Bedrich.
+    </p>
+  </div>
+
+  <a href="https://github.com/snide/sphinx_rtd_theme">Sphinx theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

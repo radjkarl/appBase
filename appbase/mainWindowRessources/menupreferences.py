@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 import appbase
-import QtRec
-from QtRec import QtGui, QtCore
-#import os
+
+from PyQt4 import QtGui, QtCore
+
 from fancywidgets.pyQtBased.FwMinimalTextEditor import FwMinimalTextEditor
 from fancywidgets.pyQtBased.Dialogs import Dialogs
 from fancywidgets.pyQtBased.FingerTabWidget import FingerTabWidget
@@ -15,7 +15,7 @@ _dialogs = Dialogs()
 
 class _TabSession(QtGui.QWidget):
 	'''
-	The tab 'session' in the preferences widget
+	The fingerTab 'session' in the preferences widget
 	'''
 	def __init__(self, prefWindow):
 		super(_TabSession, self).__init__()
@@ -23,10 +23,12 @@ class _TabSession(QtGui.QWidget):
 		prefWindow.sigClosed.connect(self._restoreLastScreenshotWindow)
 
 		self.app = QtGui.QApplication.instance()
-		self.app.session.sigSave.connect(self._saveToFile)
 		
-		self._iconPath = None
-	
+		self.app.session.sigSave.connect(self._save)
+		self.app.session.sigRestore.connect(self._restore)
+		
+		self.opts= {'iconPath':None}
+		
 		vlayout = QtGui.QVBoxLayout()
 		self.setLayout(vlayout)
 		
@@ -35,64 +37,45 @@ class _TabSession(QtGui.QWidget):
 		qtrecPrefs.setLayout(qtrecLayout)
 		vlayout.addWidget(qtrecPrefs)
 
-		b = QtGui.QCheckBox('Save time stamp')
-		b.setChecked(QtRec.core.save_time_stamp)
-		#b.toggled.connect(QtRec.core.setSaveTimeStep)
-		b.toggled.connect(lambda x: setattr(QtRec.core, 'save_time_stamp', x))
-
-		#b.setToolTip(QtRec.core.setSaveTimeStep.__doc__)
-		
-		qtrecLayout.addWidget(b)
-
-		b = QtGui.QCheckBox('Save History')
-		b.setChecked(QtRec.core.save_history)
-		#b.toggled.connect(QtRec.core.setSaveHistory)
-		b.toggled.connect(lambda x: setattr(QtRec.core, 'save_history', x))
-		
-		#b.setToolTip(QtRec.core.setSaveHistory.__doc__)
-		qtrecLayout.addWidget(b)
+		l = QtGui.QHBoxLayout()
+		l.addWidget(QtGui.QLabel('max. saved states'))
+		self.maxSessions = QtGui.QSpinBox()
+		self.maxSessions.setRange(1,1000)
+		self.maxSessions.valueChanged.connect(
+			lambda val: self.app.session.opts.__setitem__('maxSessions', val))
+		l.addWidget(self.maxSessions)
+		qtrecLayout.addLayout(l)
 		
 		self.interval = QtGui.QLabel()
 		
-		self.slider = QtGui.QSlider(QtCore.Qt.Orientation(1), self, logname='AutosaveInterval')#1...horizontal
-		
+		self.slider = QtGui.QSlider(QtCore.Qt.Orientation(1), self)#1...horizontal
 		self.slider.sliderMoved.connect(self._updateInterval)
 		
 		qtrecLayout.addWidget(self.interval)
 		qtrecLayout.addWidget(self.slider)
-		if self.app:
-			self.slider.setSliderPosition (self.app.session.autosave_interval)
-			self._updateInterval(self.app.session.autosave_interval)
-		else:
-			self._updateInterval(5)
-		
-		file_desc = QtGui.origQtGui.QGroupBox('File Information')
-		layout = QtGui.origQtGui.QVBoxLayout()
 
-		iconChoose = QtGui.origQtGui.QComboBox()
-		if self.app:
-			self._iconPath = self.app.session.tmp_dir_session.join('icon')
-			if self._iconPath.exists():
-				iconChoose.addItem (QtGui.origQtGui.QIcon(self._iconPath), 'Recent')
-			else:
-				self._iconPath = appbase.logo_path
-			iconChoose.addItem (QtGui.origQtGui.QIcon(appbase.logo_path), 'Default')
-		else:
-			iconChoose.addItem('None')
-		iconChoose.addItem('Individual')
-		iconChoose.activated[unicode].connect(self._cooseIndividualIcon)
+		file_desc = QtGui.QGroupBox('File Information')
+		layout = QtGui.QVBoxLayout()
+
+		self.iconChoose = QtGui.QComboBox()
+		self._iconPath = None
 		
-		iconLayout = QtGui.origQtGui.QHBoxLayout()
-		iconLayout.addWidget(QtGui.origQtGui.QLabel('Icon:'))
-		iconLayout.addWidget(iconChoose)
+		self.iconChoose.addItem ('Default')
+
+		self.iconChoose.addItem('Individual')
+		self.iconChoose.activated[unicode].connect(self._cooseIndividualIcon)
+		
+		iconLayout = QtGui.QHBoxLayout()
+		iconLayout.addWidget(QtGui.QLabel('Icon:'))
+		iconLayout.addWidget(self.iconChoose)
 		layout.addLayout(iconLayout)
 		
 		#CHOOSE A SCREENSHOT A SHOW IN THE LAUNCHER DETAILS AREA
 		self._lastSchreenshotWindow = None
 		self._screenshot_from_window = None
-		screenshotLayout = QtGui.origQtGui.QHBoxLayout()
-		screenshotLayout.addWidget(QtGui.origQtGui.QLabel('Screenshot:'))
-		self._screenshotChoose = QtGui.origQtGui.QComboBox()
+		screenshotLayout = QtGui.QHBoxLayout()
+		screenshotLayout.addWidget(QtGui.QLabel('Screenshot:'))
+		self._screenshotChoose = QtGui.QComboBox()
 		self._screenshotChoose.currentIndexChanged.connect(self._chosenScreenshotWindowChanged)
 		screenshotLayout.addWidget(self._screenshotChoose)
 		layout.addLayout(screenshotLayout)
@@ -163,14 +146,32 @@ class _TabSession(QtGui.QWidget):
 			win.setPalette(p)
 
 
-	def _saveToFile(self, to_path):
+	def _save(self, session):
 		if not self._screenshot_from_window:
 			self._screenshot_from_window = self._availWindows()[0]
 		pixmap =  QtGui.QPixmap.grabWidget(self._screenshot_from_window)
-		pixmap.save(to_path.join('screenshot.png'), 'png')
+		pixmap.save(session.tmp_dir_save_session.join('screenshot.png'), 'png')
 		if self._iconPath:
-			self.app.session.addFileToSave(self._iconPath, 'icon')
-		self.app.session.addContentToSave(self.descritionEditior.text.toHtml(), 'description.html')
+			session.addFileToSave(self.opts['iconPath'], 'icon')
+		session.addContentToSave(self.descritionEditior.text.toHtml(), 'description.html')
+
+
+	def update(self):
+		if not self.app.session.opts['autosave']:
+			self.slider.setSliderPosition(99)
+			self._updateInterval(99, False)
+		else:
+			a = self.app.session.opts['autosaveIntervalMin']
+			self.slider.setSliderPosition(a)
+			self._updateInterval(a, False)
+		self.maxSessions.setValue(self.app.session.opts['maxSessions'])
+	
+	
+	def _restore(self):
+		self.descritionEditior.text.setText(
+			self.app.session.getSavedContent('description.html') )
+		iconPath = self.app.session.getSavedFile('icon')
+		self.opts['iconPath'] = iconPath
 
 
 	def showEvent(self, event):
@@ -196,43 +197,56 @@ p, li { white-space: pre-wrap; }
 ''' %userName()
 
 
-	def _cooseIndividualIcon(self, text):
-		self._iconPath = _dialogs.getOpenFileName(directory= appbase.icon_path)
+	def _cooseIndividualIcon(self, txt):
+		if txt == 'Individual':
+			i = _dialogs.getOpenFileName(directory=appbase.icon_path)
+			if i:
+				self.opts['iconPath'] = i
 
 
-	def _updateInterval(self, time_min):
+	def _updateInterval(self, time_min, updateOpts=True):
 		if time_min == 0:
 			time_min = 0.1
 		if time_min == 99:
 			self.interval.setText("Autosave: never")
-			if self.app:
-				self.app.session.timerAutosave.stop()
+			if self.app and updateOpts:
+				self.app.session.opts['autosave'] = False
 		else:
 			self.interval.setText("Autosave: %s min" %time_min)
-		if self.app:
-			self.app.session.timerAutosave.setInterval(time_min*60*1000)
-			self.app.session.timerAutosave.start()
+			if self.app and updateOpts:
+				self.app.session.opts['autosaveIntervalMin'] = time_min
+				self.app.session.opts['autosave'] = True
 
 
 
 	
 
 class MenuPreferences(QtGui.QWidget):
+	'''
+	The mainWindow preferences shown using fingerTabs
+	'''
 	sigClosed = QtCore.pyqtSignal()
 
 	def __init__(self, win, parent=None):
 		
-		super(MenuPreferences, self).__init__(parent, logparent=win)
+		super(MenuPreferences, self).__init__(parent)
+		self.window = win
 		self.setWindowTitle('Preferences')
 		self.resize(530,480)
-		#print FingerTabWidget,998
 		self.tabs = FingerTabWidget(self)
-		#print 777
 		self.tab_session = _TabSession(self)
-		#print 1
 		self.tabs.addTab(self.tab_session, 'Session')
+	
 
-		
+	def show(self):
+		for i in range(self.tabs.count()):
+			try:
+				self.tabs.widget(i).update()
+			except AttributeError:
+				pass
+		QtGui.QWidget.show(self)
+
+
 	def closeEvent(self, evt):
 		self.sigClosed.emit()
 		super(MenuPreferences, self).closeEvent(evt)

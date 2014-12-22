@@ -1,0 +1,4 @@
+ordereddict >= 1.1
+numpy >= 1.7.1
+fancytools >= 0.2
+fancywidgets >= 0.1

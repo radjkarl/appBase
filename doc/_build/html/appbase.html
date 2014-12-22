@@ -1,0 +1,366 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>appbase package &mdash; appbase  documentation</title>
+  
+
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="top" title="appbase  documentation" href="index.html"/>
+        <link rel="next" title="appbase.mainWindowRessources package" href="appbase.mainWindowRessources.html"/>
+        <link rel="prev" title="Welcome to appbase’s documentation!" href="index.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        <a href="index.html" class="fa fa-home"> appbase</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+        
+            <ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="">appbase package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#subpackages">Subpackages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-appbase.Application">Submodules</a></li>
+</ul>
+</li>
+</ul>
+
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">appbase</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+    <li>appbase package</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          <a href="_sources/appbase.txt" rel="nofollow"> View page source</a>
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            
+  <div class="section" id="module-appbase">
+<span id="appbase-package"></span><h1>appbase package<a class="headerlink" href="#module-appbase" title="Permalink to this headline">¶</a></h1>
+<p>Appbase is the foundation for a pyQt based application including:</p>
+<ul class="simple">
+<li>save, load, autosave</li>
+<li>fullscreen with F11</li>
+<li>close-dialog</li>
+<li>system tray control</li>
+</ul>
+<div class="section" id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="appbase.mainWindowRessources.html">appbase.mainWindowRessources package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="appbase.mainWindowRessources.html#module-appbase.mainWindowRessources.menuabout">Submodules</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="module-appbase.Application">
+<span id="submodules"></span><h2>Submodules<a class="headerlink" href="#module-appbase.Application" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="appbase.Application.Application">
+<em class="property">class </em><code class="descclassname">appbase.Application.</code><code class="descname">Application</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appbase/Application.html#Application"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appbase.Application.Application" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">PyQt4.QtGui.QApplication</span></code></p>
+<ul class="simple">
+<li>extract the opened (as pyz-zipped) session in a temp folder</li>
+<li>create 2nd temp-folder for sessions to be saved</li>
+<li>send a close signal to all child structures when exit</li>
+<li>write a log file with all output</li>
+<li>enable icons in menues of gnome-sessions</li>
+<li>gives option of debug mode</li>
+</ul>
+<dl class="method">
+<dt id="appbase.Application.Application.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appbase/Application.html#Application.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appbase.Application.Application.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="appbase.Application.Application.exec_">
+<code class="descname">exec_</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appbase/Application.html#Application.exec_"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appbase.Application.Application.exec_" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-appbase.Launcher"></span><dl class="class">
+<dt id="appbase.Launcher.Launcher">
+<em class="property">class </em><code class="descclassname">appbase.Launcher.</code><code class="descname">Launcher</code><span class="sig-paren">(</span><em>title='PYZ-Launcher'</em>, <em>icon=None</em>, <em>start_script=None</em>, <em>left_header=None</em>, <em>right_header=None</em>, <em>file_type='pyz'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appbase/Launcher.html#Launcher"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appbase.Launcher.Launcher" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">PyQt4.QtGui.QMainWindow</span></code></p>
+<p>main class for the Launcher</p>
+<dl class="attribute">
+<dt id="appbase.Launcher.Launcher.CONFIG_FILE">
+<code class="descname">CONFIG_FILE</code><em class="property"> = 'C:\\Users\\elkb4\\appbase.Launcher'</em><a class="headerlink" href="#appbase.Launcher.Launcher.CONFIG_FILE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="appbase.Launcher.Launcher.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>title='PYZ-Launcher'</em>, <em>icon=None</em>, <em>start_script=None</em>, <em>left_header=None</em>, <em>right_header=None</em>, <em>file_type='pyz'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appbase/Launcher.html#Launcher.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appbase.Launcher.Launcher.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="appbase.Launcher.Launcher.rootDir">
+<em class="property">static </em><code class="descname">rootDir</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appbase/Launcher.html#Launcher.rootDir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appbase.Launcher.Launcher.rootDir" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-appbase.MainWindow"></span><dl class="class">
+<dt id="appbase.MainWindow.MainWindow">
+<em class="property">class </em><code class="descclassname">appbase.MainWindow.</code><code class="descname">MainWindow</code><span class="sig-paren">(</span><em>title=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appbase/MainWindow.html#MainWindow"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appbase.MainWindow.MainWindow" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">PyQt4.QtGui.QMainWindow</span></code></p>
+<p>template for QMainWindow including:
+* a menu bar with all common features
+* fullscreen with F11
+* changed window title when saved under a new name
+* Preferences in Menubar-&gt;File
+* autosave
+* close dialog</p>
+<dl class="method">
+<dt id="appbase.MainWindow.MainWindow.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>title=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appbase/MainWindow.html#MainWindow.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appbase.MainWindow.MainWindow.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="appbase.MainWindow.MainWindow.closeEvent">
+<code class="descname">closeEvent</code><span class="sig-paren">(</span><em>evt</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appbase/MainWindow.html#MainWindow.closeEvent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appbase.MainWindow.MainWindow.closeEvent" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="appbase.MainWindow.MainWindow.setTitleAdditive">
+<code class="descname">setTitleAdditive</code><span class="sig-paren">(</span><em>value=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appbase/MainWindow.html#MainWindow.setTitleAdditive"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appbase.MainWindow.MainWindow.setTitleAdditive" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="appbase.MainWindow.MainWindow.setTitlePath">
+<code class="descname">setTitlePath</code><span class="sig-paren">(</span><em>value=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appbase/MainWindow.html#MainWindow.setTitlePath"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appbase.MainWindow.MainWindow.setTitlePath" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-appbase.MultiWorkspaceWindow"></span><dl class="class">
+<dt id="appbase.MultiWorkspaceWindow.MultiWorkspaceWindow">
+<em class="property">class </em><code class="descclassname">appbase.MultiWorkspaceWindow.</code><code class="descname">MultiWorkspaceWindow</code><span class="sig-paren">(</span><em>workspaceClass</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appbase/MultiWorkspaceWindow.html#MultiWorkspaceWindow"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appbase.MultiWorkspaceWindow.MultiWorkspaceWindow" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#appbase.MainWindow.MainWindow" title="appbase.MainWindow.MainWindow"><code class="xref py py-class docutils literal"><span class="pre">appbase.MainWindow.MainWindow</span></code></a></p>
+<p>Adding workspace management to appbase.MainWindow</p>
+<ul class="simple">
+<li>&#8216;Workspace&#8217; menu in menu bar</li>
+<li>Switch between workspaces with [Ctrl]+[Page up/down]</li>
+<li>Add workspace with [Ctrl]+[W]</li>
+<li>Remove current workspace with [Ctrl]+[Q]</li>
+</ul>
+<dl class="method">
+<dt id="appbase.MultiWorkspaceWindow.MultiWorkspaceWindow.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>workspaceClass</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appbase/MultiWorkspaceWindow.html#MultiWorkspaceWindow.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appbase.MultiWorkspaceWindow.MultiWorkspaceWindow.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>workspaceClass needs to have the following methods:</p>
+<ul class="simple">
+<li>def setActive -&gt; called when workspace is activated</li>
+<li>def setInactive -&gt; called when workspace is deactivated</li>
+</ul>
+</dd></dl>
+
+<dl class="method">
+<dt id="appbase.MultiWorkspaceWindow.MultiWorkspaceWindow.addWorkspace">
+<code class="descname">addWorkspace</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appbase/MultiWorkspaceWindow.html#MultiWorkspaceWindow.addWorkspace"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appbase.MultiWorkspaceWindow.MultiWorkspaceWindow.addWorkspace" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="appbase.MultiWorkspaceWindow.MultiWorkspaceWindow.closeCurrentWorkspace">
+<code class="descname">closeCurrentWorkspace</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appbase/MultiWorkspaceWindow.html#MultiWorkspaceWindow.closeCurrentWorkspace"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appbase.MultiWorkspaceWindow.MultiWorkspaceWindow.closeCurrentWorkspace" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="appbase.MultiWorkspaceWindow.MultiWorkspaceWindow.closeWorkspace">
+<code class="descname">closeWorkspace</code><span class="sig-paren">(</span><em>ws</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appbase/MultiWorkspaceWindow.html#MultiWorkspaceWindow.closeWorkspace"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appbase.MultiWorkspaceWindow.MultiWorkspaceWindow.closeWorkspace" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="appbase.MultiWorkspaceWindow.MultiWorkspaceWindow.currentWorkspace">
+<code class="descname">currentWorkspace</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appbase/MultiWorkspaceWindow.html#MultiWorkspaceWindow.currentWorkspace"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appbase.MultiWorkspaceWindow.MultiWorkspaceWindow.currentWorkspace" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="appbase.MultiWorkspaceWindow.MultiWorkspaceWindow.showNextWorkspace">
+<code class="descname">showNextWorkspace</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appbase/MultiWorkspaceWindow.html#MultiWorkspaceWindow.showNextWorkspace"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appbase.MultiWorkspaceWindow.MultiWorkspaceWindow.showNextWorkspace" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="appbase.MultiWorkspaceWindow.MultiWorkspaceWindow.showPreviousWorkspace">
+<code class="descname">showPreviousWorkspace</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appbase/MultiWorkspaceWindow.html#MultiWorkspaceWindow.showPreviousWorkspace"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appbase.MultiWorkspaceWindow.MultiWorkspaceWindow.showPreviousWorkspace" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="appbase.MultiWorkspaceWindow.MultiWorkspaceWindow.showWorkspace">
+<code class="descname">showWorkspace</code><span class="sig-paren">(</span><em>i</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appbase/MultiWorkspaceWindow.html#MultiWorkspaceWindow.showWorkspace"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appbase.MultiWorkspaceWindow.MultiWorkspaceWindow.showWorkspace" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="appbase.MultiWorkspaceWindow.MultiWorkspaceWindow.workspaces">
+<code class="descname">workspaces</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appbase/MultiWorkspaceWindow.html#MultiWorkspaceWindow.workspaces"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appbase.MultiWorkspaceWindow.MultiWorkspaceWindow.workspaces" title="Permalink to this definition">¶</a></dt>
+<dd><p>return generator for all all workspace instances</p>
+</dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-appbase.Server"></span><p>Created on 11 Nov 2014</p>
+<p>&#64;author: elkb4</p>
+<dl class="class">
+<dt id="appbase.Server.Server">
+<em class="property">class </em><code class="descclassname">appbase.Server.</code><code class="descname">Server</code><span class="sig-paren">(</span><em>win</em>, <em>parent=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appbase/Server.html#Server"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appbase.Server.Server" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">PyQt4.QtGui.QSystemTrayIcon</span></code></p>
+<p>a system tray icon to</p>
+<ul class="simple">
+<li>show/hide the current session [left mouse button]</li>
+<li>show options(load, save, new) [right mouse button]</li>
+</ul>
+<dl class="method">
+<dt id="appbase.Server.Server.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>win</em>, <em>parent=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appbase/Server.html#Server.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appbase.Server.Server.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="appbase.Server.Server.clickTrap">
+<code class="descname">clickTrap</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/appbase/Server.html#Server.clickTrap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appbase.Server.Server.clickTrap" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="appbase.Server.Server.showMainWindow">
+<code class="descname">showMainWindow</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appbase/Server.html#Server.showMainWindow"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appbase.Server.Server.showMainWindow" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="appbase.Server.Server.toggleShowHide">
+<code class="descname">toggleShowHide</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/appbase/Server.html#Server.toggleShowHide"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#appbase.Server.Server.toggleShowHide" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="appbase.mainWindowRessources.html" class="btn btn-neutral float-right" title="appbase.mainWindowRessources package"/>Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="index.html" class="btn btn-neutral" title="Welcome to appbase’s documentation!"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2014, Karl Bedrich.
+    </p>
+  </div>
+
+  <a href="https://github.com/snide/sphinx_rtd_theme">Sphinx theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
