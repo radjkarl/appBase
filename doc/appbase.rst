@@ -16,25 +16,40 @@ Subpackages
 Submodules
 ----------
 
+appbase.Application module
+--------------------------
+
 .. automodule:: appbase.Application
     :members:
     :undoc-members:
     :show-inheritance:
+
+appbase.Launcher module
+-----------------------
 
 .. automodule:: appbase.Launcher
     :members:
     :undoc-members:
     :show-inheritance:
 
+appbase.MainWindow module
+-------------------------
+
 .. automodule:: appbase.MainWindow
     :members:
     :undoc-members:
     :show-inheritance:
 
+appbase.MultiWorkspaceWindow module
+-----------------------------------
+
 .. automodule:: appbase.MultiWorkspaceWindow
     :members:
     :undoc-members:
     :show-inheritance:
+
+appbase.Server module
+---------------------
 
 .. automodule:: appbase.Server
     :members:

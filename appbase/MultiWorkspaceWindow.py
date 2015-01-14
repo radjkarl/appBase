@@ -82,8 +82,12 @@ class MultiWorkspaceWindow(MainWindow):
 
     def closeWorkspace(self, ws):
         ws.setInactive()
-        self.centralWidget().removeWidget(ws)   
-        
+        self.centralWidget().removeWidget(ws)
+        #ws.setParent(None)
+        ws.deleteLater()
+        #del ws# = None
+        #import sys
+        #print 66666, sys.getrefcount(ws)
 
     def closeCurrentWorkspace(self):
         c = self.centralWidget()

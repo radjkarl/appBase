@@ -6,7 +6,7 @@ from mainWindowRessources.menubar import MenuBar
 #try:
 #from . import Application
 #except:
-from appbase import Application
+from appbase.Application import Application
 	
 #foreign:
 from PyQt4 import QtGui
