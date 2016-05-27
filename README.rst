@@ -7,6 +7,12 @@ Appbase is a foundation for pyQt based applications.
 - Browse the `API Documentation <http://radjkarl.github.io/appBase>`_
 - Fork the code on `github <https://github.com/radjkarl/appBase>`_
 
+
+.. image:: https://github.com/radjkarl/appBase/blob/master/appbase_showcase.png
+    :align: center
+    :alt: showcase
+
+
 It includes:
 
 * **Application.py** - just substitute your QApplication this one and you get...
