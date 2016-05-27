@@ -2,23 +2,35 @@
 AppBase - your base for app development
 =======================================
 
-Appbase is the foundation for a pyQt based application
+Appbase is a foundation for pyQt based applications.
 
 - Browse the `API Documentation <http://radjkarl.github.io/appBase>`_
 - Fork the code on `github <https://github.com/radjkarl/appBase>`_
 
 It includes:
 
-* **Launcher.py** - a graphical launcher to view and open python sessions stored as .pyz
 * **Application.py** - just substitute your QApplication this one and you get...
    
    * open, save, new, timed autosave etc.
       
-* **MainWindow.py** - this mainWindow gives you a predefined menubar including all features of application.py
+* **MainWindow.py** - this mainWindow gives you a predefined menubar including all features of Application.py
 * **MultiWorkspaceWindow.py** - mainWindow with workspace management
 * **Server.py** - a system tray control for the mainWindow
 
+DEPRECIATED:
+* **Launcher.py** - a graphical launcher to view and open python sessions stored as .pyz
 
-During the install procedure you also have the option to add a launcher in your start menu launching the Launcher.py under default conditions.
 
-The Launcher itself is highly custom-able allowing different headers, logos and file types to start.
+Session management
+^^^^^^^^^^^^^^^^^^
+* Load and save your session as a zipped file
+* Save and restore temporal states of your session (Menubar->State)
+* Handle multiple workspaces in one window  (Menubar->Workspace)
+
+
+Tests
+^^^^^
+To open an example window type::
+
+    python -m appBase.MultiWorkspaceWindow
+

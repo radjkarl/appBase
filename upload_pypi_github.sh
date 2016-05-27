@@ -1,12 +1,12 @@
 #PYPI
 ######
 #build
-python setup.py sdist #standard egg
-python setup.py bdist_wheel #new_standard wheel
-python setup.py install # sphinx takes only the installed pkg 
+#python setup.py sdist #standard egg
+#python setup.py bdist_wheel #new_standard wheel
+#python setup.py install # sphinx takes only the installed pkg 
 
 #upload
-python setup.py sdist upload -r pypi
+#python setup.py sdist upload -r pypi
 python setup.py bdist_wheel upload -r pypi
 
 

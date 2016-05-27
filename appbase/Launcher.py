@@ -1,4 +1,10 @@
 # -*- coding: utf-8 -*-
+
+###############
+#The launcher class is not updated any more
+#I might remove it
+###############
+
 #own
 import appbase
 from fancytools.os.PathStr import PathStr
@@ -18,6 +24,8 @@ import tempfile
 
 
 CONFIG_FILE = PathStr.home().join(__name__)
+
+
 
 
 class Launcher(QtGui.QMainWindow):
@@ -50,11 +58,11 @@ class Launcher(QtGui.QMainWindow):
 		_path = PathStr.getcwd()
 		_default_text_color = '#3c3c3c'
 
-		if icon == None:
+		if icon is None:
 			icon = os.path.join(_path,'media','launcher_logo.svg')
-		if start_script == None:
+		if start_script is None:
 			start_script = os.path.join(_path,'test_session.py')
-		if left_header ==None:
+		if left_header is None:
 			_description = "<a href=%s style='color: %s'>%s</a>" %(
 				appbase.__url__,_default_text_color,appbase.__description__)
 			
@@ -71,7 +79,7 @@ class Launcher(QtGui.QMainWindow):
 				_default_text_color,
 				appbase.__author__
 				)
-		if right_header == None:
+		if right_header is None:
 			#if no header is given, list all pdfs in folder media as link
 			d = _path
 			right_header = ''
@@ -587,39 +595,3 @@ if __name__ == '__main__':
 	a= Launcher()
 	a.show()
 	sys.exit(app.exec_())
-
-
-
-
-#def _getDefaultOptions():
-
-	#defaultTextColor = '#3c3c3c'
-	#pack_path = os.path.abspath(os.path.dirname(__file__))
-	#description = "<a href=%s style='color: %s'>%s</a>" %(
-			#appbase.__url__,defaultTextColor,appbase.__description__)
-	##TODO: recent changes ... ist ja jetzt in changes und nicht mehr im scipteordner drin
-	#LAUNCHER_LEFT_HEADER = """<b>%s</b><br>
-				#version&nbsp;&nbsp;<a href=%s style='color: %s'>%s</a><br>
-				#autor&nbsp;&nbsp;&nbsp;&nbsp;
-					#<a href=mailto:%s style='color: %s'>%s</a> """ %( #text-decoration:underline
-				#description,
-				#os.path.join('media','recent_changes.txt'),
-				#defaultTextColor,
-				#appbase.__version__,
-				#appbase.__email__,
-				#defaultTextColor,
-				#appbase.__author__
-				#)
-	#d = pack_path
-	#LAUNCHER_RIGHT_HEADER = ''
-	#for f in os.listdir(os.path.join(d, 'media')):
-		#if f.endswith('.pdf'):
-			#_guidePath = os.path.join(d, 'media',f)
-			#LAUNCHER_RIGHT_HEADER += "<a href=%s style='color: %s'>%s</a><br>" %(
-				#_guidePath, defaultTextColor, f[:-4])
-	#LAUNCHER_RIGHT_HEADER = LAUNCHER_RIGHT_HEADER[:-4]
-	#
-	#START_SCRIPT = os.path.join(pack_path,'test_session.py')
-	#
-	#
-	

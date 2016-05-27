@@ -7,13 +7,15 @@ doc/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
-*.py[cod]
+*.pyc
+*.pyo
 
 # C extensions
 *.so
 
 # Distribution / packaging
 .Python
+DUMP/
 env/
 bin/
 build/

@@ -1,5 +1,7 @@
 from PyQt4 import QtGui
 
+
+
 class Server(QtGui.QSystemTrayIcon):
     '''
     a system tray icon to 
