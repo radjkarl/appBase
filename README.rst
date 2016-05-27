@@ -8,7 +8,7 @@ Appbase is a foundation for pyQt based applications.
 - Fork the code on `github <https://github.com/radjkarl/appBase>`_
 
 
-.. image:: https://github.com/radjkarl/appBase/blob/master/appbase_showcase.png
+.. image:: https://raw.githubusercontent.com/radjkarl/appBase/master/appbase_showcase.png
     :align: center
     :alt: showcase
 
@@ -25,6 +25,14 @@ It includes:
 
 DEPRECIATED:
 * **Launcher.py** - a graphical launcher to view and open python sessions stored as .pyz
+
+
+Installation
+^^^^^^^^^^^^
+
+**appBase** is listed in the Python Package Index. You can install it typing::
+
+    pip install appBase
 
 
 Session management

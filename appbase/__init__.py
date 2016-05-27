@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 '''
-Appbase is the foundation for a pyQt based application including:
+appbase is the foundation for a pyQt based application including:
 
 * save, load, autosave
 * session management
