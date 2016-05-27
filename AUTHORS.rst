@@ -1,1 +1,0 @@
-Karl Bedrich 2013 - 2014
