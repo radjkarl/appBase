@@ -1,0 +1,807 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>appbase.Session &mdash; appbase 0.3 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="appbase 0.3 documentation" href="../../index.html"/>
+        <link rel="up" title="Module code" href="../index.html"/> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> appbase
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.3
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../appbase.html">appbase package</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../index.html">appbase</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      
+    <li>appbase.Session</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for appbase.Session</h1><div class="highlight"><pre>
+<span class="c"># -*- coding: utf-8 -*-</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+
+<span class="c"># from this pgk:</span>
+<span class="kn">from</span> <span class="nn">appbase.Server</span> <span class="kn">import</span> <span class="n">Server</span>
+<span class="kn">from</span> <span class="nn">appbase.dialogs.FirstStart</span> <span class="kn">import</span> <span class="n">FirstStart</span>
+
+<span class="c"># other own pgks:</span>
+<span class="kn">from</span> <span class="nn">fancytools.os.PathStr</span> <span class="kn">import</span> <span class="n">PathStr</span>
+<span class="kn">from</span> <span class="nn">fancytools.utils.StreamSignal</span> <span class="kn">import</span> <span class="n">StreamSignal</span>
+<span class="kn">from</span> <span class="nn">fancytools.fcollections.naturalSorting</span> <span class="kn">import</span> <span class="n">naturalSorting</span>
+<span class="kn">from</span> <span class="nn">fancywidgets.pyQtBased.Dialogs</span> <span class="kn">import</span> <span class="n">Dialogs</span>
+
+<span class="c"># foreign pkg:</span>
+<span class="kn">import</span> <span class="nn">tempfile</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">distutils.spawn</span> <span class="kn">import</span> <span class="n">find_executable</span>
+<span class="kn">from</span> <span class="nn">zipfile</span> <span class="kn">import</span> <span class="n">ZipFile</span>
+<span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">gmtime</span><span class="p">,</span> <span class="n">strftime</span>
+<span class="kn">from</span> <span class="nn">PyQt4</span> <span class="kn">import</span> <span class="n">QtCore</span><span class="p">,</span> <span class="n">QtGui</span>
+<span class="kn">import</span> <span class="nn">cPickle</span> <span class="kn">as</span> <span class="nn">pickle</span>
+
+<span class="kn">import</span> <span class="nn">__main__</span>
+
+
+
+<div class="viewcode-block" id="Session"><a class="viewcode-back" href="../../appbase.html#appbase.Session.Session">[docs]</a><span class="k">class</span> <span class="nc">Session</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">QObject</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Session management to be accessible in QtGui.QApplication.instance().session</span>
+
+<span class="sd">    * extract the opened (as pyz-zipped) session in a temp folder</span>
+<span class="sd">    * create 2nd temp-folder for sessions to be saved</span>
+<span class="sd">    * send a close signal to all child structures when exit</span>
+<span class="sd">    * write a log file with all output</span>
+<span class="sd">    * enable icons in menus of gnome-sessions [linux only]</span>
+<span class="sd">    * gives option of debug mode</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+<span class="c">#     sigPathChanged = QtCore.pyqtSignal(object) #path</span>
+    <span class="n">sigSave</span> <span class="o">=</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">pyqtSignal</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span>        <span class="c"># state dict</span>
+    <span class="n">sigRestore</span> <span class="o">=</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">pyqtSignal</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span>     <span class="c"># state dict</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Args:</span>
+<span class="sd">            first_start_dialog (Optional[bool]): </span>
+<span class="sd">                Show a different dialog for the first start.</span>
+<span class="sd">            name (Optional[str]): The applications name.</span>
+<span class="sd">            type (Optional[str]): The file type to be used for saving sessions.</span>
+<span class="sd">            icon (Optional[str]): Path to the application icon.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">QtCore</span><span class="o">.</span><span class="n">QObject</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="c"># SESSION CONSTANTS:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">NAME</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;name&#39;</span><span class="p">,</span> <span class="n">__main__</span><span class="o">.</span><span class="n">__name__</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">FTYPE</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;ftype&#39;</span><span class="p">,</span> <span class="s">&#39;pyz&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ICON</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;icon&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+        <span class="c"># hidden app-preferences folder:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dir</span> <span class="o">=</span> <span class="n">PathStr</span><span class="o">.</span><span class="n">home</span><span class="p">()</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="s">&#39;.</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">NAME</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">APP_CONFIG_FILE</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dir</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s">&#39;config.txt&#39;</span><span class="p">)</span>
+
+        <span class="c"># session specific options:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">opts</span> <span class="o">=</span> <span class="n">_Opts</span><span class="p">({</span>
+                    <span class="s">&#39;maxSessions&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+                    <span class="s">&#39;enableGuiIcons&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                    <span class="s">&#39;writeToShell&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                    <span class="s">&#39;createLog&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+                    <span class="s">&#39;debugMode&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+                    <span class="s">&#39;autosave&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                    <span class="s">&#39;autosaveIntervalMin&#39;</span><span class="p">:</span> <span class="mi">15</span><span class="p">,</span>
+                    <span class="s">&#39;server&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+                     <span class="p">},</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="c">#global options - same for all new and restored sessions:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">app_opts</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;showCloseDialog&#39;</span><span class="p">:</span><span class="bp">True</span><span class="p">,</span> <span class="s">&#39;recent sessions&#39;</span><span class="p">:[]}</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">APP_CONFIG_FILE</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="c">#allow different first start dialog:</span>
+            <span class="n">dialog</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;first_start_dialog&#39;</span><span class="p">,</span> <span class="n">FirstStart</span><span class="p">)</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="n">dialog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">exec_</span><span class="p">()</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">f</span><span class="o">.</span><span class="n">result</span><span class="p">():</span>
+                <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
+            
+            <span class="c">#create the config file</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">APP_CONFIG_FILE</span><span class="p">,</span> <span class="s">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="k">pass</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">APP_CONFIG_FILE</span><span class="p">,</span><span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">r</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">r</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">app_opts</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">eval</span><span class="p">(</span><span class="n">r</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_icons_enabled</span> <span class="o">=</span> <span class="bp">False</span>        
+        <span class="bp">self</span><span class="o">.</span><span class="n">log_file</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="n">dirname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">app_opts</span><span class="p">[</span><span class="s">&#39;recent sessions&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">dirname</span><span class="p">:</span>
+            <span class="n">dirname</span> <span class="o">=</span> <span class="n">PathStr</span><span class="p">(</span><span class="n">dirname</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">dirname</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dialogs</span> <span class="o">=</span> <span class="n">Dialogs</span><span class="p">(</span><span class="n">dirname</span><span class="p">)</span>        
+        <span class="bp">self</span><span class="o">.</span><span class="n">saveThread</span> <span class="o">=</span> <span class="n">_SaveThread</span><span class="p">()</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_createdAutosaveFile</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="c">#make temp-dir</span>
+            <span class="c">#the directory where the content of the *pyz-file will be copied:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tmp_dir_session</span> <span class="o">=</span> <span class="n">PathStr</span><span class="p">(</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%s</span><span class="s">_session&#39;</span> <span class="o">%</span><span class="bp">self</span><span class="o">.</span><span class="n">NAME</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tmp_dir_save_session</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="c">#a work-dir for temp. storage:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tmp_dir_work</span> <span class="o">=</span> <span class="n">PathStr</span><span class="p">(</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%s</span><span class="s">_work&#39;</span> <span class="o">%</span><span class="bp">self</span><span class="o">.</span><span class="n">NAME</span><span class="p">))</span>
+
+        <span class="n">pathName</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_inspectArguments</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">setSessionPath</span><span class="p">(</span><span class="n">pathName</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">opts</span><span class="p">[</span><span class="s">&#39;createLog&#39;</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_setupLogFile</span><span class="p">()</span>
+        
+        <span class="c"># create connectable stdout and stderr signal:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">streamOut</span> <span class="o">=</span> <span class="n">StreamSignal</span><span class="p">(</span><span class="s">&#39;out&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">streamErr</span> <span class="o">=</span> <span class="n">StreamSignal</span><span class="p">(</span><span class="s">&#39;err&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_enableGuiIcons</span><span class="p">()</span>
+        <span class="c"># Auto-save timer:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">timerAutosave</span> <span class="o">=</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">QTimer</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">timerAutosave</span><span class="o">.</span><span class="n">timeout</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_autoSave</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">opts</span><span class="o">.</span><span class="n">activate</span><span class="p">()</span>
+        <span class="c">#first thing to do after start:</span>
+        <span class="n">QtCore</span><span class="o">.</span><span class="n">QTimer</span><span class="o">.</span><span class="n">singleShot</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">restoreCurrentState</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="Session.setSessionPath"><a class="viewcode-back" href="../../appbase.html#appbase.Session.Session.setSessionPath">[docs]</a>    <span class="k">def</span> <span class="nf">setSessionPath</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">statename</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">path</span><span class="p">:</span> <span class="c"># and path.endswith(&#39;.%s&#39; %self.FTYPE):</span>
+            <span class="c"># this script was opened out from a zip-container (named as &#39;*.pyz&#39;)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">PathStr</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">()</span><span class="o">.</span><span class="n">abspath</span><span class="p">()</span>
+            <span class="c"># extract the zip temporally</span>
+            <span class="n">ZipFile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">extractall</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tmp_dir_session</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">n_sessions</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stateNames</span><span class="p">())</span>
+            <span class="c"># SET STATE</span>
+            <span class="n">snames</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stateNames</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">statename</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="c"># last one</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">current_session</span> <span class="o">=</span> <span class="n">snames</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="n">statename</span> <span class="ow">in</span> <span class="n">snames</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">current_session</span> <span class="o">=</span> <span class="n">statename</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&quot;state &#39;</span><span class="si">%s</span><span class="s">&#39; not in saved states </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span><span class="p">(</span><span class="n">statename</span><span class="p">,</span> <span class="n">snames</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">n_sessions</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">current_session</span> <span class="o">=</span> <span class="bp">None</span></div>
+
+
+<div class="viewcode-block" id="Session.writeLog"><a class="viewcode-back" href="../../appbase.html#appbase.Session.Session.writeLog">[docs]</a>    <span class="k">def</span> <span class="nf">writeLog</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">write</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">log_file</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="n">so</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">streamOut</span><span class="o">.</span><span class="n">message</span>
+        <span class="n">se</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">streamErr</span><span class="o">.</span><span class="n">message</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">log_file</span><span class="o">.</span><span class="n">write</span>
+        <span class="k">if</span> <span class="n">write</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="c"># ensure only connected once</span>
+                <span class="n">so</span><span class="o">.</span><span class="n">disconnect</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+                <span class="n">se</span><span class="o">.</span><span class="n">disconnect</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+                <span class="k">pass</span>
+            <span class="n">so</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+            <span class="n">se</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">so</span><span class="o">.</span><span class="n">disconnect</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+                <span class="n">se</span><span class="o">.</span><span class="n">disconnect</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+                <span class="k">pass</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_enableGuiIcons</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c"># enable icons in all QMenuBars only for this program if generally disabled</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">opts</span><span class="p">[</span><span class="s">&#39;enableGuiIcons&#39;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s">&#39;posix&#39;</span><span class="p">:</span><span class="c">#linux</span>
+                <span class="n">this_env</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;DESKTOP_SESSION&#39;</span><span class="p">))</span>
+                <span class="n">relevant_env</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;gnome&#39;</span><span class="p">,</span> <span class="s">&#39;gnome-shell&#39;</span><span class="p">,</span> <span class="s">&#39;ubuntustudio&#39;</span><span class="p">,</span> <span class="s">&#39;xubuntu&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">this_env</span> <span class="ow">in</span> <span class="n">relevant_env</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="s">&#39;false&#39;</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">popen</span><span class="p">(</span> 
+                    <span class="c">#if the menu-icons on the gnome-desktop are disabled</span>
+                    <span class="s">&#39;gconftool-2 --get /desktop/gnome/interface/menus_have_icons&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">():</span>
+                        <span class="k">print</span> <span class="s">&#39;enable menu-icons&#39;</span>
+                        <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span>
+                    <span class="s">&#39;gconftool-2 --type Boolean --set /desktop/gnome/interface/menus_have_icons True&#39;</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_icons_enabled</span> <span class="o">=</span> <span class="bp">True</span>
+
+
+    <span class="k">def</span> <span class="nf">_setupLogFile</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">lfile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tmp_dir_session</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s">&#39;log.txt&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">lfile</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">log_file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">lfile</span><span class="p">,</span> <span class="s">&#39;a&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">log_file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">lfile</span><span class="p">,</span> <span class="s">&#39;w&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;&#39;&#39;</span>
+
+<span class="s">####################################</span>
+<span class="s">New run at </span><span class="si">%s</span><span class="s"></span>
+<span class="s">####################################</span>
+<span class="s">            </span>
+<span class="s">&#39;&#39;&#39;</span> <span class="o">%</span><span class="n">strftime</span><span class="p">(</span> <span class="s">&quot;</span><span class="si">%d</span><span class="s">.%m.%Y|%H:%M:%S&quot;</span><span class="p">,</span> <span class="n">gmtime</span><span class="p">()</span> <span class="p">)</span> <span class="p">)</span>
+
+
+<div class="viewcode-block" id="Session.checkMaxSessions"><a class="viewcode-back" href="../../appbase.html#appbase.Session.Session.checkMaxSessions">[docs]</a>    <span class="k">def</span> <span class="nf">checkMaxSessions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nMax</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        check whether max. number of saved sessions is reached</span>
+<span class="sd">        if: remove the oldest session</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">nMax</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">nMax</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">opts</span><span class="p">[</span><span class="s">&#39;maxSessions&#39;</span><span class="p">]</span>
+        <span class="n">l</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stateNames</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">l</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">nMax</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">l</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">l</span><span class="p">)</span><span class="o">-</span><span class="n">nMax</span><span class="p">]:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">tmp_dir_session</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">f</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="Session.stateNames"><a class="viewcode-back" href="../../appbase.html#appbase.Session.Session.stateNames">[docs]</a>    <span class="k">def</span> <span class="nf">stateNames</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns:</span>
+<span class="sd">             list: the names of all saved sessions</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tmp_dir_session</span>
+        <span class="n">l</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">listdir</span><span class="p">()</span>
+        <span class="n">l</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">l</span> <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">isdir</span><span class="p">()]</span>
+        <span class="n">naturalSorting</span><span class="p">(</span><span class="n">l</span><span class="p">)</span>
+        <span class="c"># bring autosave to first position:</span>
+        <span class="k">if</span> <span class="s">&#39;autoSave&#39;</span> <span class="ow">in</span> <span class="n">l</span><span class="p">:</span>
+            <span class="n">l</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s">&#39;autoSave&#39;</span><span class="p">)</span>
+            <span class="n">l</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s">&#39;autoSave&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">l</span></div>
+
+
+<div class="viewcode-block" id="Session.restorePreviousState"><a class="viewcode-back" href="../../appbase.html#appbase.Session.Session.restorePreviousState">[docs]</a>    <span class="k">def</span> <span class="nf">restorePreviousState</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stateNames</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">s</span><span class="p">:</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_session</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">current_session</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">restoreCurrentState</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Session.restoreNextState"><a class="viewcode-back" href="../../appbase.html#appbase.Session.Session.restoreNextState">[docs]</a>    <span class="k">def</span> <span class="nf">restoreNextState</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stateNames</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">s</span><span class="p">:</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_session</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">current_session</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">restoreCurrentState</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Session.restoreStateName"><a class="viewcode-back" href="../../appbase.html#appbase.Session.Session.restoreStateName">[docs]</a>    <span class="k">def</span> <span class="nf">restoreStateName</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;restore the state of given [name]&#39;&#39;&#39;</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_session</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">restoreCurrentState</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Session.renameState"><a class="viewcode-back" href="../../appbase.html#appbase.Session.Session.renameState">[docs]</a>    <span class="k">def</span> <span class="nf">renameState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">oldStateName</span><span class="p">,</span> <span class="n">newStateName</span><span class="p">):</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tmp_dir_session</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">oldStateName</span><span class="p">)</span>
+        <span class="n">s</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">newStateName</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_session</span> <span class="o">==</span> <span class="n">oldStateName</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">current_session</span> <span class="o">=</span> <span class="n">newStateName</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;==&gt; State [</span><span class="si">%s</span><span class="s">] renamed to  [</span><span class="si">%s</span><span class="s">]&quot;</span> <span class="o">%</span><span class="p">(</span><span class="n">oldStateName</span><span class="p">,</span> <span class="n">newStateName</span><span class="p">))</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_recusiveReplacePlaceholderWithArray</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">arrays</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">recursive</span><span class="p">(</span><span class="n">state</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">state</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">dict</span><span class="p">:</span>
+                    <span class="n">recursive</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">str</span> <span class="ow">and</span> <span class="n">val</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;arr_&#39;</span><span class="p">):</span>
+                    <span class="n">state</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">arrays</span><span class="p">[</span><span class="n">val</span><span class="p">]</span>
+        <span class="n">recursive</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="Session.restoreCurrentState"><a class="viewcode-back" href="../../appbase.html#appbase.Session.Session.restoreCurrentState">[docs]</a>    <span class="k">def</span> <span class="nf">restoreCurrentState</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_session</span><span class="p">:</span>
+            <span class="n">orig</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tmp_dir_save_session</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tmp_dir_save_session</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tmp_dir_session</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                                            <span class="bp">self</span><span class="o">.</span><span class="n">current_session</span><span class="p">)</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s">&#39;state.pickle&#39;</span><span class="p">),</span> <span class="s">&quot;rb&quot;</span> <span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">state</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span> <span class="n">f</span> <span class="p">)</span>
+            <span class="n">p</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s">&#39;arrays.npz&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                <span class="n">arrays</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s">&#39;arrays.npz&#39;</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_recusiveReplacePlaceholderWithArray</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">arrays</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">dialogs</span><span class="o">.</span><span class="n">restoreState</span><span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="s">&#39;dialogs&#39;</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">opts</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="s">&#39;session&#39;</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sigRestore</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tmp_dir_save_session</span> <span class="o">=</span> <span class="n">orig</span>
+            
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;==&gt; State [</span><span class="si">%s</span><span class="s">] restored from &#39;</span><span class="si">%s</span><span class="s">&#39;&quot;</span> <span class="o">%</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_session</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="Session.addSession"><a class="viewcode-back" href="../../appbase.html#appbase.Session.Session.addSession">[docs]</a>    <span class="k">def</span> <span class="nf">addSession</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_session</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_sessions</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_sessions</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tmp_dir_save_session</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tmp_dir_session</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                                        <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_sessions</span><span class="p">))</span><span class="o">.</span><span class="n">mkdir</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">checkMaxSessions</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Session.quit"><a class="viewcode-back" href="../../appbase.html#appbase.Session.Session.quit">[docs]</a>    <span class="k">def</span> <span class="nf">quit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">print</span> <span class="s">&#39;exiting...&#39;</span>
+        <span class="c"># RESET ICONS</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_icons_enabled</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s">&#39;disable menu-icons&#39;</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span> <span class="c">#restore the standard-setting for seeing icons in the menus</span>
+            <span class="s">&#39;gconftool-2 --type Boolean --set /desktop/gnome/interface/menus_have_icons False&#39;</span><span class="p">)</span>
+
+        <span class="c"># WAIT FOR PROMT IF IN DEBUG MODE</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">opts</span><span class="p">[</span><span class="s">&#39;debugMode&#39;</span><span class="p">]:</span>
+            <span class="nb">raw_input</span><span class="p">(</span><span class="s">&quot;Press any key to end the session...&quot;</span><span class="p">)</span>
+        <span class="c"># REMOVE TEMP FOLDERS</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tmp_dir_session</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tmp_dir_work</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
+            <span class="k">pass</span>  <span class="c"># in case the folders are used by another process</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">APP_CONFIG_FILE</span><span class="p">,</span> <span class="s">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">app_opts</span><span class="p">))</span>
+        <span class="c"># CLOSE LOG FILE</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">log_file</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">writeLog</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">log_file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_inspectArguments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;inspect the command-line-args and give them to appBase&#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">args</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">exec_path</span> <span class="o">=</span> <span class="n">PathStr</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">exec_path</span> <span class="o">=</span> <span class="bp">None</span>
+
+        <span class="n">session_name</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+        
+        <span class="n">openSession</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">arg</span> <span class="ow">in</span> <span class="p">(</span><span class="s">&#39;-h&#39;</span><span class="p">,</span> <span class="s">&#39;--help&#39;</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_showHelp</span><span class="p">()</span>
+            <span class="k">elif</span> <span class="n">arg</span> <span class="ow">in</span> <span class="p">(</span><span class="s">&#39;-d&#39;</span><span class="p">,</span> <span class="s">&#39;--debug&#39;</span><span class="p">):</span>
+                <span class="k">print</span> <span class="s">&#39;RUNNGING IN DEBUG-MODE&#39;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">opts</span><span class="p">[</span><span class="s">&#39;debugMode&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="k">elif</span> <span class="n">arg</span> <span class="ow">in</span> <span class="p">(</span><span class="s">&#39;-l&#39;</span><span class="p">,</span> <span class="s">&#39;--log&#39;</span><span class="p">):</span>
+                <span class="k">print</span> <span class="s">&#39;CREATE LOG&#39;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">opts</span><span class="p">[</span><span class="s">&#39;createLog&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="k">elif</span> <span class="n">arg</span> <span class="ow">in</span> <span class="p">(</span><span class="s">&#39;-s&#39;</span><span class="p">,</span> <span class="s">&#39;--server&#39;</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">opts</span><span class="p">[</span><span class="s">&#39;server&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="k">elif</span> <span class="n">arg</span> <span class="ow">in</span> <span class="p">(</span><span class="s">&#39;-o&#39;</span><span class="p">,</span> <span class="s">&#39;--open&#39;</span><span class="p">):</span>
+                <span class="n">openSession</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="k">elif</span> <span class="n">openSession</span><span class="p">:</span>
+                <span class="n">session_name</span> <span class="o">=</span> <span class="n">arg</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">print</span> <span class="s">&quot;Argument &#39;</span><span class="si">%s</span><span class="s">&#39; not known.&quot;</span> <span class="o">%</span><span class="n">arg</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_showHelp</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">session_name</span>
+
+
+    <span class="k">def</span> <span class="nf">_showHelp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s">&#39;&#39;&#39;</span>
+<span class="s">    </span><span class="si">%s</span><span class="s">-sessions can started with the following arguments:</span>
+<span class="s">        [-h or --help] - show the help-page</span>
+<span class="s">        [-d or --debug] - run in debugging-mode</span>
+<span class="s">        [-l or --log] - create log file</span>
+<span class="s">        [-n or --new] - start a new session, don&#39;l load saved properties</span>
+<span class="s">        [-exec [cmd]] - execute python code from this script/executable</span>
+<span class="s">        &#39;&#39;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="Session.save"><a class="viewcode-back" href="../../appbase.html#appbase.Session.Session.save">[docs]</a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;save the current session</span>
+<span class="sd">        override, if session was saved earlier&#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_saveState</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">saveAs</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Session.saveAs"><a class="viewcode-back" href="../../appbase.html#appbase.Session.Session.saveAs">[docs]</a>    <span class="k">def</span> <span class="nf">saveAs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">filename</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="c"># ask for filename:</span>
+            <span class="n">filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dialogs</span><span class="o">.</span><span class="n">getSaveFileName</span><span class="p">(</span><span class="nb">filter</span><span class="o">=</span><span class="s">&quot;*.</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">FTYPE</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">filename</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">filename</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_saveState</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_createdAutosaveFile</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_createdAutosaveFile</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
+                <span class="k">print</span><span class="p">(</span><span class="s">&quot;removed automatically created &#39;</span><span class="si">%s</span><span class="s">&#39;&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">_createdAutosaveFile</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_createdAutosaveFile</span> <span class="o">=</span> <span class="bp">None</span></div>
+
+
+<div class="viewcode-block" id="Session.replace"><a class="viewcode-back" href="../../appbase.html#appbase.Session.Session.replace">[docs]</a>    <span class="k">def</span> <span class="nf">replace</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        replace current session with one given by file path</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setSessionPath</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">restoreCurrentState</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Session.open"><a class="viewcode-back" href="../../appbase.html#appbase.Session.Session.open">[docs]</a>    <span class="k">def</span> <span class="nf">open</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;open a session to define in a dialog in an extra window&#39;&#39;&#39;</span> 
+        <span class="n">filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dialogs</span><span class="o">.</span><span class="n">getOpenFileName</span><span class="p">(</span><span class="nb">filter</span><span class="o">=</span><span class="s">&quot;*.</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">FTYPE</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">filename</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Session.new"><a class="viewcode-back" href="../../appbase.html#appbase.Session.Session.new">[docs]</a>    <span class="k">def</span> <span class="nf">new</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;start a session an independent process&#39;&#39;&#39;</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">exec_path</span><span class="p">,)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">exec_path</span><span class="o">.</span><span class="n">filetype</span><span class="p">()</span> <span class="ow">in</span> <span class="p">(</span><span class="s">&#39;py&#39;</span><span class="p">,</span> <span class="s">&#39;pyw&#39;</span><span class="p">,</span> <span class="s">&#39;pyz&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">FTYPE</span><span class="p">):</span>
+            <span class="c">#get the absolute path to the python-executable</span>
+            <span class="n">p</span> <span class="o">=</span> <span class="n">find_executable</span><span class="p">(</span><span class="s">&quot;python&quot;</span><span class="p">)</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="s">&#39;python&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="n">path</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c">#for some reason the first arg is ignored if run as .exe</span>
+            <span class="c">#in spawnv -&gt; set a dummy arg</span>
+            <span class="n">path</span> <span class="o">+=</span> <span class="p">(</span><span class="s">&#39;DUMMY&#39;</span><span class="p">,)</span>
+        <span class="k">if</span> <span class="n">filename</span><span class="p">:</span>
+            <span class="n">path</span> <span class="o">+=</span> <span class="p">(</span><span class="s">&#39;-o&#39;</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">spawnl</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">P_NOWAIT</span><span class="p">,</span> <span class="o">*</span><span class="n">path</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Session.registerMainWindow"><a class="viewcode-back" href="../../appbase.html#appbase.Session.Session.registerMainWindow">[docs]</a>    <span class="k">def</span> <span class="nf">registerMainWindow</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">win</span><span class="p">):</span>
+        <span class="n">win</span><span class="o">.</span><span class="n">setWindowIcon</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QIcon</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ICON</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_mainWindow</span> <span class="o">=</span> <span class="n">win</span>
+        <span class="n">win</span><span class="o">.</span><span class="n">show</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_showMainWindow</span>
+        <span class="n">win</span><span class="o">.</span><span class="n">hide</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hideMainWindow</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">opts</span><span class="p">[</span><span class="s">&#39;server&#39;</span><span class="p">]:</span>
+            <span class="n">server_</span> <span class="o">=</span> <span class="n">Server</span><span class="p">(</span><span class="n">win</span><span class="p">)</span>
+            <span class="n">win</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">win</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_showMainWindow</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c">#restore autosave</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_autosave</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_mainWindow</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_mainWindow</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">_hideMainWindow</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c">#disable autosave on hidden window</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_autosave</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">opts</span><span class="p">[</span><span class="s">&#39;autosave&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">opts</span><span class="p">[</span><span class="s">&#39;autosave&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_mainWindow</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">hide</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_mainWindow</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">_saveState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;save current state and add a new state&#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">addSession</span><span class="p">()</span><span class="c">#next session</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_save</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_sessions</span><span class="p">),</span> <span class="n">path</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">_autoSave</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;save state into &#39;autosave&#39; &#39;&#39;&#39;</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="s">&#39;autoSave&#39;</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="p">:</span>
+            <span class="n">path</span><span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dir</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%s</span><span class="s">.</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">FTYPE</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_createdAutosaveFile</span> <span class="o">=</span> <span class="n">path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tmp_dir_save_session</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tmp_dir_session</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">a</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_save</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="Session.blockingSave"><a class="viewcode-back" href="../../appbase.html#appbase.Session.Session.blockingSave">[docs]</a>    <span class="k">def</span> <span class="nf">blockingSave</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        saved session to file - returns after finish</span>
+<span class="sd">        only called by interactiveTutorial-save at the moment</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tmp_dir_save_session</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tmp_dir_session</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s">&#39;block&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">()</span>
+        <span class="n">state</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;session&#39;</span><span class="p">:</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">opts</span><span class="p">),</span>
+                 <span class="s">&#39;dialogs&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">dialogs</span><span class="o">.</span><span class="n">saveState</span><span class="p">()}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">saveThread</span><span class="o">.</span><span class="n">prepare</span><span class="p">(</span><span class="s">&#39;0&#39;</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tmp_dir_session</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sigSave</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">saveThread</span><span class="o">.</span><span class="n">run</span><span class="p">()</span> </div>
+
+
+    <span class="k">def</span> <span class="nf">_save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stateName</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;save into &#39;stateName&#39; to pyz-path&#39;&#39;&#39;</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&#39;saving...&#39;</span><span class="p">)</span>
+
+        <span class="n">state</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;session&#39;</span><span class="p">:</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">opts</span><span class="p">),</span>
+                 <span class="s">&#39;dialogs&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">dialogs</span><span class="o">.</span><span class="n">saveState</span><span class="p">()}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">sigSave</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">saveThread</span><span class="o">.</span><span class="n">prepare</span><span class="p">(</span><span class="n">stateName</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tmp_dir_session</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">saveThread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_session</span> <span class="o">=</span> <span class="n">stateName</span>
+
+        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">app_opts</span><span class="p">[</span><span class="s">&#39;recent sessions&#39;</span><span class="p">]</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c"># is this session already exists: remove it</span>
+            <span class="n">r</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="c"># add this session at the beginning</span>
+        <span class="n">r</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">path</span><span class="p">)</span></div>
+
+
+
+<span class="k">class</span> <span class="nc">_SaveThread</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">QThread</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Run the saving procedure in a thread to be non-blocking</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">prepare</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stateName</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">dirpath</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stateName</span> <span class="o">=</span> <span class="n">stateName</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dirpath</span> <span class="o">=</span> <span class="n">dirpath</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_state</span> <span class="o">=</span> <span class="n">state</span>
+
+
+    <span class="k">def</span> <span class="nf">_recusiveReplaceArrayWithPlaceholder</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        replace all numpy.array within the state dict</span>
+<span class="sd">        with a placeholder</span>
+<span class="sd">        this allows to save the arrays extra using numpy.save_compressed</span>
+<span class="sd">        &#39;&#39;&#39;</span> 
+        <span class="n">c</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">arrays</span> <span class="o">=</span> <span class="p">{}</span>
+        
+        <span class="k">def</span> <span class="nf">recursive</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">state</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+                <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">dict</span><span class="p">:</span>
+                    <span class="n">recursive</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+                        <span class="n">name</span> <span class="o">=</span> <span class="s">&#39;arr_</span><span class="si">%i</span><span class="s">&#39;</span> <span class="o">%</span><span class="n">c</span>
+                        <span class="n">arrays</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+                        <span class="n">state</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">name</span>
+                        <span class="n">c</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">recursive</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">arrays</span>
+
+
+    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">arrays</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_recusiveReplaceArrayWithPlaceholder</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_state</span><span class="p">)</span>
+        <span class="c"># save state</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dirpath</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stateName</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span> <span class="n">p</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s">&#39;state.pickle&#39;</span><span class="p">),</span> <span class="s">&quot;wb&quot;</span> <span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">_state</span><span class="p">,</span> <span class="n">f</span> <span class="p">)</span>
+        <span class="c"># save arrays</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">arrays</span><span class="p">):</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">savez_compressed</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s">&#39;arrays.npz&#39;</span><span class="p">),</span> <span class="o">**</span><span class="n">arrays</span><span class="p">)</span>
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_state</span>
+        <span class="c"># create zip file</span>
+        <span class="k">with</span> <span class="n">ZipFile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span><span class="s">&#39;w&#39;</span><span class="p">,</span>
+             <span class="c"># FROM https://docs.python.org/2/library/zipfile.html :</span>
+             <span class="c"># allowZip64 is True zipfile will create ZIP files </span>
+             <span class="c">#  that use the ZIP64 extensions when the zipfile is larger than 2 </span>
+             <span class="c"># GB. If it is false (the default) zipfile will raise an exception </span>
+             <span class="c"># when the ZIP file would require ZIP64 extensions. ZIP64 extensions are </span>
+             <span class="c"># disabled by default because the default zip and unzip commands on Unix </span>
+             <span class="c"># (the InfoZIP utilities) don’t support these extensions.</span>
+             <span class="n">allowZip64</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span> <span class="k">as</span> <span class="n">zipFile</span><span class="p">:</span>
+
+            <span class="c"># copy a dir to the zip-file:</span>
+            <span class="n">basedir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dirpath</span>
+            <span class="k">for</span> <span class="n">root</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">files</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dirpath</span><span class="p">):</span>
+                <span class="n">dirname</span> <span class="o">=</span> <span class="n">root</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">basedir</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+                    <span class="n">zipFile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span><span class="n">f</span><span class="p">),</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dirname</span><span class="p">,</span><span class="n">f</span><span class="p">)</span> <span class="p">)</span>
+
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;|</span><span class="si">%s</span><span class="s">| ==&gt; State [</span><span class="si">%s</span><span class="s">] saved to &#39;</span><span class="si">%s</span><span class="s">&#39;&quot;</span> <span class="o">%</span><span class="p">(</span>
+                    <span class="n">strftime</span><span class="p">(</span><span class="s">&quot;%H:%M:%S&quot;</span><span class="p">,</span> <span class="n">gmtime</span><span class="p">()),</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">stateName</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">))</span>
+
+
+
+<span class="k">class</span> <span class="nc">_Opts</span><span class="p">(</span><span class="nb">dict</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;session.opts dictionary</span>
+<span class="sd">     -&gt; execute things when opts are changed</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">session</span><span class="p">):</span>
+        <span class="nb">dict</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">session</span> <span class="o">=</span> <span class="n">session</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_activated</span> <span class="o">=</span> <span class="bp">False</span>
+
+
+    <span class="k">def</span> <span class="nf">activate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_activated</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">d</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__setitem__</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_activated</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">item</span> <span class="o">==</span> <span class="s">&#39;writeToShell&#39;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">streamOut</span><span class="o">.</span><span class="n">setWriteToShell</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">streamErr</span><span class="o">.</span><span class="n">setWriteToShell</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">item</span> <span class="o">==</span> <span class="s">&#39;createLog&#39;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">value</span><span class="p">:</span> 
+                    <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">writeLog</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">item</span> <span class="o">==</span> <span class="s">&#39;autosaveIntervalMin&#39;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">timerAutosave</span><span class="o">.</span><span class="n">setInterval</span><span class="p">(</span><span class="n">value</span><span class="o">*</span><span class="mi">60</span><span class="o">*</span><span class="mi">1000</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">item</span> <span class="o">==</span> <span class="s">&#39;autosave&#39;</span><span class="p">:</span>
+                <span class="n">t</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">timerAutosave</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">t</span><span class="o">.</span><span class="n">isActive</span><span class="p">()</span> <span class="ow">and</span> <span class="n">value</span><span class="p">:</span>
+                    <span class="n">t</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+                <span class="k">elif</span> <span class="n">t</span><span class="o">.</span><span class="n">isActive</span><span class="p">()</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">value</span><span class="p">:</span>
+                    <span class="n">t</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+            <span class="k">elif</span> <span class="n">item</span> <span class="o">==</span> <span class="s">&#39;maxSessions&#39;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">checkMaxSessions</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="nb">dict</span><span class="o">.</span><span class="n">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016, Karl Bedrich.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'0.3',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

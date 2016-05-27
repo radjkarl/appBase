@@ -1,0 +1,20 @@
+appbase.dialogs package
+=======================
+
+.. automodule:: appbase.dialogs
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+Submodules
+----------
+
+appbase.dialogs.FirstStart module
+---------------------------------
+
+.. automodule:: appbase.dialogs.FirstStart
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
