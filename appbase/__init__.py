@@ -12,7 +12,7 @@ appbase is the foundation for a pyQt based application including:
 
 import os as _os
 
-__version__ = '0.3'
+__version__ = '0.3.1'
 __author__ = 'Karl Bedrich'
 __email__ = 'karl@bedrich.de'
 __url__ = 'https://github.com/radjkarl/appbase'
@@ -35,8 +35,3 @@ __classifiers__ = [
         'Topic :: Scientific/Engineering :: Visualization',
         'Topic :: Software Development :: Libraries :: Python Modules',
         ]
-
-
-# TODO: remove icons from package (was only used for Launcher
-_path = _os.path.abspath(_os.path.dirname(__file__))
-icon_path = _os.path.join(_path, 'media', 'icons')

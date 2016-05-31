@@ -1,8 +1,9 @@
-=======================================
-AppBase - your base for app development
-=======================================
+=============================================
+AppBase - your base for PyQt4 app development
+=============================================
 
-Appbase is a foundation for pyQt based applications.
+.. image:: https://img.shields.io/badge/License-GPLv3-red.svg
+.. image:: https://img.shields.io/badge/python-2.6%7C2.7-yellow.svg
 
 - Browse the `API Documentation <http://radjkarl.github.io/appBase>`_
 - Fork the code on `github <https://github.com/radjkarl/appBase>`_
