@@ -39,7 +39,7 @@ Version:        %s<br>
 License:        %s<br>
 Url:            <a href="%s">%s</a>""" % (
                         mod.__name__,
-                        mod.__description__,
+                        mod.__doc__,
                         mod.__author__,
                         mod.__email__,
                         mod.__version__,
