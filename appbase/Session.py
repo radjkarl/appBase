@@ -416,9 +416,9 @@ New run at %s
             p = find_executable("python")
             path = (p, 'python') + path
         else:
-            #for some reason the first arg is ignored if run as .exe
-            #in spawnv -> set a dummy arg
-            path += ('DUMMY',)
+            #if run in frozen env (.exe):
+            #first arg if execpath of the next session:
+            path += (self.exec_path,)
         if filename:
             path += ('-o', filename)
         os.spawnl(os.P_NOWAIT, *path)

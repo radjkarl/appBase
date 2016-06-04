@@ -48,13 +48,28 @@ setup(
     author_email    = package.__email__,
     url                = package.__url__,
     license            = package.__license__,
-    install_requires= package.__depencies__,
-    classifiers        = package.__classifiers__,
-    description        = package.__description__,
+    install_requires= [
+        "numpy >= 1.7.1",
+        # "PyQt4 >= 4.11.3", # not installable through pip
+        "fancytools >= 0.2",
+        "fancywidgets >= 0.1"
+    ],
+    classifiers        = [
+        'Intended Audience :: Developers',
+        'Intended Audience :: Science/Research',
+        'Intended Audience :: Other Audience',
+        'License :: OSI Approved :: GNU General Public License (GPL)',
+        'Operating System :: OS Independent',
+        'Programming Language :: Python',
+        'Topic :: Scientific/Engineering :: Information Analysis',
+        'Topic :: Scientific/Engineering :: Visualization',
+        'Topic :: Software Development :: Libraries :: Python Modules',
+        ],
+    description        = package.__doc__,
     packages        = find_packages(exclude=['tests*']),
     include_package_data=True,
-    scripts            = [] if not os.path.exists('bin') else [
-                        os.path.join('bin',x) for x in os.listdir('bin')],
+#     scripts            = [] if not os.path.exists('bin') else [
+#                         os.path.join('bin',x) for x in os.listdir('bin')],
     long_description=(
         read('README.rst') + '\n\n' +
         read('CHANGES.rst') + '\n\n' +
