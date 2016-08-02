@@ -67,7 +67,7 @@ class Session(QtCore.QObject):
                     'writeToShell': True,
                     'createLog': False,
                     'debugMode': False,
-                    'autosave': True,
+                    'autosave': False,
                     'autosaveIntervalMin': 15,
                     'server': False,
                      }, self)
