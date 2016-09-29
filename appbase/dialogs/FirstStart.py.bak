@@ -1,5 +1,4 @@
-from __future__ import print_function
-import sys
+import sys, os
 
 from PyQt4 import QtGui
 
@@ -76,7 +75,7 @@ class FirstStart(QtGui.QDialog):
                     else:
                         runAsAdmin((sys.executable, __file__, app_file, self.ftype ,self.name))
                 except:
-                    print('needs admin rights to work')
+                    print 'needs admin rights to work'
             else:
                 embeddIntoOS(app_file, self.ftype, self.name)
         
@@ -95,11 +94,7 @@ def embeddIntoOS(app_file, ftype, app_name):
 
 
 if __name__ == '__main__':
-    #this file may be called directly 
-    #TODO: put into scripts folder and make test here
-    
-    args = sys.argv[1:]
     try:
-        embeddIntoOS(*args)
-    except Exception as err:
-        print(err)
+        embeddIntoOS(*sys.argv[1:])
+    except Exception, err:
+        print err

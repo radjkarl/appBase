@@ -1,14 +1,12 @@
-from __future__ import absolute_import
-from builtins import str
 # -*- coding: utf-8 -*-
 
 #foreign
 from PyQt4 import QtGui
 
 #this pgk
-from .menupreferences import MenuPreferences
-from .menuabout import MenuAbout
-from .menuShortcuts import MenuShortcuts
+from menupreferences import MenuPreferences
+from menuabout import MenuAbout
+from menuShortcuts import MenuShortcuts
 
 #own
 from fancywidgets.pyQtBased.MenuBar import MenuBar as FWMenuBar

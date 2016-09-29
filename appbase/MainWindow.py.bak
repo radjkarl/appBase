@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 #this pkg:
-from __future__ import print_function
-from __future__ import absolute_import
-
-from appbase.mainWindowRessources.menubar import MenuBar
+from mainWindowRessources.menubar import MenuBar
 from appbase.Application import Application
     
 #foreign:
@@ -25,7 +22,7 @@ class MainWindow(QtGui.QMainWindow):
         super(MainWindow, self).__init__()
         self.app = QtGui.QApplication.instance()
         if not isinstance(self.app, Application):
-            print('Error: QApp is no instance from appbase.Application')
+            print 'Error: QApp is no instance from appbase.Application'
             return
         fn = lambda state: self.setTitlePath(self.app.session.path)
         

@@ -1,9 +1,4 @@
 # -*- coding: utf-8 -*-
-
-from __future__ import print_function
-from future import standard_library
-standard_library.install_aliases()
-
 import numpy as np
 
 # from this pgk:
@@ -24,7 +19,7 @@ from distutils.spawn import find_executable
 from zipfile import ZipFile
 from time import gmtime, strftime
 from PyQt4 import QtCore, QtGui
-import pickle as pickle
+import cPickle as pickle
 
 import __main__
 
@@ -188,7 +183,7 @@ class Session(QtCore.QObject):
                     if 'false' in os.popen( 
                     #if the menu-icons on the gnome-desktop are disabled
                     'gconftool-2 --get /desktop/gnome/interface/menus_have_icons').read():
-                        print('enable menu-icons')
+                        print 'enable menu-icons'
                         os.system(
                     'gconftool-2 --type Boolean --set /desktop/gnome/interface/menus_have_icons True')
                         self._icons_enabled = True
@@ -271,7 +266,7 @@ New run at %s
 
     def _recusiveReplacePlaceholderWithArray(self, state, arrays):
         def recursive(state):
-            for key, val in list(state.items()):
+            for key, val in state.items():
                 if type(val) is dict:
                     recursive(val)
                 elif type(val) is str and val.startswith('arr_'):
@@ -308,16 +303,16 @@ New run at %s
 
 
     def quit(self):
-        print('exiting...')
+        print 'exiting...'
         # RESET ICONS
         if self._icons_enabled:
-            print('disable menu-icons')
+            print 'disable menu-icons'
             os.system( #restore the standard-setting for seeing icons in the menus
             'gconftool-2 --type Boolean --set /desktop/gnome/interface/menus_have_icons False')
 
         # WAIT FOR PROMT IF IN DEBUG MODE
         if self.opts['debugMode']:
-            input("Press any key to end the session...")
+            raw_input("Press any key to end the session...")
         # REMOVE TEMP FOLDERS
         try:
             self.tmp_dir_session.remove()
@@ -348,10 +343,10 @@ New run at %s
             if arg in ('-h', '--help'):
                 self._showHelp()
             elif arg in ('-d', '--debug'):
-                print('RUNNGING IN DEBUG-MODE')
+                print 'RUNNGING IN DEBUG-MODE'
                 self.opts['debugMode'] = True
             elif arg in ('-l', '--log'):
-                print('CREATE LOG')
+                print 'CREATE LOG'
                 self.opts['createLog'] = True
             elif arg in ('-s', '--server'):
                 self.opts['server'] = True
@@ -360,7 +355,7 @@ New run at %s
             elif openSession:
                 session_name = arg
             else:
-                print("Argument '%s' not known." %arg)
+                print "Argument '%s' not known." %arg
                 return self._showHelp()
         return session_name
 
@@ -533,7 +528,7 @@ class _SaveThread(QtCore.QThread):
         arrays = {}
         
         def recursive(c, state):
-            for key, val in state.items():
+            for key, val in state.iteritems():
                 if type(val) is dict:
                     recursive(c, val)
                 else:
@@ -596,7 +591,7 @@ class _Opts(dict):
 
 
     def update(self, d):
-        for key, val in d.items():
+        for key, val in d.iteritems():
             self.__setitem__(key, val)
 
 

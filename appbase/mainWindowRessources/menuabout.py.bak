@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import division
-from past.utils import old_div
 from PyQt4 import QtGui, QtSvg
 
 
@@ -20,9 +18,9 @@ class MenuAbout(QtGui.QWidget):
         self.setLayout(l)
         logo = QtSvg.QSvgWidget(self.app.session.ICON)
         s = logo.sizeHint()
-        aR = old_div(float(s.height()), s.width())
+        aR = float(s.height()) / s.width()
         h = 150
-        w = old_div(h,aR)
+        w = h/aR
         logo.setFixedSize(w, h)
         self.label_txt = QtGui.QLabel()
 
@@ -54,8 +52,8 @@ Url:            <a href="%s">%s</a>""" % (
     def setInstitutionLogo(self, path):
         logo = QtSvg.QSvgWidget(path)
         s = logo.sizeHint()
-        aR = old_div(float(s.height()), s.width())
+        aR = float(s.height()) / s.width()
         h = 150
-        w = old_div(h,aR)
+        w = h/aR
         logo.setFixedSize(int(w), int(h))
         self.layout().addWidget(logo)

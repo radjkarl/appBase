@@ -1,4 +1,3 @@
-from __future__ import absolute_import
 from PyQt4 import QtGui
 
 
@@ -22,14 +21,8 @@ class Server(QtGui.QSystemTrayIcon):
         if win:
             self.a_show = menu.addAction("show")
             self.a_hide = menu.addAction("hide")
-            self.a_show.triggered.connect(lambda: [
-                        win.show(), 
-                        self.a_hide.setVisible(True), 
-                        self.a_show.setVisible(False)]) 
-            self.a_hide.triggered.connect(lambda: [
-                        win.hide(), 
-                        self.a_hide.setVisible(False), 
-                        self.a_show.setVisible(True)]) 
+            self.a_show.triggered.connect(lambda: [win.show(), self.a_hide.setVisible(True), self.a_show.setVisible(False)]) 
+            self.a_hide.triggered.connect(lambda: [win.hide(), self.a_hide.setVisible(False), self.a_show.setVisible(True)]) 
             if win.isVisible():
                 self.a_show.setVisible(False) 
             else:
@@ -65,8 +58,8 @@ class Server(QtGui.QSystemTrayIcon):
 
 if __name__ == '__main__':
     import sys
-    from appbase.Application import Application
-    from appbase.MainWindow import MainWindow
+    from Application import Application
+    from MainWindow import MainWindow
     
     app = Application([])
     win = MainWindow('dummy')
