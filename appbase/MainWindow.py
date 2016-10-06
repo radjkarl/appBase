@@ -7,10 +7,10 @@ from appbase.mainWindowRessources.menubar import MenuBar
 from appbase.Application import Application
     
 #foreign:
-from PyQt4 import QtGui
+from qtpy import QtGui, QtPrintSupport, QtWidgets
 
 
-class MainWindow(QtGui.QMainWindow):
+class MainWindow(QtWidgets.QMainWindow):
     '''
     template for QMainWindow including:
     
@@ -23,7 +23,7 @@ class MainWindow(QtGui.QMainWindow):
     '''
     def __init__(self, title=''):
         super(MainWindow, self).__init__()
-        self.app = QtGui.QApplication.instance()
+        self.app = QtWidgets.QApplication.instance()
         if not isinstance(self.app, Application):
             print('Error: QApp is no instance from appbase.Application')
             return
@@ -78,24 +78,24 @@ class MainWindow(QtGui.QMainWindow):
         if self.app.session.app_opts['showCloseDialog']:
             b = _CloseDialog(self)
             ret = b.exec_()
-            if ret == QtGui.QMessageBox.Save:
+            if ret == QtWidgets.QMessageBox.Save:
                 self.app.session.save()
-            elif ret == QtGui.QMessageBox.Cancel:
+            elif ret == QtWidgets.QMessageBox.Cancel:
                 return evt.ignore()
         return evt.accept()
         
             
             
-class _CloseDialog(QtGui.QMessageBox):    
+class _CloseDialog(QtWidgets.QMessageBox):    
     def __init__(self, mainWindow):
-        QtGui.QMessageBox.__init__(self, mainWindow)
-        self.setIcon(QtGui.QMessageBox.Warning)
+        QtWidgets.QMessageBox.__init__(self, mainWindow)
+        self.setIcon(QtWidgets.QMessageBox.Warning)
         self.setText("Close the program...")
         self.setInformativeText("Save changes?")
-        self.setStandardButtons(QtGui.QMessageBox.Save | QtGui.QMessageBox.Discard | QtGui.QMessageBox.Cancel)
+        self.setStandardButtons(QtWidgets.QMessageBox.Save | QtWidgets.QMessageBox.Discard | QtWidgets.QMessageBox.Cancel)
 
 
-        c = QtGui.QCheckBox("don't ask me again")
+        c = QtWidgets.QCheckBox("don't ask me again")
         c.clicked.connect(lambda val: mainWindow.app.session.app_opts.__setitem__('showCloseDialog', not val))
         self.layout().addWidget(c,4,0,7,0)
 

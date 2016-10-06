@@ -3,19 +3,19 @@
 #this pkg:
 from appbase.Session import Session
 #foreign:
-from PyQt4 import QtGui
+from qtpy import QtGui, QtPrintSupport, QtWidgets
 import sys
 
 
 
-class Application(QtGui.QApplication):
+class Application(QtWidgets.QApplication):
     '''
-    A normal QtGui.QApplication
+    A normal QtWidgets.QApplication
     with embedded session management
     '''
     def __init__(self, args, **kwargs):
 
-        QtGui.QApplication.__init__(self, args)
+        QtWidgets.QApplication.__init__(self, args)
         #add session features (load, save, restore state etc) can be found in:
         self.session = Session(args, **kwargs)
         #tell the session when to run the quit procedure:
@@ -35,6 +35,6 @@ class Application(QtGui.QApplication):
 
 if __name__ == '__main__':
     app = Application([])
-    win = QtGui.QMainWindow()
+    win = QtWidgets.QMainWindow()
     win.show()
     sys.exit(app.exec_())

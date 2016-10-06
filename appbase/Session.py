@@ -23,7 +23,7 @@ import sys
 from distutils.spawn import find_executable
 from zipfile import ZipFile
 from time import gmtime, strftime
-from PyQt4 import QtCore, QtGui
+from qtpy import QtCore, QtGui, QtPrintSupport, QtWidgets
 import pickle as pickle
 
 import __main__
@@ -31,7 +31,7 @@ import __main__
 
 
 class Session(QtCore.QObject):
-    '''Session management to be accessible in QtGui.QApplication.instance().session
+    '''Session management to be accessible in QtWidgets.QApplication.instance().session
 
     * extract the opened (as pyz-zipped) session in a temp folder
     * create 2nd temp-folder for sessions to be saved

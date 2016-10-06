@@ -13,7 +13,7 @@ from fancytools.os.PathStr import PathStr
 from fancywidgets.pyQtBased.Dialogs import Dialogs
 
 #foreign
-from PyQt4 import QtGui, QtCore, QtSvg
+from qtpy import QtGui, QtPrintSupport, QtWidgets, QtCore, QtSvg
 
 #built-in
 import os
@@ -30,7 +30,7 @@ CONFIG_FILE = PathStr.home().join(__name__)
 
 
 
-class Launcher(QtGui.QMainWindow):
+class Launcher(QtWidgets.QMainWindow):
     '''
     A graphical starter for *.pyz files created by the save-method from
     appbase.MainWindow
@@ -92,7 +92,7 @@ class Launcher(QtGui.QMainWindow):
                         _guidePath, _default_text_color, f[:-4])
             right_header = right_header[:-4]
 
-        QtGui.QMainWindow.__init__(self)
+        QtWidgets.QMainWindow.__init__(self)
 
 
         self._start_script = start_script
@@ -100,20 +100,20 @@ class Launcher(QtGui.QMainWindow):
         self.setWindowIcon(QtGui.QIcon(icon))
         self.resize(900,500)
         #BASE STRUTURE
-        area = QtGui.QWidget()
+        area = QtWidgets.QWidget()
         self.setCentralWidget(area)
-        layout = QtGui.QVBoxLayout()
+        layout = QtWidgets.QVBoxLayout()
         area.setLayout(layout)
-        #header = QtGui.QHBoxLayout()
+        #header = QtWidgets.QHBoxLayout()
         #layout.addLayout(header)
         #grab the default text color of a qlabel to color all links from blue to it:
         #LEFT TEXT
-        info = QtGui.QLabel(left_header)
+        info = QtWidgets.QLabel(left_header)
         info.setOpenExternalLinks (True)
         #LOGO
-        header = QtGui.QWidget()
+        header = QtWidgets.QWidget()
         header.setFixedHeight(70)
-        headerlayout = QtGui.QHBoxLayout()
+        headerlayout = QtWidgets.QHBoxLayout()
         header.setLayout(headerlayout)
         logo = QtSvg.QSvgWidget(icon)
         logo.setFixedWidth(50)
@@ -122,19 +122,19 @@ class Launcher(QtGui.QMainWindow):
         headerlayout.addWidget(info)
         layout.addWidget(header)
         #RIGHT_HEADER
-        userGuide = QtGui.QLabel(right_header)
+        userGuide = QtWidgets.QLabel(right_header)
         userGuide.setOpenExternalLinks(True)
         userGuide.setAlignment(QtCore.Qt.AlignTop | QtCore.Qt.AlignRight)
         headerlayout.addWidget(userGuide)
         #ROOT-PATH OF THE SESSIONS
-        rootLayout = QtGui.QHBoxLayout()
-        rootFrame = QtGui.QFrame()
-        rootFrame.setFrameStyle(QtGui.QFrame.StyledPanel | QtGui.QFrame.Plain)
+        rootLayout = QtWidgets.QHBoxLayout()
+        rootFrame = QtWidgets.QFrame()
+        rootFrame.setFrameStyle(QtWidgets.QFrame.StyledPanel | QtWidgets.QFrame.Plain)
         rootFrame.setFixedHeight(45)
         rootFrame.setLineWidth(0)
         rootFrame.setLayout(rootLayout)
         layout.addWidget(rootFrame)
-        self.rootDir = QtGui.QLabel()
+        self.rootDir = QtWidgets.QLabel()
         self.rootDir.setAutoFillBackground(True)
         self.rootDir.setStyleSheet("QLabel { background-color: white; }")
 
@@ -147,8 +147,8 @@ class Launcher(QtGui.QMainWindow):
         self.fileSystemModel.setNameFilterDisables(False)
         self.treeView.setModel(self.fileSystemModel)
 
-        treelayout = QtGui.QHBoxLayout()
-        splitter = QtGui.QSplitter(QtCore.Qt.Orientation(1))
+        treelayout = QtWidgets.QHBoxLayout()
+        splitter = QtWidgets.QSplitter(QtCore.Qt.Orientation(1))
 
         self.fileInfo = _PyzInfo(splitter, self.fileSystemModel, self.treeView)
         self.treeView.clicked.connect(self.fileInfo.update)
@@ -167,7 +167,7 @@ class Launcher(QtGui.QMainWindow):
             except IOError:
                 pass #file not existant
         if not self._path or not self._path.exists():
-            msgBox = QtGui.QMessageBox()
+            msgBox = QtWidgets.QMessageBox()
             msgBox.setText("Please choose your projectDirectory.")
             msgBox.exec_()
             self._changeRootDir()
@@ -176,20 +176,20 @@ class Launcher(QtGui.QMainWindow):
         self.rootDir.setText(abspath)
         rootLayout.addWidget(self.rootDir)
         #GO UPWARDS ROOT-PATH BUTTON
-        btnUpRootDir = QtGui.QPushButton('up')
+        btnUpRootDir = QtWidgets.QPushButton('up')
         btnUpRootDir.clicked.connect(self._goUpRootDir)
         rootLayout.addWidget(btnUpRootDir)
         #DEFINE CURRENT DIR AS ROOT-PATH
-        btnDefineRootDir = QtGui.QPushButton('set')
+        btnDefineRootDir = QtWidgets.QPushButton('set')
         btnDefineRootDir.clicked.connect(self._defineRootDir)
         rootLayout.addWidget(btnDefineRootDir)
         #SELECT ROOT-PATH BUTTON
-        buttonRootDir = QtGui.QPushButton('select')
+        buttonRootDir = QtWidgets.QPushButton('select')
         buttonRootDir.clicked.connect(self._changeRootDir)
         rootLayout.addWidget(buttonRootDir)
         #NEW-BUTTON
         if self._start_script:
-            newButton = QtGui.QPushButton('NEW')
+            newButton = QtWidgets.QPushButton('NEW')
             newButton.clicked.connect(self._openNew)
             layout.addWidget(newButton)
 
@@ -235,39 +235,39 @@ class Launcher(QtGui.QMainWindow):
 
 
 
-class _FileEditMenu(QtGui.QWidget):
+class _FileEditMenu(QtWidgets.QWidget):
     def __init__(self, treeView):
-        QtGui.QWidget.__init__(self)
+        QtWidgets.QWidget.__init__(self)
         self._treeView = treeView
-        self._menu=QtGui.QMenu(self)
+        self._menu=QtWidgets.QMenu(self)
         d = PathStr.getcwd()
         iconpath = os.path.join(d, 'media','icons','approve.svg')
-        self._actionStart = QtGui.QAction(QtGui.QIcon(iconpath),
+        self._actionStart = QtWidgets.QAction(QtGui.QIcon(iconpath),
             'Start', self._treeView,
             triggered=self._treeView.openProject)
 
         iconpath = os.path.join(d, 'media','icons','delete.svg')
-        delete = QtGui.QAction(QtGui.QIcon(iconpath),
+        delete = QtWidgets.QAction(QtGui.QIcon(iconpath),
             'Delete', self._treeView,
             triggered=self._treeView.deleteSelected)
 
         iconpath = os.path.join(d, 'media','icons','rename.svg')
-        rename = QtGui.QAction(QtGui.QIcon(iconpath),
+        rename = QtWidgets.QAction(QtGui.QIcon(iconpath),
             'Rename', self._treeView,
             triggered=self._treeView.editSelected)
 
         iconpath = os.path.join(d, 'media','icons','new.svg')
-        newDir = QtGui.QAction(QtGui.QIcon(iconpath),
+        newDir = QtWidgets.QAction(QtGui.QIcon(iconpath),
             'New Directory', self._treeView,
             triggered=self._treeView.newDirInSelected)
 
         iconpath = os.path.join(d, 'media','icons','findReplace.svg')
-        self._editStartScript = QtGui.QAction(QtGui.QIcon(iconpath),
+        self._editStartScript = QtWidgets.QAction(QtGui.QIcon(iconpath),
             'Edit start script', self._treeView,
             triggered=self._treeView.editStartScriptInSelected)
 
         iconpath = os.path.join(d, 'media','icons','bug.png')
-        self._actionInDebugMode = QtGui.QAction(QtGui.QIcon(iconpath),
+        self._actionInDebugMode = QtWidgets.QAction(QtGui.QIcon(iconpath),
             'Run in debug mode', self._treeView,
             triggered=self._treeView.runInDebugMode)
 
@@ -289,7 +289,7 @@ class _FileEditMenu(QtGui.QWidget):
 
 
 
-class _TreeView(QtGui.QTreeView):
+class _TreeView(QtWidgets.QTreeView):
 
     def __init__(self):
         super(_TreeView, self).__init__()
@@ -297,7 +297,7 @@ class _TreeView(QtGui.QTreeView):
         self.setExpandsOnDoubleClick(False)#connect own function for doubleclick
         self._menu = _FileEditMenu(self)
         #no editing of the items when clicked, rightclicked, doubleclicked:
-        self.setEditTriggers(QtGui.QAbstractItemView.NoEditTriggers)
+        self.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
         self.sortByColumn(0, QtCore.Qt.AscendingOrder)#sort by name
         self.setSortingEnabled(True)
         self.setAnimated(True)#expanding/collapsing animated
@@ -306,7 +306,7 @@ class _TreeView(QtGui.QTreeView):
         #DRAG/DROP
         self.setDragEnabled(True)
         self.setAcceptDrops(True)
-        self.setDragDropMode(QtGui.QAbstractItemView.InternalMove)
+        self.setDragDropMode(QtWidgets.QAbstractItemView.InternalMove)
         self.doubleClicked.connect(self._doubleClicked)
 
 
@@ -330,10 +330,10 @@ class _TreeView(QtGui.QTreeView):
 
 
     def deleteSelected(self):
-        msgBox = QtGui.QMessageBox()
+        msgBox = QtWidgets.QMessageBox()
         msgBox.setText("Are you sure?")
-        msgBox.addButton('Yes', QtGui.QMessageBox.YesRole)
-        msgBox.addButton('No', QtGui.QMessageBox.RejectRole)
+        msgBox.addButton('Yes', QtWidgets.QMessageBox.YesRole)
+        msgBox.addButton('No', QtWidgets.QMessageBox.RejectRole)
         ret = msgBox.exec_()
         if ret == 0:#yes
             self.fileSystemModel.remove(self.currentIndex())
@@ -414,42 +414,42 @@ class _TreeView(QtGui.QTreeView):
 
 
 
-class _PyzInfo(QtGui.QWidget):
+class _PyzInfo(QtWidgets.QWidget):
     def __init__(self, vsplitter, filesystemmodel, treeView):
-        QtGui.QWidget.__init__(self)
-        self.layout = QtGui.QVBoxLayout()
+        QtWidgets.QWidget.__init__(self)
+        self.layout = QtWidgets.QVBoxLayout()
         self._filesystemmodel = filesystemmodel
         self._treeView = treeView
 
         self.vsplitter = vsplitter
-        self.hsplitter = QtGui.QSplitter(QtCore.Qt.Orientation(0))
+        self.hsplitter = QtWidgets.QSplitter(QtCore.Qt.Orientation(0))
         self.vsplitter.splitterMoved.connect(self.scaleImgV)
         self.hsplitter.splitterMoved.connect(self.scaleImgH)
         self.layout.addWidget(self.hsplitter)
         self._sizeDefined= False
         self.setLayout(self.layout)
-        self.img = QtGui.QLabel()
-        self.text = QtGui.QTextEdit()
+        self.img = QtWidgets.QLabel()
+        self.text = QtWidgets.QTextEdit()
         self.text.setReadOnly(True)
         self.hsplitter.addWidget(self.img)
         self.hsplitter.addWidget(self.text)
 
-        btnStart = QtGui.QPushButton('start')
-        self._btnDebug = QtGui.QCheckBox('debug mode')
+        btnStart = QtWidgets.QPushButton('start')
+        self._btnDebug = QtWidgets.QCheckBox('debug mode')
 
-        #labelOpen = QtGui.QLabel('open/edit')
-        openBox = QtGui.QGroupBox('open/edit')
+        #labelOpen = QtWidgets.QLabel('open/edit')
+        openBox = QtWidgets.QGroupBox('open/edit')
         openBox.setAlignment(QtCore.Qt.AlignHCenter)
-        btnCode = QtGui.QPushButton('startscript')
-        btnActivities = QtGui.QPushButton('activities')
-        btnLogs = QtGui.QPushButton('logs')
+        btnCode = QtWidgets.QPushButton('startscript')
+        btnActivities = QtWidgets.QPushButton('activities')
+        btnLogs = QtWidgets.QPushButton('logs')
 
         btnStart.clicked.connect(self._startPYZ)
         btnCode.clicked.connect(self._treeView.editStartScriptInSelected)
 
-        lBtn = QtGui.QHBoxLayout()
-        lStart = QtGui.QVBoxLayout()
-        lOpen = QtGui.QHBoxLayout()
+        lBtn = QtWidgets.QHBoxLayout()
+        lStart = QtWidgets.QVBoxLayout()
+        lOpen = QtWidgets.QHBoxLayout()
         #lOpen.addWidget(openBox)
         openBox.setLayout(lOpen)
         lBtn.addLayout(lStart)
@@ -459,7 +459,7 @@ class _PyzInfo(QtGui.QWidget):
         lStart.addWidget(self._btnDebug)
 
         #lOpen.addWidget(labelOpen, alignment=QtCore.Qt.AlignCenter)
-    #    lOpenBtn = QtGui.QHBoxLayout()
+    #    lOpenBtn = QtWidgets.QHBoxLayout()
         #lOpen.addLayout(lOpenBtn)
         lOpen.addWidget(btnCode)
         lOpen.addWidget(btnActivities)
@@ -512,10 +512,10 @@ class _PyzInfo(QtGui.QWidget):
 
 
 
-class _FileSystemModel(QtGui.QFileSystemModel):
+class _FileSystemModel(QtWidgets.QFileSystemModel):
 
     def __init__(self, view, file_type):
-        QtGui.QFileSystemModel.__init__(self, view)
+        QtWidgets.QFileSystemModel.__init__(self, view)
         self.view = view
         self.file_type = file_type
 
@@ -593,7 +593,7 @@ class _FileSystemModel(QtGui.QFileSystemModel):
 
 
 if __name__ == '__main__':
-    app = QtGui.QApplication([])
+    app = QtWidgets.QApplication([])
     a= Launcher()
     a.show()
     sys.exit(app.exec_())
