@@ -28,8 +28,6 @@ import pickle as pickle
 
 import __main__
 
-
-
 class Session(QtCore.QObject):
     '''Session management to be accessible in QtWidgets.QApplication.instance().session
 
@@ -41,9 +39,9 @@ class Session(QtCore.QObject):
     * gives option of debug mode
     '''
 
-#     sigPathChanged = QtCore.pyqtSignal(object) #path
-    sigSave = QtCore.pyqtSignal(object)        # state dict
-    sigRestore = QtCore.pyqtSignal(object)     # state dict
+#     sigPathChanged = QtCore.Signal(object) #path
+    sigSave = QtCore.Signal(object)        # state dict
+    sigRestore = QtCore.Signal(object)     # state dict
 
     def __init__(self, args, **kwargs):
         """
