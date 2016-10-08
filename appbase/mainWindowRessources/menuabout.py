@@ -1,22 +1,22 @@
 # -*- coding: utf-8 -*-
 from __future__ import division
 
-from PyQt4 import QtGui, QtSvg
+from qtpy import QtGui, QtPrintSupport, QtWidgets, QtSvg
 
 
 
-class MenuAbout(QtGui.QWidget):
+class MenuAbout(QtWidgets.QWidget):
     """Create a simple about window, showing a logo
 
     and general information defined in the main modules __init__.py file
     """
     def __init__(self, parent=None):
-        self.app = QtGui.QApplication.instance()
+        self.app = QtWidgets.QApplication.instance()
 
         super(MenuAbout, self).__init__(parent)
         self.setWindowTitle('About')
 
-        l = QtGui.QHBoxLayout()
+        l = QtWidgets.QHBoxLayout()
         self.setLayout(l)
         logo = QtSvg.QSvgWidget(self.app.session.ICON)
         s = logo.sizeHint()
@@ -24,7 +24,7 @@ class MenuAbout(QtGui.QWidget):
         h = 150
         w = h/aR
         logo.setFixedSize(w, h)
-        self.label_txt = QtGui.QLabel()
+        self.label_txt = QtWidgets.QLabel()
 
         l.addWidget(logo)
         l.addWidget(self.label_txt)

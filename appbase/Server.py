@@ -1,9 +1,9 @@
 from __future__ import absolute_import
-from PyQt4 import QtGui
+from qtpy import QtGui, QtPrintSupport, QtWidgets
 
 
 
-class Server(QtGui.QSystemTrayIcon):
+class Server(QtWidgets.QSystemTrayIcon):
     '''
     a system tray icon to 
     
@@ -14,11 +14,11 @@ class Server(QtGui.QSystemTrayIcon):
     def __init__(self, win, parent=None):
         name = win.windowTitle()
         icon = win.windowIcon()
-        QtGui.QSystemTrayIcon.__init__(self, QtGui.QIcon(icon), parent)
-        self.app = QtGui.QApplication.instance()
+        QtWidgets.QSystemTrayIcon.__init__(self, QtGui.QIcon(icon), parent)
+        self.app = QtWidgets.QApplication.instance()
 
 
-        menu = QtGui.QMenu(parent)
+        menu = QtWidgets.QMenu(parent)
         if win:
             self.a_show = menu.addAction("show")
             self.a_hide = menu.addAction("hide")
@@ -43,7 +43,7 @@ class Server(QtGui.QSystemTrayIcon):
 
         self.activated.connect(self.clickTrap)
         self.show()
-        self.showMessage(name, '...started', QtGui.QSystemTrayIcon.Information)
+        self.showMessage(name, '...started', QtWidgets.QSystemTrayIcon.Information)
 
 
     def toggleShowHide(self):
