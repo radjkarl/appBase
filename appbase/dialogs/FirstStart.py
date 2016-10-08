@@ -1,7 +1,7 @@
 from __future__ import print_function
 import sys
 
-from PyQt4 import QtGui
+from qtpy import QtGui, QtPrintSupport, QtWidgets
 
 
 from fancytools.os.isAdmin import isAdmin
@@ -14,12 +14,12 @@ import __main__
 
 
 
-class FirstStart(QtGui.QDialog):
+class FirstStart(QtWidgets.QDialog):
     '''
     Dialog to ask user to embed the application into the OS
     '''
     def __init__(self, session):
-        QtGui.QDialog.__init__(self)
+        QtWidgets.QDialog.__init__(self)
         
         self.name =  session.NAME
         self.ftype = session.FTYPE
@@ -28,18 +28,18 @@ class FirstStart(QtGui.QDialog):
         self.setWindowTitle('Starting %s the first time...' %self.name)
         self.resize(300,100)
 
-        l = QtGui.QVBoxLayout()
+        l = QtWidgets.QVBoxLayout()
         self.setLayout(l)
 
-        self.cb_startmenu = QtGui.QCheckBox('Add to start menu')
+        self.cb_startmenu = QtWidgets.QCheckBox('Add to start menu')
         self.cb_startmenu.setChecked(True)
-        self.cb_mime = QtGui.QCheckBox('Open *.%s files with %s [NEEDS ADMIN]' %(self.ftype, self.name))
+        self.cb_mime = QtWidgets.QCheckBox('Open *.%s files with %s [NEEDS ADMIN]' %(self.ftype, self.name))
         self.cb_mime.setChecked(True)
 
-        self.btn_done = QtGui.QPushButton('Done')
+        self.btn_done = QtWidgets.QPushButton('Done')
         self.btn_done.clicked.connect(self.accept)
 
-        l.addWidget(QtGui.QLabel("The folder '.%s' will be created in \nyour home directory to store all\nnecassary information." %self.name)) 
+        l.addWidget(QtWidgets.QLabel("The folder '.%s' will be created in \nyour home directory to store all\nnecassary information." %self.name)) 
 
         l.addWidget(self.cb_startmenu) 
         l.addWidget(self.cb_mime) 
@@ -80,7 +80,7 @@ class FirstStart(QtGui.QDialog):
             else:
                 embeddIntoOS(app_file, self.ftype, self.name)
         
-        QtGui.QDialog.accept(self)
+        QtWidgets.QDialog.accept(self)
         
   
         

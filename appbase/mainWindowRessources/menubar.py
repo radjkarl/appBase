@@ -3,7 +3,7 @@ from builtins import str
 # -*- coding: utf-8 -*-
 
 #foreign
-from PyQt4 import QtGui
+from qtpy import QtGui, QtPrintSupport, QtWidgets
 
 #this pgk
 from .menupreferences import MenuPreferences
@@ -15,23 +15,23 @@ from fancywidgets.pyQtBased.MenuBar import MenuBar as FWMenuBar
 from fancytools.os.PathStr import PathStr
 
 
-class _RenameStateDialog(QtGui.QDialog):
+class _RenameStateDialog(QtWidgets.QDialog):
     '''
     A simple QDialog asking for a new name for a given save state
     '''
     def __init__(self, oldStateName):
-        QtGui.QDialog.__init__(self)
+        QtWidgets.QDialog.__init__(self)
         self.setWindowTitle('Rename State')
-        l = QtGui.QVBoxLayout()
+        l = QtWidgets.QVBoxLayout()
         self.setLayout(l)
-        hl = QtGui.QHBoxLayout()
-        hl.addWidget(QtGui.QLabel(oldStateName))
-        self.editor = QtGui.QLineEdit(oldStateName)
+        hl = QtWidgets.QHBoxLayout()
+        hl.addWidget(QtWidgets.QLabel(oldStateName))
+        self.editor = QtWidgets.QLineEdit(oldStateName)
         hl.addWidget(self.editor)
         
         l.addLayout(hl)
         
-        self.btn_done = QtGui.QPushButton('Done')
+        self.btn_done = QtWidgets.QPushButton('Done')
         self.btn_done.clicked.connect(self.accept)
         l.addWidget(self.btn_done) 
 
@@ -48,7 +48,7 @@ class MenuBar(FWMenuBar):
     
     def __init__(self):
         super(MenuBar, self).__init__()
-        self.app = QtGui.QApplication.instance()
+        self.app = QtWidgets.QApplication.instance()
         #MENU - FILE
         self.menu_file = self.addMenu('&File')
         new_add = self.menu_file.addAction('New')
@@ -95,7 +95,7 @@ class MenuBar(FWMenuBar):
 
         #MENU - VIEW
         self.menu_view = self.addMenu('&View')
-        self.ckBox_fullscreen =  QtGui.QAction('Fullscreen', self.menu_view, checkable=True)
+        self.ckBox_fullscreen =  QtWidgets.QAction('Fullscreen', self.menu_view, checkable=True)
         self.menu_view.addAction(self.ckBox_fullscreen)
         self.ckBox_fullscreen.setStatusTip('Toggle between window and fullscreen')
         self.ckBox_fullscreen.triggered.connect(self.setFullscreen)
@@ -147,7 +147,7 @@ class MenuBar(FWMenuBar):
         r = _RenameStateDialog(oldStateName)
         ret = r.exec_()
         t = str(r.editor.text())
-        if ret == QtGui.QDialog.Accepted and t and t != oldStateName:
+        if ret == QtWidgets.QDialog.Accepted and t and t != oldStateName:
             self.app.session.renameState(oldStateName, t)
 
 

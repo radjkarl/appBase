@@ -1,13 +1,13 @@
 from builtins import range
 # -*- coding: utf-8 -*-
 
-from PyQt4 import QtGui, QtCore
+from qtpy import QtGui, QtPrintSupport, QtWidgets, QtCore
 
 from fancywidgets.pyQtBased.FingerTabWidget import AutoResizeFingerTabWidget
 
 
 
-class MenuPreferences(QtGui.QWidget):
+class MenuPreferences(QtWidgets.QWidget):
     '''
     The mainWindow preferences shown using fingerTabs
     '''
@@ -31,46 +31,46 @@ class MenuPreferences(QtGui.QWidget):
                 w.update()
             except AttributeError:
                 pass
-        QtGui.QWidget.show(self)
+        QtWidgets.QWidget.show(self)
 
 
 
-class _TabSession(QtGui.QWidget):
+class _TabSession(QtWidgets.QWidget):
     '''
     The fingerTab 'session' in the preferences widget
     '''
     def __init__(self, prefWindow):
         super(_TabSession, self).__init__()
-        self.app = QtGui.QApplication.instance()
+        self.app = QtWidgets.QApplication.instance()
 
-        vlayout = QtGui.QVBoxLayout()
+        vlayout = QtWidgets.QVBoxLayout()
         self.setLayout(vlayout)
         
-        qtrecPrefs = QtGui.QGroupBox("Record Activity")
-        qtrecLayout = QtGui.QVBoxLayout()
+        qtrecPrefs = QtWidgets.QGroupBox("Record Activity")
+        qtrecLayout = QtWidgets.QVBoxLayout()
         qtrecPrefs.setLayout(qtrecLayout)
         vlayout.addWidget(qtrecPrefs)
 
-        l = QtGui.QHBoxLayout()
-        l.addWidget(QtGui.QLabel('max. saved states'))
-        self.maxSessions = QtGui.QSpinBox()
+        l = QtWidgets.QHBoxLayout()
+        l.addWidget(QtWidgets.QLabel('max. saved states'))
+        self.maxSessions = QtWidgets.QSpinBox()
         self.maxSessions.setRange(1,1000)
         self.maxSessions.valueChanged.connect(
             lambda val: self.app.session.opts.__setitem__('maxSessions', val))
         l.addWidget(self.maxSessions)
         qtrecLayout.addLayout(l)
         
-        self.interval = QtGui.QLabel()
+        self.interval = QtWidgets.QLabel()
         
-        self.slider = QtGui.QSlider(QtCore.Qt.Orientation(1), self)#1...horizontal
+        self.slider = QtWidgets.QSlider(QtCore.Qt.Orientation(1), self)#1...horizontal
         self.slider.sliderMoved.connect(self._updateInterval)
         
         qtrecLayout.addWidget(self.interval)
         qtrecLayout.addWidget(self.slider)
         
-        l = QtGui.QHBoxLayout()
-        l.addWidget(QtGui.QLabel('Show close dialog'))
-        self.showCloseDialog = QtGui.QCheckBox()
+        l = QtWidgets.QHBoxLayout()
+        l.addWidget(QtWidgets.QLabel('Show close dialog'))
+        self.showCloseDialog = QtWidgets.QCheckBox()
         self.showCloseDialog.clicked.connect(
             lambda val: self.app.session.app_opts.__setitem__('showCloseDialog', val))
         l.addWidget(self.showCloseDialog)

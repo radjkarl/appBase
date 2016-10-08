@@ -1,6 +1,6 @@
 from __future__ import absolute_import
 
-from PyQt4 import QtGui, QtCore
+from qtpy import QtGui, QtPrintSupport, QtWidgets, QtCore
 
 from appbase.MainWindow import MainWindow
 
@@ -26,34 +26,34 @@ class MultiWorkspaceWindow(MainWindow):
 
         self._workspace_cls = workspaceClass
 
-        self.setCentralWidget(QtGui.QStackedWidget())
+        self.setCentralWidget(QtWidgets.QStackedWidget())
 
         # APPEND MENUBAR
         m = self.menuBar()
-        w = m.menu_workspace = QtGui.QMenu('&Workspace')
+        w = m.menu_workspace = QtWidgets.QMenu('&Workspace')
         m.insertMenuBefore(m.menu_help, w)
 
-        action_add = QtGui.QAction('&Add', w)
+        action_add = QtWidgets.QAction('&Add', w)
         action_add.triggered.connect(self.addWorkspace)
         action_add.setShortcuts(QtGui.QKeySequence(QtCore.Qt.CTRL + QtCore.Qt.Key_W))
         w.addAction(action_add)
 
-        action_close = QtGui.QAction('&Close current', w)
+        action_close = QtWidgets.QAction('&Close current', w)
         action_close.triggered.connect(self.closeCurrentWorkspace)
         action_close.setShortcuts(QtGui.QKeySequence(QtCore.Qt.CTRL + QtCore.Qt.Key_Q))
         w.addAction(action_close)
 
-        action_next = QtGui.QAction('&Next', w)
+        action_next = QtWidgets.QAction('&Next', w)
         action_next.triggered.connect(self.showNextWorkspace)
         action_next.setShortcuts(QtGui.QKeySequence(QtCore.Qt.CTRL + QtCore.Qt.Key_PageUp))
         w.addAction(action_next)
 
-        action_previous = QtGui.QAction('&Previous', w)
+        action_previous = QtWidgets.QAction('&Previous', w)
         action_previous.triggered.connect(self.showPreviousWorkspace)
         action_previous.setShortcuts(QtGui.QKeySequence(QtCore.Qt.CTRL + QtCore.Qt.Key_PageDown))
         w.addAction(action_previous)
 
-        self._menu_workspaces = QtGui.QMenu('Set', w)
+        self._menu_workspaces = QtWidgets.QMenu('Set', w)
         self._menu_workspaces.aboutToShow.connect(self._listWorkspacesInMenu)
         w.addMenu(self._menu_workspaces)
 
@@ -139,7 +139,7 @@ class MultiWorkspaceWindow(MainWindow):
                 t = '[%s] <-' % str(i+1)
             else:
                 t = '[%s]' % str(i+1)
-            a = QtGui.QAction(t, self._menu_workspaces)
+            a = QtWidgets.QAction(t, self._menu_workspaces)
 
             a.triggered.connect(lambda clicked, i=i, self=self: self.showWorkspace(i))
             self._menu_workspaces.addAction(a)
@@ -150,7 +150,7 @@ if __name__ == '__main__':
     from appbase.Application import Application
     import sys
 
-    class Workspace(QtGui.QTextEdit):
+    class Workspace(QtWidgets.QTextEdit):
         def setInactive(self):
             self.append('inactivated')
 
