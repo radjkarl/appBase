@@ -50,7 +50,7 @@ setup(
     license            = package.__license__,
     install_requires= [
         "numpy >= 1.7.1",
-        # "PyQt4 >= 4.11.3", # not installable through pip
+        "qtpy",
         "fancytools >= 0.2",
         "fancywidgets >= 0.1"
     ],

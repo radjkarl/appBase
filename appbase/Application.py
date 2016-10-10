@@ -3,7 +3,7 @@
 #this pkg:
 from appbase.Session import Session
 #foreign:
-from qtpy import QtGui, QtPrintSupport, QtWidgets
+from qtpy import QtWidgets
 import sys
 
 

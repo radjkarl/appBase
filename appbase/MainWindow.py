@@ -7,7 +7,7 @@ from appbase.mainWindowRessources.menubar import MenuBar
 from appbase.Application import Application
     
 #foreign:
-from qtpy import QtGui, QtPrintSupport, QtWidgets
+from qtpy import QtGui, QtWidgets
 
 
 class MainWindow(QtWidgets.QMainWindow):

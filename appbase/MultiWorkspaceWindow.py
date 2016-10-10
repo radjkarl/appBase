@@ -1,6 +1,6 @@
 from __future__ import absolute_import
 
-from qtpy import QtGui, QtPrintSupport, QtWidgets, QtCore
+from qtpy import QtGui, QtWidgets, QtCore
 
 from appbase.MainWindow import MainWindow
 

@@ -13,7 +13,7 @@ from fancytools.os.PathStr import PathStr
 from fancywidgets.pyQtBased.Dialogs import Dialogs
 
 #foreign
-from qtpy import QtGui, QtPrintSupport, QtWidgets, QtCore, QtSvg
+from qtpy import QtGui, QtWidgets, QtCore, QtSvg
 
 #built-in
 import os

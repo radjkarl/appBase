@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import print_function
-# from future import standard_library
-# standard_library.install_aliases()
 
 import numpy as np
 
@@ -23,10 +21,12 @@ import sys
 from distutils.spawn import find_executable
 from zipfile import ZipFile
 from time import gmtime, strftime
-from qtpy import QtCore, QtGui, QtPrintSupport, QtWidgets
+from qtpy import QtCore, QtGui
 import pickle as pickle
 
 import __main__
+
+
 
 class Session(QtCore.QObject):
     '''Session management to be accessible in QtWidgets.QApplication.instance().session
