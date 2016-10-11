@@ -1,52 +1,55 @@
+# coding=utf-8
+from __future__ import absolute_import
+from builtins import str
 # -*- coding: utf-8 -*-
 
-#foreign
-from PyQt4 import QtGui
+# foreign
+from qtpy import QtGui, QtWidgets
 
-#this pgk
-from menupreferences import MenuPreferences
-from menuabout import MenuAbout
-from menuShortcuts import MenuShortcuts
+# this pgk
+from .menupreferences import MenuPreferences
+from .menuabout import MenuAbout
+from .menuShortcuts import MenuShortcuts
 
-#own
+# own
 from fancywidgets.pyQtBased.MenuBar import MenuBar as FWMenuBar
 from fancytools.os.PathStr import PathStr
 
 
-class _RenameStateDialog(QtGui.QDialog):
-    '''
+class _RenameStateDialog(QtWidgets.QDialog):
+    """
     A simple QDialog asking for a new name for a given save state
-    '''
-    def __init__(self, oldStateName):
-        QtGui.QDialog.__init__(self)
-        self.setWindowTitle('Rename State')
-        l = QtGui.QVBoxLayout()
-        self.setLayout(l)
-        hl = QtGui.QHBoxLayout()
-        hl.addWidget(QtGui.QLabel(oldStateName))
-        self.editor = QtGui.QLineEdit(oldStateName)
-        hl.addWidget(self.editor)
-        
-        l.addLayout(hl)
-        
-        self.btn_done = QtGui.QPushButton('Done')
-        self.btn_done.clicked.connect(self.accept)
-        l.addWidget(self.btn_done) 
+    """
 
+    def __init__(self, oldStateName):
+        QtWidgets.QDialog.__init__(self)
+        self.setWindowTitle('Rename State')
+        l = QtWidgets.QVBoxLayout()
+        self.setLayout(l)
+        hl = QtWidgets.QHBoxLayout()
+        hl.addWidget(QtWidgets.QLabel(oldStateName))
+        self.editor = QtWidgets.QLineEdit(oldStateName)
+        hl.addWidget(self.editor)
+
+        l.addLayout(hl)
+
+        self.btn_done = QtWidgets.QPushButton('Done')
+        self.btn_done.clicked.connect(self.accept)
+        l.addWidget(self.btn_done)
 
 
 class MenuBar(FWMenuBar):
-    '''
-    MenuBar including 
+    """
+    MenuBar including
     * File (Save, Load, New...)
     * State (Next, Previous...)
     * View (Fullscreen)
     * Help (Shortcuts, About)
-    '''
-    
+    """
+
     def __init__(self):
         super(MenuBar, self).__init__()
-        self.app = QtGui.QApplication.instance()
+        self.app = QtWidgets.QApplication.instance()
         #MENU - FILE
         self.menu_file = self.addMenu('&File')
         new_add = self.menu_file.addAction('New')
@@ -71,16 +74,20 @@ class MenuBar(FWMenuBar):
 
         self.menu_file.addSeparator()
         self.file_preferences = MenuPreferences(self)
-        self.menu_file.action_preferences = self.menu_file.addAction('Preferences')
-        self.menu_file.action_preferences.triggered.connect(self.file_preferences.show)
+        self.menu_file.action_preferences = self.menu_file.addAction(
+            'Preferences')
+        self.menu_file.action_preferences.triggered.connect(
+            self.file_preferences.show)
 
-        self.menu_file.addAction('Exit').triggered.connect(self.app.closeAllWindows)
+        self.menu_file.addAction('Exit').triggered.connect(
+            self.app.closeAllWindows)
 
         #MENU - STATE
         menu_state = self.addMenu('&State')
         self.a_previous = menu_state.addAction('Previous')
         self.a_previous.setStatusTip('Restore a previously saved state')
-        self.a_previous.triggered.connect(self.app.session.restorePreviousState)
+        self.a_previous.triggered.connect(
+            self.app.session.restorePreviousState)
 
         self.a_next = menu_state.addAction('Next')
         self.a_next.setStatusTip('Restore a previously saved state')
@@ -93,15 +100,17 @@ class MenuBar(FWMenuBar):
 
         #MENU - VIEW
         self.menu_view = self.addMenu('&View')
-        self.ckBox_fullscreen =  QtGui.QAction('Fullscreen', self.menu_view, checkable=True)
+        self.ckBox_fullscreen = QtWidgets.QAction(
+            'Fullscreen', self.menu_view, checkable=True)
         self.menu_view.addAction(self.ckBox_fullscreen)
-        self.ckBox_fullscreen.setStatusTip('Toggle between window and fullscreen')
+        self.ckBox_fullscreen.setStatusTip(
+            'Toggle between window and fullscreen')
         self.ckBox_fullscreen.triggered.connect(self.setFullscreen)
         self.ckBox_fullscreen.setShortcuts(QtGui.QKeySequence('F11'))
 
         #MENU - HELP
         self.menu_help = self.addMenu('&Help')
-        
+
         sc = self.menu_help.addAction('Shortcuts')
         sc.setStatusTip('...list all shortcuts')
         self.shortcutsWidget = MenuShortcuts()
@@ -113,13 +122,12 @@ class MenuBar(FWMenuBar):
         self.aboutWidget = MenuAbout()
         about.triggered.connect(self.aboutWidget.show)
 
-        #CONNECTING TO APPLICATION.SESSION
+        # CONNECTING TO APPLICATION.SESSION
         s = self.app.session
         new_add.triggered.connect(s.new)
         save.triggered.connect(s.save)
         save_as.triggered.connect(lambda checked: s.saveAs())
         open_add.triggered.connect(s.open)
-
 
     def _updateOpenRecentMenu(self):
         self.m_open_recent.clear()
@@ -129,39 +137,35 @@ class MenuBar(FWMenuBar):
             a.setToolTip(s)
             a.triggered.connect(lambda checked, s=s: self.app.session.new(s))
 
-
     def _updateRenameStateActions(self):
         self.m_renameState.clear()
         se = self.app.session
         for s in se.stateNames():
-            txt = '[%s]' %s
+            txt = '[%s]' % s
             if s == se.current_session:
                 txt += ' <-'
             self.m_renameState.addAction(txt).triggered.connect(
-                            lambda checked, s=s: self._showRenameStateDialog(s))
-
+                lambda checked, s=s: self._showRenameStateDialog(s))
 
     def _showRenameStateDialog(self, oldStateName):
         r = _RenameStateDialog(oldStateName)
         ret = r.exec_()
         t = str(r.editor.text())
-        if ret == QtGui.QDialog.Accepted and t and t != oldStateName:
+        if ret == QtWidgets.QDialog.Accepted and t and t != oldStateName:
             self.app.session.renameState(oldStateName, t)
-
 
     def _updateSetStateActions(self):
         self.m_setState.clear()
         se = self.app.session
         for s in se.stateNames():
-            txt = '[%s]' %s
+            txt = '[%s]' % s
             if s == se.current_session:
                 txt += ' <-'
             self.m_setState.addAction(txt).triggered.connect(
-                            lambda checked, s=s: se.restoreStateName(s))
-
+                lambda checked, s=s: se.restoreStateName(s))
 
     def setFullscreen(self, fullscreen):
-        '''toggle between fullscreen and normal window'''
+        """toggle between fullscreen and normal window"""
         if not fullscreen:
             self.ckBox_fullscreen.setChecked(False)
             self.parent().showNormal()

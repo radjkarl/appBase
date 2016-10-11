@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-'''
+"""
 appbase is the foundation for a pyQt based application including:
 
 * save, load, autosave
@@ -7,7 +7,7 @@ appbase is the foundation for a pyQt based application including:
 * fullscreen with F11
 * close-dialog
 * system tray control
-'''
+"""
 
 
 # import os as _os

@@ -1,21 +1,24 @@
+# coding=utf-8
+from __future__ import print_function
+from builtins import str
 # -*- coding: utf-8 -*-
 
 ###############
-#The launcher class is not updated any more
-#I might remove it
+# The launcher class is not updated any more
+# I might remove it
 ###############
 
-#own
+# own
 import appbase
 from fancytools.os.PathStr import PathStr
 from fancywidgets.pyQtBased.Dialogs import Dialogs
 
-#foreign
-from PyQt4 import QtGui, QtCore, QtSvg
+# foreign
+from qtpy import QtGui, QtWidgets, QtCore, QtSvg
 
-#built-in
+# built-in
 import os
-from  zipfile import ZipFile
+from zipfile import ZipFile
 import distutils
 from distutils import spawn
 import subprocess
@@ -26,92 +29,89 @@ import tempfile
 CONFIG_FILE = PathStr.home().join(__name__)
 
 
-
-
-class Launcher(QtGui.QMainWindow):
-    '''
+class Launcher(QtWidgets.QMainWindow):
+    """
     A graphical starter for *.pyz files created by the save-method from
     appbase.MainWindow
-    
+
     NEEDS AN OVERHAUL ... after that's done it will be able to:
-    
+
     * show all *.pyz-files in a filetree
-    * show the session specific ... 
-    
+    * show the session specific ...
+
         * icon
         * description
         * author etc.
     * start, remove, rename, modify a session
     * modify, start a certain state of a session
-    '''
+    """
 
     def __init__(self,
-            title='PYZ-Launcher',
-            icon=None,
-            start_script = None,
-            left_header=None,
-            right_header=None,
-            file_type='pyz'
-            ):
+                 title='PYZ-Launcher',
+                 icon=None,
+                 start_script=None,
+                 left_header=None,
+                 right_header=None,
+                 file_type='pyz'
+                 ):
         self.dialogs = Dialogs()
 
         _path = PathStr.getcwd()
         _default_text_color = '#3c3c3c'
 
         if icon is None:
-            icon = os.path.join(_path,'media','launcher_logo.svg')
+            icon = os.path.join(_path, 'media', 'launcher_logo.svg')
         if start_script is None:
-            start_script = os.path.join(_path,'test_session.py')
+            start_script = os.path.join(_path, 'test_session.py')
         if left_header is None:
-            _description = "<a href=%s style='color: %s'>%s</a>" %(
-                appbase.__url__,_default_text_color,appbase.__description__)
-            
+            _description = "<a href=%s style='color: %s'>%s</a>" % (
+                appbase.__url__, _default_text_color, appbase.__description__)
+
             left_header = """<b>%s</b><br>
                 version&nbsp;&nbsp;
                 <a href=%s style='color: %s'>%s</a><br>
                 autor&nbsp;&nbsp;&nbsp;&nbsp;
-                    <a href=mailto:%s style='color: %s'>%s</a> """ %( #text-decoration:underline
+                    <a href=mailto:%s style='color: %s'>%s</a> """ % (  # text-decoration:underline
                 _description,
-                os.path.join(_path,'media','recent_changes.txt'),
+                os.path.join(_path, 'media', 'recent_changes.txt'),
                 _default_text_color,
                 appbase.__version__,
                 appbase.__email__,
                 _default_text_color,
                 appbase.__author__
-                )
+            )
         if right_header is None:
-            #if no header is given, list all pdfs in folder media as link
+            # if no header is given, list all pdfs in folder media as link
             d = _path
             right_header = ''
             for f in os.listdir(os.path.join(d, 'media')):
                 if f.endswith('.pdf'):
-                    _guidePath = os.path.join(d, 'media',f)
-                    right_header += "<a href=%s style='color: %s'>%s</a><br>" %(
+                    _guidePath = os.path.join(d, 'media', f)
+                    right_header += "<a href=%s style='color: %s'>%s</a><br>" % (
                         _guidePath, _default_text_color, f[:-4])
             right_header = right_header[:-4]
 
-        QtGui.QMainWindow.__init__(self)
-
+        QtWidgets.QMainWindow.__init__(self)
 
         self._start_script = start_script
         self.setWindowTitle(title)
         self.setWindowIcon(QtGui.QIcon(icon))
-        self.resize(900,500)
-        #BASE STRUTURE
-        area = QtGui.QWidget()
+        self.resize(900, 500)
+        # BASE STRUTURE
+        area = QtWidgets.QWidget()
         self.setCentralWidget(area)
-        layout = QtGui.QVBoxLayout()
+        layout = QtWidgets.QVBoxLayout()
         area.setLayout(layout)
-        #header = QtGui.QHBoxLayout()
-        #layout.addLayout(header)
-        #grab the default text color of a qlabel to color all links from blue to it:
-        #LEFT TEXT
-        info = QtGui.QLabel(left_header)
-        info.setOpenExternalLinks (True)
-        #LOGO
-        header = QtGui.QWidget()
+        #header = QtWidgets.QHBoxLayout()
+        # layout.addLayout(header)
+        # grab the default text color of a qlabel to color all links from blue to it:
+        # LEFT TEXT
+        info = QtWidgets.QLabel(left_header)
+        info.setOpenExternalLinks(True)
+        # LOGO
+        header = QtWidgets.QWidget()
         header.setFixedHeight(70)
-        headerlayout = QtGui.QHBoxLayout()
+        headerlayout = QtWidgets.QHBoxLayout()
         header.setLayout(headerlayout)
         logo = QtSvg.QSvgWidget(icon)
         logo.setFixedWidth(50)
@@ -119,34 +119,34 @@ class Launcher(QtGui.QMainWindow):
         headerlayout.addWidget(logo)
         headerlayout.addWidget(info)
         layout.addWidget(header)
-        #RIGHT_HEADER
-        userGuide = QtGui.QLabel(right_header)
+        # RIGHT_HEADER
+        userGuide = QtWidgets.QLabel(right_header)
         userGuide.setOpenExternalLinks(True)
         userGuide.setAlignment(QtCore.Qt.AlignTop | QtCore.Qt.AlignRight)
         headerlayout.addWidget(userGuide)
-        #ROOT-PATH OF THE SESSIONS
-        rootLayout = QtGui.QHBoxLayout()
-        rootFrame = QtGui.QFrame()
-        rootFrame.setFrameStyle(QtGui.QFrame.StyledPanel | QtGui.QFrame.Plain)
+        # ROOT-PATH OF THE SESSIONS
+        rootLayout = QtWidgets.QHBoxLayout()
+        rootFrame = QtWidgets.QFrame()
+        rootFrame.setFrameStyle(
+            QtWidgets.QFrame.StyledPanel | QtWidgets.QFrame.Plain)
         rootFrame.setFixedHeight(45)
         rootFrame.setLineWidth(0)
         rootFrame.setLayout(rootLayout)
         layout.addWidget(rootFrame)
-        self.rootDir = QtGui.QLabel()
+        self.rootDir = QtWidgets.QLabel()
         self.rootDir.setAutoFillBackground(True)
         self.rootDir.setStyleSheet("QLabel { background-color: white; }")
 
-
-        #FILE-BROWSER
+        # FILE-BROWSER
         self.treeView = _TreeView()
 
         self.fileSystemModel = _FileSystemModel(self.treeView, file_type)
-        self.fileSystemModel.setNameFilters(['*.%s' %file_type])
+        self.fileSystemModel.setNameFilters(['*.%s' % file_type])
         self.fileSystemModel.setNameFilterDisables(False)
         self.treeView.setModel(self.fileSystemModel)
 
-        treelayout = QtGui.QHBoxLayout()
-        splitter = QtGui.QSplitter(QtCore.Qt.Orientation(1))
+        treelayout = QtWidgets.QHBoxLayout()
+        splitter = QtWidgets.QSplitter(QtCore.Qt.Orientation(1))
 
         self.fileInfo = _PyzInfo(splitter, self.fileSystemModel, self.treeView)
         self.treeView.clicked.connect(self.fileInfo.update)
@@ -154,18 +154,21 @@ class Launcher(QtGui.QMainWindow):
         splitter.addWidget(self.treeView)
         splitter.addWidget(self.fileInfo)
         treelayout.addWidget(splitter)
-        
+
         layout.addLayout(treelayout)
 
-        #get last root-path
+        # get last root-path
         self._path = PathStr('')
         if CONFIG_FILE:
             try:
-                self._path = PathStr(open(CONFIG_FILE, 'r').read().decode('unicode-escape'))
+                self._path = PathStr(
+                    open(
+                        CONFIG_FILE,
+                        'r').read().decode('unicode-escape'))
             except IOError:
-                pass #file not existant
+                pass  # file not existant
         if not self._path or not self._path.exists():
-            msgBox = QtGui.QMessageBox()
+            msgBox = QtWidgets.QMessageBox()
             msgBox.setText("Please choose your projectDirectory.")
             msgBox.exec_()
             self._changeRootDir()
@@ -173,101 +176,97 @@ class Launcher(QtGui.QMainWindow):
         abspath = os.path.abspath(self._path)
         self.rootDir.setText(abspath)
         rootLayout.addWidget(self.rootDir)
-        #GO UPWARDS ROOT-PATH BUTTON
-        btnUpRootDir = QtGui.QPushButton('up')
+        # GO UPWARDS ROOT-PATH BUTTON
+        btnUpRootDir = QtWidgets.QPushButton('up')
         btnUpRootDir.clicked.connect(self._goUpRootDir)
         rootLayout.addWidget(btnUpRootDir)
-        #DEFINE CURRENT DIR AS ROOT-PATH
-        btnDefineRootDir = QtGui.QPushButton('set')
+        # DEFINE CURRENT DIR AS ROOT-PATH
+        btnDefineRootDir = QtWidgets.QPushButton('set')
         btnDefineRootDir.clicked.connect(self._defineRootDir)
         rootLayout.addWidget(btnDefineRootDir)
-        #SELECT ROOT-PATH BUTTON
-        buttonRootDir = QtGui.QPushButton('select')
+        # SELECT ROOT-PATH BUTTON
+        buttonRootDir = QtWidgets.QPushButton('select')
         buttonRootDir.clicked.connect(self._changeRootDir)
         rootLayout.addWidget(buttonRootDir)
-        #NEW-BUTTON
+        # NEW-BUTTON
         if self._start_script:
-            newButton = QtGui.QPushButton('NEW')
+            newButton = QtWidgets.QPushButton('NEW')
             newButton.clicked.connect(self._openNew)
             layout.addWidget(newButton)
 
     @staticmethod
     def rootDir():
         try:
-            return PathStr(open(CONFIG_FILE, 'r').read().decode('unicode-escape'))
-        except IOError:#create starter
+            return PathStr(
+                open(CONFIG_FILE, 'r').read().decode('unicode-escape'))
+        except IOError:  # create starter
             return PathStr.home()
-        
-
 
     def _goUpRootDir(self):
         self._setRootDir(self._path.dirname())
 
     def _defineRootDir(self):
         i = self.treeView.selectedIndexes()
-        #if not self.treeView.isIndexHidden(i):
+        # if not self.treeView.isIndexHidden(i):
         if i:
             if self.fileSystemModel.isDir(i[0]):
                 self._setRootDir(PathStr(self.fileSystemModel.filePath(i[0])))
 
     def _changeRootDir(self):
-        path =self.dialogs.getExistingDirectory()
+        path = self.dialogs.getExistingDirectory()
         if path:
             self._setRootDir(path)
-
 
     def _setRootDir(self, path):
         self._path = path
         self.rootDir.setText(self._path)
         root = self.fileSystemModel.setRootPath(self._path)
         self.treeView.setRootIndex(root)
-        #save last path to file
+        # save last path to file
         if CONFIG_FILE:
             open(CONFIG_FILE, 'w').write(self._path.encode('unicode-escape'))
 
-
     def _openNew(self):
         p = spawn.find_executable("python")
-        os.spawnl(os.P_NOWAIT, p, 'python', '%s' %self._start_script)
+        os.spawnl(os.P_NOWAIT, p, 'python', '%s' % self._start_script)
 
 
+class _FileEditMenu(QtWidgets.QWidget):
 
-
-class _FileEditMenu(QtGui.QWidget):
     def __init__(self, treeView):
-        QtGui.QWidget.__init__(self)
+        QtWidgets.QWidget.__init__(self)
         self._treeView = treeView
-        self._menu=QtGui.QMenu(self)
+        self._menu = QtWidgets.QMenu(self)
         d = PathStr.getcwd()
-        iconpath = os.path.join(d, 'media','icons','approve.svg')
-        self._actionStart = QtGui.QAction(QtGui.QIcon(iconpath),
-            'Start', self._treeView,
-            triggered=self._treeView.openProject)
+        iconpath = os.path.join(d, 'media', 'icons', 'approve.svg')
+        self._actionStart = QtWidgets.QAction(QtGui.QIcon(iconpath),
+                                              'Start', self._treeView,
+                                              triggered=self._treeView.openProject)
 
-        iconpath = os.path.join(d, 'media','icons','delete.svg')
-        delete = QtGui.QAction(QtGui.QIcon(iconpath),
-            'Delete', self._treeView,
-            triggered=self._treeView.deleteSelected)
+        iconpath = os.path.join(d, 'media', 'icons', 'delete.svg')
+        delete = QtWidgets.QAction(QtGui.QIcon(iconpath),
+                                   'Delete', self._treeView,
+                                   triggered=self._treeView.deleteSelected)
 
-        iconpath = os.path.join(d, 'media','icons','rename.svg')
-        rename = QtGui.QAction(QtGui.QIcon(iconpath),
-            'Rename', self._treeView,
-            triggered=self._treeView.editSelected)
+        iconpath = os.path.join(d, 'media', 'icons', 'rename.svg')
+        rename = QtWidgets.QAction(QtGui.QIcon(iconpath),
+                                   'Rename', self._treeView,
+                                   triggered=self._treeView.editSelected)
 
-        iconpath = os.path.join(d, 'media','icons','new.svg')
-        newDir = QtGui.QAction(QtGui.QIcon(iconpath),
-            'New Directory', self._treeView,
-            triggered=self._treeView.newDirInSelected)
+        iconpath = os.path.join(d, 'media', 'icons', 'new.svg')
+        newDir = QtWidgets.QAction(QtGui.QIcon(iconpath),
+                                   'New Directory', self._treeView,
+                                   triggered=self._treeView.newDirInSelected)
 
-        iconpath = os.path.join(d, 'media','icons','findReplace.svg')
-        self._editStartScript = QtGui.QAction(QtGui.QIcon(iconpath),
-            'Edit start script', self._treeView,
-            triggered=self._treeView.editStartScriptInSelected)
+        iconpath = os.path.join(d, 'media', 'icons', 'findReplace.svg')
+        self._editStartScript = QtWidgets.QAction(QtGui.QIcon(iconpath),
+                                                  'Edit start script', self._treeView,
+                                                  triggered=self._treeView.editStartScriptInSelected)
 
-        iconpath = os.path.join(d, 'media','icons','bug.png')
-        self._actionInDebugMode = QtGui.QAction(QtGui.QIcon(iconpath),
-            'Run in debug mode', self._treeView,
-            triggered=self._treeView.runInDebugMode)
+        iconpath = os.path.join(d, 'media', 'icons', 'bug.png')
+        self._actionInDebugMode = QtWidgets.QAction(QtGui.QIcon(iconpath),
+                                                    'Run in debug mode', self._treeView,
+                                                    triggered=self._treeView.runInDebugMode)
 
         self._menu.addAction(self._actionStart)
         self._menu.addAction(rename)
@@ -276,49 +275,45 @@ class _FileEditMenu(QtGui.QWidget):
         self._menu.addAction(delete)
         self._menu.addAction(self._actionInDebugMode)
 
-
+    # TODO: does not match signature
     def show(self, evt):
         isDir = self._treeView.selectedIsDir(evt.pos())
         self._actionStart.setVisible(not isDir)
         self._editStartScript.setVisible(not isDir)
         self._actionInDebugMode.setVisible(not isDir)
         self._menu.popup(evt.globalPos())
-        
 
 
-
-class _TreeView(QtGui.QTreeView):
+class _TreeView(QtWidgets.QTreeView):
 
     def __init__(self):
         super(_TreeView, self).__init__()
         self.setHeaderHidden(False)
-        self.setExpandsOnDoubleClick(False)#connect own function for doubleclick
+        # connect own function for doubleclick
+        self.setExpandsOnDoubleClick(False)
         self._menu = _FileEditMenu(self)
-        #no editing of the items when clicked, rightclicked, doubleclicked:
-        self.setEditTriggers(QtGui.QAbstractItemView.NoEditTriggers)
-        self.sortByColumn(0, QtCore.Qt.AscendingOrder)#sort by name
+        # no editing of the items when clicked, rightclicked, doubleclicked:
+        self.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
+        self.sortByColumn(0, QtCore.Qt.AscendingOrder)  # sort by name
         self.setSortingEnabled(True)
-        self.setAnimated(True)#expanding/collapsing animated
-        self.setIconSize(QtCore.QSize(60,60))
+        self.setAnimated(True)  # expanding/collapsing animated
+        self.setIconSize(QtCore.QSize(60, 60))
 
-        #DRAG/DROP
+        # DRAG/DROP
         self.setDragEnabled(True)
         self.setAcceptDrops(True)
-        self.setDragDropMode(QtGui.QAbstractItemView.InternalMove)
+        self.setDragDropMode(QtWidgets.QAbstractItemView.InternalMove)
         self.doubleClicked.connect(self._doubleClicked)
-
 
     def keyPressEvent(self, event):
         if event.matches(QtGui.QKeySequence.Delete):
             self.deleteSelected()
 
-
-    def selectionChanged(self,selected, deselected):
+    def selectionChanged(self, selected, deselected):
         for index in deselected.indexes():
-            #print index
+            # print index
             self.closePersistentEditor(index)
         super(_TreeView, self).selectionChanged(selected, deselected)
-
 
     def mousePressEvent(self, event):
         mouseBtn = event.button()
@@ -326,25 +321,21 @@ class _TreeView(QtGui.QTreeView):
             self._menu.show(event)
         super(_TreeView, self).mousePressEvent(event)
 
-
     def deleteSelected(self):
-        msgBox = QtGui.QMessageBox()
+        msgBox = QtWidgets.QMessageBox()
         msgBox.setText("Are you sure?")
-        msgBox.addButton('Yes', QtGui.QMessageBox.YesRole)
-        msgBox.addButton('No', QtGui.QMessageBox.RejectRole)
+        msgBox.addButton('Yes', QtWidgets.QMessageBox.YesRole)
+        msgBox.addButton('No', QtWidgets.QMessageBox.RejectRole)
         ret = msgBox.exec_()
-        if ret == 0:#yes
+        if ret == 0:  # yes
             self.fileSystemModel.remove(self.currentIndex())
-
 
     def selectedIsDir(self, pos):
         index = self.indexAt(pos)
         return self.fileSystemModel.isDir(index)
 
-
     def editSelected(self):
         self.openPersistentEditor(self.currentIndex())
-
 
     def newDirInSelected(self):
         index = self.currentIndex()
@@ -354,101 +345,96 @@ class _TreeView(QtGui.QTreeView):
             self.setExpanded(index, True)
         self.fileSystemModel.mkdir(index, 'NEW')
 
-
     def editStartScriptInSelected(self):
         index = self.currentIndex()
         self.fileSystemModel.editStartScript(index)
 
-
     def dropEvent(self, e):
         index = self.indexAt(e.pos())
-        #only insert into directories
+        # only insert into directories
         if self.fileSystemModel.isDir(index):
-            super(_TreeView,self).dropEvent(e)
-
+            super(_TreeView, self).dropEvent(e)
 
     def setModel(self, model):
         self.fileSystemModel = model
-        super(_TreeView,self).setModel(model)
+        super(_TreeView, self).setModel(model)
         self.setColumnWidth(0, 300)
-        self.hideColumn(1)#type
-        self.hideColumn(2)#size
-
+        self.hideColumn(1)  # type
+        self.hideColumn(2)  # size
 
     def setPath(self, path):
         self._path = path
         root = self.fileSystemModel.setRootPath(self._path)
         self.setRootIndex(root)
 
-
     def _doubleClicked(self, index):
-        #if folder->toggle expanding
-        if     self.fileSystemModel.isDir(index):
-            self.setExpanded(index, not self.isExpanded(index) )
+        # if folder->toggle expanding
+        if self.fileSystemModel.isDir(index):
+            self.setExpanded(index, not self.isExpanded(index))
         else:
             self.openProject(index)
-
 
     def runInDebugMode(self):
         index = self.currentIndex()
         #term = os.environ.get('TERM')
         self.fileSystemModel.updateStartStript(index)
 
-        if os.name == 'posix':#linux
+        if os.name == 'posix':  # linux
             term = 'xterm'
         else:
             sys.exit('debug mode not supported on windows yet')
         subprocess.call([term, '-e',
-            'python %s -d' %self.fileSystemModel.filePath(index)])
+                         'python %s -d' % self.fileSystemModel.filePath(index)])
 
-
-    def openProject(self,index=None):
+    def openProject(self, index=None):
         if not index:
             index = self.currentIndex()
         self.fileSystemModel.updateStartStript(index)
         p = distutils.spawn.find_executable("python")
-        #start an indepentent python-process
-        os.spawnl(os.P_NOWAIT, p, 'python', '%s' %self.fileSystemModel.filePath(index))
+        # start an indepentent python-process
+        os.spawnl(
+            os.P_NOWAIT, p, 'python', '%s' %
+            self.fileSystemModel.filePath(index))
 
 
+class _PyzInfo(QtWidgets.QWidget):
 
-class _PyzInfo(QtGui.QWidget):
     def __init__(self, vsplitter, filesystemmodel, treeView):
-        QtGui.QWidget.__init__(self)
-        self.layout = QtGui.QVBoxLayout()
+        QtWidgets.QWidget.__init__(self)
+        self.layout = QtWidgets.QVBoxLayout()
         self._filesystemmodel = filesystemmodel
         self._treeView = treeView
 
         self.vsplitter = vsplitter
-        self.hsplitter = QtGui.QSplitter(QtCore.Qt.Orientation(0))
+        self.hsplitter = QtWidgets.QSplitter(QtCore.Qt.Orientation(0))
         self.vsplitter.splitterMoved.connect(self.scaleImgV)
         self.hsplitter.splitterMoved.connect(self.scaleImgH)
         self.layout.addWidget(self.hsplitter)
-        self._sizeDefined= False
+        self._sizeDefined = False
         self.setLayout(self.layout)
-        self.img = QtGui.QLabel()
-        self.text = QtGui.QTextEdit()
+        self.img = QtWidgets.QLabel()
+        self.text = QtWidgets.QTextEdit()
         self.text.setReadOnly(True)
         self.hsplitter.addWidget(self.img)
         self.hsplitter.addWidget(self.text)
 
-        btnStart = QtGui.QPushButton('start')
-        self._btnDebug = QtGui.QCheckBox('debug mode')
+        btnStart = QtWidgets.QPushButton('start')
+        self._btnDebug = QtWidgets.QCheckBox('debug mode')
 
-        #labelOpen = QtGui.QLabel('open/edit')
-        openBox = QtGui.QGroupBox('open/edit')
+        #labelOpen = QtWidgets.QLabel('open/edit')
+        openBox = QtWidgets.QGroupBox('open/edit')
         openBox.setAlignment(QtCore.Qt.AlignHCenter)
-        btnCode = QtGui.QPushButton('startscript')
-        btnActivities = QtGui.QPushButton('activities')
-        btnLogs = QtGui.QPushButton('logs')
+        btnCode = QtWidgets.QPushButton('startscript')
+        btnActivities = QtWidgets.QPushButton('activities')
+        btnLogs = QtWidgets.QPushButton('logs')
 
         btnStart.clicked.connect(self._startPYZ)
         btnCode.clicked.connect(self._treeView.editStartScriptInSelected)
 
-        lBtn = QtGui.QHBoxLayout()
-        lStart = QtGui.QVBoxLayout()
-        lOpen = QtGui.QHBoxLayout()
-        #lOpen.addWidget(openBox)
+        lBtn = QtWidgets.QHBoxLayout()
+        lStart = QtWidgets.QVBoxLayout()
+        lOpen = QtWidgets.QHBoxLayout()
+        # lOpen.addWidget(openBox)
         openBox.setLayout(lOpen)
         lBtn.addLayout(lStart)
         lBtn.addWidget(openBox)
@@ -457,8 +443,8 @@ class _PyzInfo(QtGui.QWidget):
         lStart.addWidget(self._btnDebug)
 
         #lOpen.addWidget(labelOpen, alignment=QtCore.Qt.AlignCenter)
-    #    lOpenBtn = QtGui.QHBoxLayout()
-        #lOpen.addLayout(lOpenBtn)
+    #    lOpenBtn = QtWidgets.QHBoxLayout()
+        # lOpen.addLayout(lOpenBtn)
         lOpen.addWidget(btnCode)
         lOpen.addWidget(btnActivities)
         lOpen.addWidget(btnLogs)
@@ -467,36 +453,36 @@ class _PyzInfo(QtGui.QWidget):
 
         self.hide()
 
-
     def _startPYZ(self):
         if self._btnDebug.isChecked():
             self._treeView.runInDebugMode()
         else:
             self._treeView.openProject()
 
-
-    def scaleImgV(self,sizeTreeView,pos):
-        width = self.vsplitter.sizes()[1]-30
+    def scaleImgV(self, sizeTreeView, pos):
+        width = self.vsplitter.sizes()[1] - 30
         self.img.setPixmap(QtGui.QPixmap(self.imgpath).scaledToWidth(width))
 
-
-    def scaleImgH(self,sizeTreeView,pos):
-        height = self.hsplitter.sizes()[0]-30
+    def scaleImgH(self, sizeTreeView, pos):
+        height = self.hsplitter.sizes()[0] - 30
         self.img.setPixmap(QtGui.QPixmap(self.imgpath).scaledToHeight(height))
-
 
     def update(self, index):
         if self._filesystemmodel.isPyz(index):
-            (self.imgpath, description_path) = self._filesystemmodel.extractFiles(index,'screenshot.png', 'description.html')
-            #if not self.imgpath:
+            (self.imgpath, description_path) = self._filesystemmodel.extractFiles(
+                index, 'screenshot.png', 'description.html')
+            # if not self.imgpath:
             #    self.imgpath = self.filesystemmodel.extractFiles(index,'icon')[0]
             #    print self.imgpath
             if self.imgpath:
                 if not self._sizeDefined:
                     self._sizeDefined = True
                     width = 400
-                    self.vsplitter.moveSplitter(400,1)#self.splitter.sizes()[0]*0.5,1)
-                    self.img.setPixmap(QtGui.QPixmap(self.imgpath).scaledToWidth(width))
+                    # self.splitter.sizes()[0]*0.5,1)
+                    self.vsplitter.moveSplitter(400, 1)
+                    self.img.setPixmap(
+                        QtGui.QPixmap(
+                            self.imgpath).scaledToWidth(width))
                 self.img.show()
             else:
                 self.img.hide()
@@ -509,11 +495,10 @@ class _PyzInfo(QtGui.QWidget):
             self.hide()
 
 
-
-class _FileSystemModel(QtGui.QFileSystemModel):
+class _FileSystemModel(QtWidgets.QFileSystemModel):
 
     def __init__(self, view, file_type):
-        QtGui.QFileSystemModel.__init__(self, view)
+        QtWidgets.QFileSystemModel.__init__(self, view)
         self.view = view
         self.file_type = file_type
 
@@ -521,14 +506,12 @@ class _FileSystemModel(QtGui.QFileSystemModel):
         self._editedSessions = {}
         self._tmp_dir_work = tempfile.mkdtemp('PYZ-launcher')
 
-
-    def isPyz(self,index):
-        return unicode(self.fileName(index)).endswith('.%s' %self.file_type)
-
+    def isPyz(self, index):
+        return str(self.fileName(index)).endswith('.%s' % self.file_type)
 
     def extractFiles(self, index, *fnames):
         extnames = []
-        with ZipFile(unicode(self.filePath(index)), 'r') as myzip:
+        with ZipFile(str(self.filePath(index)), 'r') as myzip:
             for name in fnames:
                 try:
                     myzip.extract(name, self._tmp_dir_work)
@@ -537,39 +520,42 @@ class _FileSystemModel(QtGui.QFileSystemModel):
                     extnames.append(None)
         return extnames
 
-
+    # TODO: does not match signature
     def data(self, index, role):
-        '''use zipped icon.png as icon'''
+        """use zipped icon.png as icon"""
         if index.column() == 0 and role == QtCore.Qt.DecorationRole:
             if self.isPyz(index):
-                with ZipFile(unicode(self.filePath(index)), 'r') as myzip:
-                #    print myzip.namelist()
+                with ZipFile(str(self.filePath(index)), 'r') as myzip:
+                    #    print myzip.namelist()
                     try:
                         myzip.extract('icon', self._tmp_dir_work)
-                        p = os.path.join(self._tmp_dir_work,'icon')
+                        p = os.path.join(self._tmp_dir_work, 'icon')
                         return QtGui.QIcon(p)
                     except KeyError:
                         pass
         return super(_FileSystemModel, self).data(index, role)
 
-
     def editStartScript(self, index):
-        '''open, edit, replace __main__.py'''
-        f = unicode(self.fileName(index))
-        if f.endswith('.%s' %self.file_type):
-            zipname = unicode(self.filePath(index))
+        """open, edit, replace __main__.py"""
+        f = str(self.fileName(index))
+        if f.endswith('.%s' % self.file_type):
+            zipname = str(self.filePath(index))
             with ZipFile(zipname, 'a') as myzip:
-                #extract+save script in tmp-dir:
+                # extract+save script in tmp-dir:
                 myzip.extract('__main__.py', self._tmp_dir_work)
                 tempfilename = f[:-4]
                 tempfilepath = os.path.join(self._tmp_dir_work, tempfilename)
-                os.rename(os.path.join(self._tmp_dir_work, '__main__.py'),tempfilepath)
+                os.rename(
+                    os.path.join(
+                        self._tmp_dir_work,
+                        '__main__.py'),
+                    tempfilepath)
                 self.openTxt(tempfilepath)
-                self._editedSessions[index] = (zipname,self._tmp_dir_work, tempfilename)
+                self._editedSessions[index] = (
+                    zipname, self._tmp_dir_work, tempfilename)
 
-
-    def openTxt(self,path):
-        #open and editor (depending on platform):
+    def openTxt(self, path):
+        # open and editor (depending on platform):
         if sys.platform.startswith('darwin'):
             subprocess.call(('open', path))
         elif os.name == 'nt':
@@ -577,21 +563,20 @@ class _FileSystemModel(QtGui.QFileSystemModel):
         elif os.name == 'posix':
             subprocess.call(('xdg-open', path))
 
-
-    def updateStartStript(self,index):
+    def updateStartStript(self, index):
         if index in self._editedSessions:
-            zipname,dirname, tempfilename = self._editedSessions[index]
-            tempfilepath = os.path.join(dirname,tempfilename)
-            #print dirname, tempfilename
+            zipname, dirname, tempfilename = self._editedSessions[index]
+            tempfilepath = os.path.join(dirname, tempfilename)
+            # print dirname, tempfilename
             if os.path.exists(tempfilepath):
-                print "adopt changed startScript '%s'" %tempfilename
+                print("adopt changed startScript '%s'" % tempfilename)
                 with ZipFile(zipname, 'a') as myzip:
                     myzip.write(tempfilepath, '__main__.py')
                 os.remove(tempfilepath)
 
 
 if __name__ == '__main__':
-    app = QtGui.QApplication([])
-    a= Launcher()
+    app = QtWidgets.QApplication([])
+    a = Launcher()
     a.show()
     sys.exit(app.exec_())
