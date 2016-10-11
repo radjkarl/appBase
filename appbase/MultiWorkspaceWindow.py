@@ -5,7 +5,6 @@ from qtpy import QtGui, QtPrintSupport, QtWidgets, QtCore
 from appbase.MainWindow import MainWindow
 
 
-
 class MultiWorkspaceWindow(MainWindow):
     '''Adding workspace management to appbase.MainWindow
 
@@ -35,22 +34,34 @@ class MultiWorkspaceWindow(MainWindow):
 
         action_add = QtWidgets.QAction('&Add', w)
         action_add.triggered.connect(self.addWorkspace)
-        action_add.setShortcuts(QtGui.QKeySequence(QtCore.Qt.CTRL + QtCore.Qt.Key_W))
+        action_add.setShortcuts(
+            QtGui.QKeySequence(
+                QtCore.Qt.CTRL +
+                QtCore.Qt.Key_W))
         w.addAction(action_add)
 
         action_close = QtWidgets.QAction('&Close current', w)
         action_close.triggered.connect(self.closeCurrentWorkspace)
-        action_close.setShortcuts(QtGui.QKeySequence(QtCore.Qt.CTRL + QtCore.Qt.Key_Q))
+        action_close.setShortcuts(
+            QtGui.QKeySequence(
+                QtCore.Qt.CTRL +
+                QtCore.Qt.Key_Q))
         w.addAction(action_close)
 
         action_next = QtWidgets.QAction('&Next', w)
         action_next.triggered.connect(self.showNextWorkspace)
-        action_next.setShortcuts(QtGui.QKeySequence(QtCore.Qt.CTRL + QtCore.Qt.Key_PageUp))
+        action_next.setShortcuts(
+            QtGui.QKeySequence(
+                QtCore.Qt.CTRL +
+                QtCore.Qt.Key_PageUp))
         w.addAction(action_next)
 
         action_previous = QtWidgets.QAction('&Previous', w)
         action_previous.triggered.connect(self.showPreviousWorkspace)
-        action_previous.setShortcuts(QtGui.QKeySequence(QtCore.Qt.CTRL + QtCore.Qt.Key_PageDown))
+        action_previous.setShortcuts(
+            QtGui.QKeySequence(
+                QtCore.Qt.CTRL +
+                QtCore.Qt.Key_PageDown))
         w.addAction(action_previous)
 
         self._menu_workspaces = QtWidgets.QMenu('Set', w)
@@ -64,7 +75,6 @@ class MultiWorkspaceWindow(MainWindow):
         sc.addShortcut('Alt+PageUp', 'Show next Workspace')
         sc.addShortcut('Alt+PageDown', 'Show previous Workspace')
 
-
     def workspaces(self, index=None):
         '''return generator for all all workspace instances'''
         c = self.centralWidget()
@@ -73,10 +83,8 @@ class MultiWorkspaceWindow(MainWindow):
         else:
             return c.widget(index)
 
-
     def currentWorkspace(self):
         return self.centralWidget().currentWidget()
-
 
     def addWorkspace(self):
         w = self.currentWorkspace()
@@ -86,15 +94,13 @@ class MultiWorkspaceWindow(MainWindow):
         c = self.centralWidget()
         i = c.addWidget(w)
         c.setCurrentIndex(i)
-        self.setTitleAdditive('[%s/%s]' % (i+1, c.count() ) )
+        self.setTitleAdditive('[%s/%s]' % (i + 1, c.count()))
         return w
-
 
     def closeWorkspace(self, ws):
         ws.close()
         self.centralWidget().removeWidget(ws)
         ws.deleteLater()
-
 
     def closeCurrentWorkspace(self):
         c = self.centralWidget()
@@ -102,17 +108,15 @@ class MultiWorkspaceWindow(MainWindow):
         if c.count() == 0:
             self.addWorkspace()
         else:
-            c.setCurrentIndex(c.count()-1)
-            self.setTitleAdditive('[%s/%s]' % (c.count(), c.count() ) )
-
+            c.setCurrentIndex(c.count() - 1)
+            self.setTitleAdditive('[%s/%s]' % (c.count(), c.count()))
 
     def showNextWorkspace(self):
         c = self.centralWidget()
         i = c.currentIndex()
-        if i >= c.count()-1:
+        if i >= c.count() - 1:
             return  # at the end
-        self.showWorkspace(i+1)
-
+        self.showWorkspace(i + 1)
 
     def showWorkspace(self, i):
         c = self.centralWidget()
@@ -120,30 +124,30 @@ class MultiWorkspaceWindow(MainWindow):
         c.setCurrentIndex(i)
         w = c.currentWidget()
         w.setActive()
-        self.setTitleAdditive('[%s/%s]' %(i+1, c.count() ) )
-
+        self.setTitleAdditive('[%s/%s]' % (i + 1, c.count()))
 
     def showPreviousWorkspace(self):
         c = self.centralWidget()
         i = c.currentIndex()
         if i == 0:
             return
-        self.showWorkspace(i-1)
-
+        self.showWorkspace(i - 1)
 
     def _listWorkspacesInMenu(self):
         c = self.centralWidget()
         self._menu_workspaces.clear()
         for i in range(c.count()):
             if i == c.currentIndex():
-                t = '[%s] <-' % str(i+1)
+                t = '[%s] <-' % str(i + 1)
             else:
-                t = '[%s]' % str(i+1)
+                t = '[%s]' % str(i + 1)
             a = QtWidgets.QAction(t, self._menu_workspaces)
 
-            a.triggered.connect(lambda clicked, i=i, self=self: self.showWorkspace(i))
+            a.triggered.connect(
+                lambda clicked,
+                i=i,
+                self=self: self.showWorkspace(i))
             self._menu_workspaces.addAction(a)
-
 
 
 if __name__ == '__main__':
@@ -151,6 +155,7 @@ if __name__ == '__main__':
     import sys
 
     class Workspace(QtWidgets.QTextEdit):
+
         def setInactive(self):
             self.append('inactivated')
 
@@ -169,4 +174,3 @@ You can switch between different workspaces via Menubar->Workspace->Next/Previou
 
     win.show()
     sys.exit(app.exec_())
-

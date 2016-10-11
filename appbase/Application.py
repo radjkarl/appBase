@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 
-#this pkg:
+# this pkg:
 from appbase.Session import Session
-#foreign:
+# foreign:
 from qtpy import QtGui, QtPrintSupport, QtWidgets
 import sys
-
 
 
 class Application(QtWidgets.QApplication):
@@ -13,12 +12,13 @@ class Application(QtWidgets.QApplication):
     A normal QtWidgets.QApplication
     with embedded session management
     '''
+
     def __init__(self, args, **kwargs):
 
         QtWidgets.QApplication.__init__(self, args)
-        #add session features (load, save, restore state etc) can be found in:
+        # add session features (load, save, restore state etc) can be found in:
         self.session = Session(args, **kwargs)
-        #tell the session when to run the quit procedure:
+        # tell the session when to run the quit procedure:
         self.lastWindowClosed.connect(self.session.quit)
 
         if sys.platform.startswith("win"):
@@ -27,10 +27,8 @@ class Application(QtWidgets.QApplication):
             # How to suppress crash notification dialog?, Jan 14,2004 -
             # Raymond Chen's response [1]
             import ctypes
-            SEM_NOGPFAULTERRORBOX = 0x0002 # From MSDN
-            ctypes.windll.kernel32.SetErrorMode(SEM_NOGPFAULTERRORBOX);
-
-
+            SEM_NOGPFAULTERRORBOX = 0x0002  # From MSDN
+            ctypes.windll.kernel32.SetErrorMode(SEM_NOGPFAULTERRORBOX)
 
 
 if __name__ == '__main__':
