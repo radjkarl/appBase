@@ -1,3 +1,4 @@
+# coding=utf-8
 from __future__ import absolute_import
 from builtins import str
 # -*- coding: utf-8 -*-
@@ -15,11 +16,10 @@ from fancywidgets.pyQtBased.MenuBar import MenuBar as FWMenuBar
 from fancytools.os.PathStr import PathStr
 
 
-
 class _RenameStateDialog(QtWidgets.QDialog):
-    '''
+    """
     A simple QDialog asking for a new name for a given save state
-    '''
+    """
 
     def __init__(self, oldStateName):
         QtWidgets.QDialog.__init__(self)
@@ -39,13 +39,13 @@ class _RenameStateDialog(QtWidgets.QDialog):
 
 
 class MenuBar(FWMenuBar):
-    '''
+    """
     MenuBar including
     * File (Save, Load, New...)
     * State (Next, Previous...)
     * View (Fullscreen)
     * Help (Shortcuts, About)
-    '''
+    """
 
     def __init__(self):
         super(MenuBar, self).__init__()
@@ -165,7 +165,7 @@ class MenuBar(FWMenuBar):
                 lambda checked, s=s: se.restoreStateName(s))
 
     def setFullscreen(self, fullscreen):
-        '''toggle between fullscreen and normal window'''
+        """toggle between fullscreen and normal window"""
         if not fullscreen:
             self.ckBox_fullscreen.setChecked(False)
             self.parent().showNormal()

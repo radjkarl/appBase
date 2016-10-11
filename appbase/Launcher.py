@@ -1,3 +1,4 @@
+# coding=utf-8
 from __future__ import print_function
 from builtins import str
 # -*- coding: utf-8 -*-
@@ -29,7 +30,7 @@ CONFIG_FILE = PathStr.home().join(__name__)
 
 
 class Launcher(QtWidgets.QMainWindow):
-    '''
+    """
     A graphical starter for *.pyz files created by the save-method from
     appbase.MainWindow
 
@@ -43,7 +44,7 @@ class Launcher(QtWidgets.QMainWindow):
         * author etc.
     * start, remove, rename, modify a session
     * modify, start a certain state of a session
-    '''
+    """
 
     def __init__(self,
                  title='PYZ-Launcher',
@@ -274,6 +275,7 @@ class _FileEditMenu(QtWidgets.QWidget):
         self._menu.addAction(delete)
         self._menu.addAction(self._actionInDebugMode)
 
+    # TODO: does not match signature
     def show(self, evt):
         isDir = self._treeView.selectedIsDir(evt.pos())
         self._actionStart.setVisible(not isDir)
@@ -518,8 +520,9 @@ class _FileSystemModel(QtWidgets.QFileSystemModel):
                     extnames.append(None)
         return extnames
 
+    # TODO: does not match signature
     def data(self, index, role):
-        '''use zipped icon.png as icon'''
+        """use zipped icon.png as icon"""
         if index.column() == 0 and role == QtCore.Qt.DecorationRole:
             if self.isPyz(index):
                 with ZipFile(str(self.filePath(index)), 'r') as myzip:
@@ -533,7 +536,7 @@ class _FileSystemModel(QtWidgets.QFileSystemModel):
         return super(_FileSystemModel, self).data(index, role)
 
     def editStartScript(self, index):
-        '''open, edit, replace __main__.py'''
+        """open, edit, replace __main__.py"""
         f = str(self.fileName(index))
         if f.endswith('.%s' % self.file_type):
             zipname = str(self.filePath(index))

@@ -1,10 +1,11 @@
+# coding=utf-8
 from qtpy import QtWidgets
 
 
 class MenuShortcuts(QtWidgets.QWidget):
-    '''
+    """
     Window showing the application shortcuts
-    '''
+    """
 
     def __init__(self):
         QtWidgets.QWidget.__init__(self)

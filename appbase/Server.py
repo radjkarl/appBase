@@ -1,14 +1,16 @@
+# coding=utf-8
 from __future__ import absolute_import
-from qtpy import QtGui, QtPrintSupport, QtWidgets
+
+from qtpy import QtGui, QtWidgets
 
 
 class Server(QtWidgets.QSystemTrayIcon):
-    '''
+    """
     a system tray icon to
 
     * show/hide the current session [left mouse button]
     * show options(load, save, new) [right mouse button]
-    '''
+    """
 
     def __init__(self, win, parent=None):
         name = win.windowTitle()

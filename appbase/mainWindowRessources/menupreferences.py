@@ -7,9 +7,9 @@ from fancywidgets.pyQtBased.FingerTabWidget import AutoResizeFingerTabWidget
 
 
 class MenuPreferences(QtWidgets.QWidget):
-    '''
+    """
     The mainWindow preferences shown using fingerTabs
-    '''
+    """
 
     def __init__(self, win, parent=None):
 
@@ -33,9 +33,9 @@ class MenuPreferences(QtWidgets.QWidget):
 
 
 class _TabSession(QtWidgets.QWidget):
-    '''
+    """
     The fingerTab 'session' in the preferences widget
-    '''
+    """
 
     def __init__(self, prefWindow):
         super(_TabSession, self).__init__()

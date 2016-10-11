@@ -11,7 +11,7 @@ from qtpy import QtGui, QtWidgets
 
 
 class MainWindow(QtWidgets.QMainWindow):
-    '''
+    """
     template for QMainWindow including:
 
     * a menu bar with all common features
@@ -20,7 +20,7 @@ class MainWindow(QtWidgets.QMainWindow):
     * Preferences in Menubar->File
     * autosave
     * close dialog
-    '''
+    """
 
     def __init__(self, title=''):
         super(MainWindow, self).__init__()

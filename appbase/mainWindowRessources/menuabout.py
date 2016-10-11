@@ -30,9 +30,9 @@ class MenuAbout(QtWidgets.QWidget):
         l.addWidget(self.label_txt)
 
     def setModule(self, mod):
-        '''
+        """
         fill the about about label txt with the module attributes of the module
-        '''
+        """
         txt = """<b>%s</b> - %s<br><br>
 Author:        %s<br>
 Email:        %s<br>

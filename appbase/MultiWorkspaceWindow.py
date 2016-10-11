@@ -1,3 +1,4 @@
+# coding=utf-8
 from __future__ import absolute_import
 
 from qtpy import QtGui, QtWidgets, QtCore
@@ -6,21 +7,21 @@ from appbase.MainWindow import MainWindow
 
 
 class MultiWorkspaceWindow(MainWindow):
-    '''Adding workspace management to appbase.MainWindow
+    """Adding workspace management to appbase.MainWindow
 
     * 'Workspace' menu in menu bar
     * Switch between workspaces with [Ctrl]+[Page up/down]
     * Add workspace with [Ctrl]+[W]
     * Remove current workspace with [Ctrl]+[Q]
-    '''
+    """
 
     def __init__(self, workspaceClass, *args, **kwargs):
-        '''
+        """
         workspaceClass needs to have the following methods:
 
         * def setActive -> called when workspace is activated
         * def setInactive -> called when workspace is deactivated
-        '''
+        """
         MainWindow.__init__(self, *args, **kwargs)
 
         self._workspace_cls = workspaceClass
@@ -76,7 +77,7 @@ class MultiWorkspaceWindow(MainWindow):
         sc.addShortcut('Alt+PageDown', 'Show previous Workspace')
 
     def workspaces(self, index=None):
-        '''return generator for all all workspace instances'''
+        """return generator for all all workspace instances"""
         c = self.centralWidget()
         if index is None:
             return (c.widget(n) for n in range(c.count()))

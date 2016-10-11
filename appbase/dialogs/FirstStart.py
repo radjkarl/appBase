@@ -1,3 +1,4 @@
+# coding=utf-8
 from __future__ import print_function
 import sys
 
@@ -14,9 +15,9 @@ import __main__
 
 
 class FirstStart(QtWidgets.QDialog):
-    '''
+    """
     Dialog to ask user to embed the application into the OS
-    '''
+    """
 
     def __init__(self, session):
         QtWidgets.QDialog.__init__(self)
@@ -49,11 +50,12 @@ class FirstStart(QtWidgets.QDialog):
         l.addWidget(self.cb_startmenu)
         l.addWidget(self.cb_mime)
         l.addWidget(self.btn_done)
-
+    
+    # TODO: does not match signature
     def accept(self, evt):
-        '''
+        """
         write setting to the preferences
-        '''
+        """
         # determine if application is a script file or frozen exe (pyinstaller)
         frozen = getattr(sys, 'frozen', False)
         if frozen:

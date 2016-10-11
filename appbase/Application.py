@@ -8,10 +8,10 @@ import sys
 
 
 class Application(QtWidgets.QApplication):
-    '''
+    """
     A normal QtWidgets.QApplication
     with embedded session management
-    '''
+    """
 
     def __init__(self, args, **kwargs):
 
