@@ -1,4 +1,4 @@
-from qtpy import QtGui, QtPrintSupport, QtWidgets
+from qtpy import QtWidgets
 
 
 class MenuShortcuts(QtWidgets.QWidget):

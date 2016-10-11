@@ -1,7 +1,7 @@
 from __future__ import print_function
 import sys
 
-from qtpy import QtGui, QtPrintSupport, QtWidgets
+from qtpy import QtWidgets
 
 
 from fancytools.os.isAdmin import isAdmin

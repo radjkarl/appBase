@@ -3,7 +3,7 @@ from builtins import str
 # -*- coding: utf-8 -*-
 
 # foreign
-from qtpy import QtGui, QtPrintSupport, QtWidgets
+from qtpy import QtGui, QtWidgets
 
 # this pgk
 from .menupreferences import MenuPreferences
@@ -13,6 +13,7 @@ from .menuShortcuts import MenuShortcuts
 # own
 from fancywidgets.pyQtBased.MenuBar import MenuBar as FWMenuBar
 from fancytools.os.PathStr import PathStr
+
 
 
 class _RenameStateDialog(QtWidgets.QDialog):

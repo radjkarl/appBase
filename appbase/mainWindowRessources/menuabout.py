@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import division
 
-from qtpy import QtGui, QtPrintSupport, QtWidgets, QtSvg
+from qtpy import QtWidgets, QtSvg
 
 
 class MenuAbout(QtWidgets.QWidget):

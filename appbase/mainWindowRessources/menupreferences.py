@@ -1,7 +1,7 @@
 from builtins import range
 # -*- coding: utf-8 -*-
 
-from qtpy import QtGui, QtPrintSupport, QtWidgets, QtCore
+from qtpy import QtWidgets, QtCore
 
 from fancywidgets.pyQtBased.FingerTabWidget import AutoResizeFingerTabWidget
 
