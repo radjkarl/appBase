@@ -61,6 +61,7 @@ class Session(QtCore.QObject):
         # hidden app-preferences folder:
         self.dir = PathStr.home().mkdir('.%s' % self.NAME)
         self.APP_CONFIG_FILE = self.dir.join('config.txt')
+        self._tmp_dir_session = None
 
         # session specific options:
         self.opts = _Opts({
@@ -102,22 +103,14 @@ class Session(QtCore.QObject):
         self.saveThread = _SaveThread()
 
         self._createdAutosaveFile = None
-        # make temp-dir
-        # the directory where the content of the *pyz-file will be copied:
-        self.tmp_dir_session = PathStr(
-                tempfile.mkdtemp(
-                        '%s_session' %
-                        self.NAME))
         self.tmp_dir_save_session = None
         # a work-dir for temp. storage:
-        self.tmp_dir_work = PathStr(tempfile.mkdtemp('%s_work' % self.NAME))
+#         self.tmp_dir_work = PathStr(tempfile.mkdtemp('%s_work' % self.NAME))
 
         pathName = self._inspectArguments(args)
-
         self.setSessionPath(pathName)
         if self.opts['createLog']:
             self._setupLogFile()
-
         # create connectable stdout and stderr signal:
         self.streamOut = StreamSignal('out')
         self.streamErr = StreamSignal('err')
@@ -125,7 +118,6 @@ class Session(QtCore.QObject):
         # Auto-save timer:
         self.timerAutosave = QtCore.QTimer()
         self.timerAutosave.timeout.connect(self._autoSave)
-
         self.opts.activate()
         # first thing to do after start:
         QtCore.QTimer.singleShot(0, self.restoreCurrentState)
@@ -228,10 +220,13 @@ New run at %s
         """Returns:
              list: the names of all saved sessions
         """
-        s = self.tmp_dir_session
-        l = s.listdir()
-        l = [x for x in l if s.join(x).isdir()]
-        naturalSorting(l)
+        if self.current_session:
+            s = self.tmp_dir_session
+            l = s.listdir()
+            l = [x for x in l if s.join(x).isdir()]
+            naturalSorting(l)
+        else:
+            l=[]
         # bring autosave to first position:
         if 'autoSave' in l:
             l.remove('autoSave')
@@ -318,7 +313,7 @@ New run at %s
         # REMOVE TEMP FOLDERS
         try:
             self.tmp_dir_session.remove()
-            self.tmp_dir_work.remove()
+#             self.tmp_dir_work.remove()
         except OSError:
             pass  # in case the folders are used by another process
 
@@ -432,6 +427,18 @@ New run at %s
         else:
             win.show()
 
+    @property
+    def tmp_dir_session(self):
+        #only create folder if needed
+        if self._tmp_dir_session is None:
+            # make temp-dir
+            # the directory where the content of the *pyz-file will be copied:
+            self._tmp_dir_session = PathStr(
+                tempfile.mkdtemp(
+                        '%s_session' %
+                        self.NAME))
+        return self._tmp_dir_session
+    
     def _showMainWindow(self):
         try:
             # restore autosave
