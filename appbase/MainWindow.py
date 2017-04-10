@@ -72,7 +72,7 @@ class MainWindow(QtWidgets.QMainWindow):
                                           self._window_title_path))
 
     def closeEvent(self, evt):
-        if self.app.session.app_opts['showCloseDialog']:
+        if self.app.session.opts['showCloseDialog']:
             b = _CloseDialog(self)
             ret = b.exec_()
             if ret == QtWidgets.QMessageBox.Save:
@@ -94,7 +94,7 @@ class _CloseDialog(QtWidgets.QMessageBox):
 
         c = QtWidgets.QCheckBox("don't ask me again")
         c.clicked.connect(
-            lambda val: mainWindow.app.session.app_opts.__setitem__(
+            lambda val: mainWindow.app.session.opts.__setitem__(
                 'showCloseDialog', not val))
         self.layout().addWidget(c, 4, 0, 7, 0)
 

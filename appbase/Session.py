@@ -62,8 +62,9 @@ class Session(QtCore.QObject):
         self.dir = PathStr.home().mkdir('.%s' % self.NAME)
         self.APP_CONFIG_FILE = self.dir.join('config.txt')
         self._tmp_dir_session = None
+        self.current_session = None
 
-        # session specific options:
+        # global session options - same for all new sessions:
         self.opts = _Opts({
             'maxSessions':         3,
             'enableGuiIcons':      True,
@@ -73,9 +74,10 @@ class Session(QtCore.QObject):
             'autosave':            False,
             'autosaveIntervalMin': 15,
             'server':              False,
-        }, self)
-        # global options - same for all new and restored sessions:
-        self.app_opts = {'showCloseDialog': True, 'recent sessions': []}
+            'showCloseDialog': True, 
+            'recent sessions': []  
+                           }, self)
+#         self.app_opts = {'showCloseDialog': True, 'recent sessions': []}
 
         if not self.APP_CONFIG_FILE.exists():
             # allow different first start dialog:
@@ -92,11 +94,11 @@ class Session(QtCore.QObject):
             with open(self.APP_CONFIG_FILE, 'r') as f:
                 r = f.read()
                 if r:
-                    self.app_opts.update(eval(r))
+                    self.opts.update(eval(r))
 
         self._icons_enabled = False
         self.log_file = None
-        dirname = self.app_opts['recent sessions']
+        dirname = self.opts['recent sessions']
         if dirname:
             dirname = PathStr(dirname[-1]).dirname()
         self.dialogs = Dialogs(dirname)
@@ -220,13 +222,12 @@ New run at %s
         """Returns:
              list: the names of all saved sessions
         """
-        if self.current_session:
-            s = self.tmp_dir_session
-            l = s.listdir()
-            l = [x for x in l if s.join(x).isdir()]
-            naturalSorting(l)
-        else:
-            l=[]
+#         if self.current_session:
+        s = self.tmp_dir_session
+        l = [x for x in s.listdir() if s.join(x).isdir()]
+        naturalSorting(l)
+        #else:
+        #    l=[]
         # bring autosave to first position:
         if 'autoSave' in l:
             l.remove('autoSave')
@@ -318,7 +319,7 @@ New run at %s
             pass  # in case the folders are used by another process
 
         with open(self.APP_CONFIG_FILE, 'w') as f:
-            f.write(str(self.app_opts))
+            f.write(str(self.opts))
         # CLOSE LOG FILE
         if self.log_file:
             self.writeLog(False)
@@ -493,7 +494,7 @@ New run at %s
 
         self.current_session = stateName
 
-        r = self.app_opts['recent sessions']
+        r = self.opts['recent sessions']
         try:
             # is this session already exists: remove it
             r.pop(r.index(path))
@@ -501,6 +502,7 @@ New run at %s
             pass
         # add this session at the beginning
         r.insert(0, path)
+
 
 
 class _SaveThread(QtCore.QThread):
@@ -513,27 +515,27 @@ class _SaveThread(QtCore.QThread):
         self.dirpath = dirpath
         self._state = state
 
+
     def _recusiveReplaceArrayWithPlaceholder(self, state):
         """
         replace all numpy.array within the state dict
         with a placeholder
         this allows to save the arrays extra using numpy.save_compressed
         """
-        c = 0
         arrays = {}
 
-        def recursive(c, state):
+        def recursive(state):
             for key, val in state.items():
                 if isinstance(val, dict):
-                    recursive(c, val)
+                    recursive(val)
                 else:
                     if isinstance(val, np.ndarray):
-                        name = 'arr_%i' % c
+                        name = 'arr_%i' %recursive.c
                         arrays[name] = val
                         state[key] = name
-                        c += 1
-
-        recursive(c, state)
+                        recursive.c += 1
+        recursive.c=0
+        recursive(state)
         return arrays
 
     def run(self):
@@ -544,7 +546,7 @@ class _SaveThread(QtCore.QThread):
             pickle.dump(self._state, f)
         # save arrays
         if len(arrays):
-            np.savez_compressed(p.join('arrays.npz'), **arrays)
+            np.savez(p.join('arrays.npz'), **arrays)
         del self._state
         # create zip file
         with ZipFile(self.path, 'w',

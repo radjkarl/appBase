@@ -18,7 +18,7 @@ class MenuPreferences(QtWidgets.QWidget):
         self.setWindowTitle('Preferences')
         self.tabs = AutoResizeFingerTabWidget(self)
         self.resize(300, 200)
-        self.tabs.setFixedSize(300, 200)
+       # self.tabs.setFixedSize(300, 200)
         self.tab_session = _TabSession(self)
         self.tabs.addTab(self.tab_session, 'Session')
 
@@ -72,7 +72,7 @@ class _TabSession(QtWidgets.QWidget):
         l.addWidget(QtWidgets.QLabel('Show close dialog'))
         self.showCloseDialog = QtWidgets.QCheckBox()
         self.showCloseDialog.clicked.connect(
-            lambda val: self.app.session.app_opts.__setitem__('showCloseDialog', val))
+            lambda val: self.app.session.opts.__setitem__('showCloseDialog', val))
         l.addWidget(self.showCloseDialog)
         vlayout.addLayout(l)
         vlayout.addStretch()
@@ -88,7 +88,7 @@ class _TabSession(QtWidgets.QWidget):
         self.maxSessions.setValue(self.app.session.opts['maxSessions'])
 
         self.showCloseDialog.setChecked(
-            self.app.session.app_opts.opts['showCloseDialog'])
+            self.app.session.opts['showCloseDialog'])
 
     def _updateInterval(self, time_min, updateOpts=True):
         if time_min == 0:

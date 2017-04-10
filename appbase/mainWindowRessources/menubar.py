@@ -131,7 +131,7 @@ class MenuBar(FWMenuBar):
 
     def _updateOpenRecentMenu(self):
         self.m_open_recent.clear()
-        for s in self.app.session.app_opts['recent sessions']:
+        for s in self.app.session.opts['recent sessions']:
             s = PathStr(s)
             a = self.m_open_recent.addAction(s.basename())
             a.setToolTip(s)
