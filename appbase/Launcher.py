@@ -65,7 +65,7 @@ class Launcher(QtWidgets.QMainWindow):
             start_script = os.path.join(_path, 'test_session.py')
         if left_header is None:
             _description = "<a href=%s style='color: %s'>%s</a>" % (
-                appbase.__url__, _default_text_color, appbase.__description__)
+                appbase.__url__, _default_text_color, appbase.__doc__)
 
             left_header = """<b>%s</b><br>
                 version&nbsp;&nbsp;

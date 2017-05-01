@@ -1,20 +1,8 @@
 # -*- coding: utf-8 -*-
-
 from __future__ import print_function
 
 import numpy as np
 
-# from this pgk:
-from appbase.Server import Server
-from appbase.dialogs.FirstStart import FirstStart
-
-# other own pgks:
-from fancytools.os.PathStr import PathStr
-from fancytools.utils.StreamSignal import StreamSignal
-from fancytools.fcollections.naturalSorting import naturalSorting
-from fancywidgets.pyQtBased.Dialogs import Dialogs
-
-# foreign pkg:
 import tempfile
 import os
 import sys
@@ -24,11 +12,21 @@ from time import gmtime, strftime
 from qtpy import QtCore, QtGui
 import pickle as pickle
 
+from appbase.Server import Server
+from appbase.dialogs.FirstStart import FirstStart
+
+from fancytools.os.PathStr import PathStr
+from fancytools.utils.StreamSignal import StreamSignal
+from fancytools.fcollections.naturalSorting import naturalSorting
+from fancywidgets.pyQtBased.Dialogs import Dialogs
+
+
 import __main__
 
 
 class Session(QtCore.QObject):
-    """Session management to be accessible in QtWidgets.QApplication.instance().session
+    """Session management to be accessible 
+    in QtWidgets.QApplication.instance().session
 
     * extract the opened (as pyz-zipped) session in a temp folder
     * create 2nd temp-folder for sessions to be saved
@@ -74,9 +72,9 @@ class Session(QtCore.QObject):
             'autosave':            False,
             'autosaveIntervalMin': 15,
             'server':              False,
-            'showCloseDialog': True, 
-            'recent sessions': []  
-                           }, self)
+            'showCloseDialog': True,
+            'recent sessions': []
+        }, self)
 #         self.app_opts = {'showCloseDialog': True, 'recent sessions': []}
 
         if not self.APP_CONFIG_FILE.exists():
@@ -143,8 +141,8 @@ class Session(QtCore.QObject):
                 self.current_session = statename
             else:
                 raise Exception(
-                        "state '%s' not in saved states %s" %
-                        (statename, snames))
+                    "state '%s' not in saved states %s" %
+                    (statename, snames))
         else:
             self.path = None
             self.n_sessions = 0
@@ -185,11 +183,12 @@ class Session(QtCore.QObject):
                     'xubuntu')
                 if this_env in relevant_env:
                     if 'false' in os.popen(
-                            # if the menu-icons on the gnome-desktop are disabled
+                            # if the menu-icons on the gnome-desktop are
+                            # disabled
                             'gconftool-2 --get /desktop/gnome/interface/menus_have_icons').read():
                         print('enable menu-icons')
                         os.system(
-                                'gconftool-2 --type Boolean --set /desktop/gnome/interface/menus_have_icons True')
+                            'gconftool-2 --type Boolean --set /desktop/gnome/interface/menus_have_icons True')
                         self._icons_enabled = True
 
     def _setupLogFile(self):
@@ -226,7 +225,7 @@ New run at %s
         s = self.tmp_dir_session
         l = [x for x in s.listdir() if s.join(x).isdir()]
         naturalSorting(l)
-        #else:
+        # else:
         #    l=[]
         # bring autosave to first position:
         if 'autoSave' in l:
@@ -276,7 +275,7 @@ New run at %s
         if self.current_session:
             orig = self.tmp_dir_save_session
             path = self.tmp_dir_save_session = self.tmp_dir_session.join(
-                    self.current_session)
+                self.current_session)
             with open(path.join('state.pickle'), "rb") as f:
                 state = pickle.load(f)
             p = path.join('arrays.npz')
@@ -290,14 +289,14 @@ New run at %s
             self.tmp_dir_save_session = orig
 
             print(
-                    "==> State [%s] restored from '%s'" %
-                    (self.current_session, self.path))
+                "==> State [%s] restored from '%s'" %
+                (self.current_session, self.path))
 
     def addSession(self):
         self.current_session = self.n_sessions
         self.n_sessions += 1
         self.tmp_dir_save_session = self.tmp_dir_session.join(
-                str(self.n_sessions)).mkdir()
+            str(self.n_sessions)).mkdir()
         self.checkMaxSessions()
 
     def quit(self):
@@ -306,7 +305,7 @@ New run at %s
         if self._icons_enabled:
             print('disable menu-icons')
             os.system(  # restore the standard-setting for seeing icons in the menus
-                    'gconftool-2 --type Boolean --set /desktop/gnome/interface/menus_have_icons False')
+                'gconftool-2 --type Boolean --set /desktop/gnome/interface/menus_have_icons False')
 
         # WAIT FOR PROMT IF IN DEBUG MODE
         if self.opts['debugMode']:
@@ -384,8 +383,8 @@ New run at %s
             if self._createdAutosaveFile:
                 self._createdAutosaveFile.remove()
                 print(
-                        "removed automatically created '%s'" %
-                        self._createdAutosaveFile)
+                    "removed automatically created '%s'" %
+                    self._createdAutosaveFile)
                 self._createdAutosaveFile = None
 
     def replace(self, path):
@@ -430,16 +429,16 @@ New run at %s
 
     @property
     def tmp_dir_session(self):
-        #only create folder if needed
+        # only create folder if needed
         if self._tmp_dir_session is None:
             # make temp-dir
             # the directory where the content of the *pyz-file will be copied:
             self._tmp_dir_session = PathStr(
                 tempfile.mkdtemp(
-                        '%s_session' %
-                        self.NAME))
+                    '%s_session' %
+                    self.NAME))
         return self._tmp_dir_session
-    
+
     def _showMainWindow(self):
         try:
             # restore autosave
@@ -449,7 +448,7 @@ New run at %s
         self._mainWindow.__class__.show(self._mainWindow)
 
     def _hideMainWindow(self):
-        # disable autosave on hidden window
+        # disable autosave when window is hidden
         self._autosave = self.opts['autosave']
         self.opts['autosave'] = False
         self._mainWindow.__class__.hide(self._mainWindow)
@@ -504,7 +503,6 @@ New run at %s
         r.insert(0, path)
 
 
-
 class _SaveThread(QtCore.QThread):
     """Run the saving procedure in a thread to be non-blocking
     """
@@ -514,7 +512,6 @@ class _SaveThread(QtCore.QThread):
         self.path = path
         self.dirpath = dirpath
         self._state = state
-
 
     def _recusiveReplaceArrayWithPlaceholder(self, state):
         """
@@ -530,11 +527,11 @@ class _SaveThread(QtCore.QThread):
                     recursive(val)
                 else:
                     if isinstance(val, np.ndarray):
-                        name = 'arr_%i' %recursive.c
+                        name = 'arr_%i' % recursive.c
                         arrays[name] = val
                         state[key] = name
                         recursive.c += 1
-        recursive.c=0
+        recursive.c = 0
         recursive(state)
         return arrays
 
@@ -565,9 +562,9 @@ class _SaveThread(QtCore.QThread):
                 dirname = root.replace(basedir, '')
                 for f in files:
                     zipFile.write(
-                            os.path.join(
-                                    root, f), os.path.join(
-                                    dirname, f))
+                        os.path.join(
+                            root, f), os.path.join(
+                            dirname, f))
 
         print("|%s| ==> State [%s] saved to '%s'" % (
             strftime("%H:%M:%S", gmtime()),
@@ -588,7 +585,6 @@ class _Opts(dict):
         self._activated = True
         self.update(self)
 
-    # TODO: does not match signature
     def update(self, d):
         for key, val in d.items():
             self.__setitem__(key, val)
