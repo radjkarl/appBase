@@ -1,13 +1,11 @@
 # -*- coding: utf-8 -*-
 # this pkg:
 from __future__ import print_function
-from __future__ import absolute_import
+
+from qtpy import QtGui, QtWidgets
 
 from appbase.mainWindowRessources.menubar import MenuBar
 from appbase.Application import Application
-
-# foreign:
-from qtpy import QtGui, QtWidgets
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -28,7 +26,9 @@ class MainWindow(QtWidgets.QMainWindow):
         if not isinstance(self.app, Application):
             print('Error: QApp is no instance from appbase.Application')
             return
-        fn = lambda state: self.setTitlePath(self.app.session.path)
+
+        def fn(state):
+            return self.setTitlePath(self.app.session.path)
 
         self.app.session.sigRestore.connect(fn)
         self.app.session.sigSave.connect(fn)
@@ -100,6 +100,8 @@ class _CloseDialog(QtWidgets.QMessageBox):
 
 
 if __name__ == '__main__':
+    import sys
+
     def save(session):
         print('saveTest')
         print(session.path)
@@ -107,7 +109,6 @@ if __name__ == '__main__':
     def restore(session):
         print('restore')
 
-    import sys
     app = Application([])
     win = MainWindow(title='Hello World')
     # CONNECT OWN SAVE/RESTORE FUNCTIONS TO THE SESSION

@@ -1,7 +1,5 @@
 # coding=utf-8
 from __future__ import absolute_import
-from builtins import str
-# -*- coding: utf-8 -*-
 
 # foreign
 from qtpy import QtGui, QtWidgets

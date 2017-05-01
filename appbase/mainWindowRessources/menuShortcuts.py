@@ -4,7 +4,7 @@ from qtpy import QtWidgets
 
 class MenuShortcuts(QtWidgets.QWidget):
     """
-    Window showing the application shortcuts
+    Window displaying the application shortcuts
     """
 
     def __init__(self):

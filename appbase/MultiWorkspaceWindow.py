@@ -1,6 +1,4 @@
 # coding=utf-8
-from __future__ import absolute_import
-
 from qtpy import QtGui, QtWidgets, QtCore
 
 from appbase.MainWindow import MainWindow
@@ -170,7 +168,8 @@ if __name__ == '__main__':
     win.addWorkspace()
 
     win.currentWorkspace().setText("""This is workspace [2]
-You can switch between different workspaces via Menubar->Workspace->Next/Previous
+You can switch between different workspaces 
+via Menubar->Workspace->Next/Previous
 -------""")
 
     win.show()

@@ -1,4 +1,3 @@
-from builtins import range
 # -*- coding: utf-8 -*-
 
 from qtpy import QtWidgets, QtCore
@@ -18,8 +17,7 @@ class MenuPreferences(QtWidgets.QWidget):
         self.setWindowTitle('Preferences')
         self.tabs = AutoResizeFingerTabWidget(self)
         self.resize(300, 200)
-       # self.tabs.setFixedSize(300, 200)
-        self.tab_session = _TabSession(self)
+        self.tab_session = _TabSession()
         self.tabs.addTab(self.tab_session, 'Session')
 
     def show(self):
@@ -37,7 +35,7 @@ class _TabSession(QtWidgets.QWidget):
     The fingerTab 'session' in the preferences widget
     """
 
-    def __init__(self, prefWindow):
+    def __init__(self):
         super(_TabSession, self).__init__()
         self.app = QtWidgets.QApplication.instance()
 

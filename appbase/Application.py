@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
-
-# this pkg:
-from appbase.Session import Session
-# foreign:
 from qtpy import QtWidgets
 import sys
+
+from appbase.Session import Session
 
 
 class Application(QtWidgets.QApplication):

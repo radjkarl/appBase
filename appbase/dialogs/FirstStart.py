@@ -4,7 +4,6 @@ import sys
 
 from qtpy import QtWidgets
 
-
 from fancytools.os.isAdmin import isAdmin
 from fancytools.os.PathStr import PathStr
 from fancytools.os.StartMenuEntry import StartMenuEntry
@@ -44,13 +43,15 @@ class FirstStart(QtWidgets.QDialog):
 
         l.addWidget(
             QtWidgets.QLabel(
-                "The folder '.%s' will be created in \nyour home directory to store all\nnecassary information." %
+                """The folder '.%s' will be created in 
+your home directory to store all
+necassary information.""" %
                 self.name))
 
         l.addWidget(self.cb_startmenu)
         l.addWidget(self.cb_mime)
         l.addWidget(self.btn_done)
-    
+
     # TODO: does not match signature
     def accept(self, evt):
         """
@@ -65,7 +66,7 @@ class FirstStart(QtWidgets.QDialog):
 
         if self.cb_startmenu.isChecked():
             # TODO: allow only logo location
-            #icon = app_file.dirname().join('media', 'logo.ico')
+            # icon = app_file.dirname().join('media', 'logo.ico')
             StartMenuEntry(self.name, app_file, icon=self.icon,
                            console=False).create()
 
