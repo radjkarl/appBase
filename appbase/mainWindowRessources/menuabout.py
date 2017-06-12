@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import division
-
-from qtpy import QtWidgets, QtSvg
+from qtpy import QtWidgets, QtSvg, QtGui, QtCore
 
 
 class MenuAbout(QtWidgets.QWidget):
@@ -49,11 +47,29 @@ Url:            <a href="%s">%s</a>""" % (
         self.label_txt.setText(txt)
         self.label_txt.setOpenExternalLinks(True)
 
-    def setInstitutionLogo(self, path):
-        logo = QtSvg.QSvgWidget(path)
-        s = logo.sizeHint()
-        aR = s.height() / s.width()
-        h = 150
-        w = h / aR
-        logo.setFixedSize(int(w), int(h))
-        self.layout().addWidget(logo)
+    def setInstitutionLogo(self, pathList: tuple):
+        """
+        takes one or more [logo].svg paths
+            if logo should be clickable, set
+                pathList = (
+                (my_path1.svg,www.something1.html),
+                (my_path2.svg,www.something2.html),
+                ...)
+        """
+        for p in pathList:
+            url = None
+            if type(p) in (list, tuple):
+                p, url = p
+            logo = QtSvg.QSvgWidget(p)
+            s = logo.sizeHint()
+            aR = s.height() / s.width()
+            h = 150
+            w = h / aR
+            logo.setFixedSize(int(w), int(h))
+            self.layout().addWidget(logo)
+            if url:
+                logo.mousePressEvent = lambda evt, u=url: self._openUrl(evt, u)
+
+    def _openUrl(self, evt, url):
+        QtGui.QDesktopServices.openUrl(QtCore.QUrl(url))
+        return evt.accept()
